@@ -29,7 +29,7 @@
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--bg);
     color: var(--text);
-    max-width: 640px;
+    max-width: 800px;
     margin: 0 auto;
     padding: 80px 24px 120px;
     line-height: 1.65;
@@ -45,8 +45,8 @@
   }
   
   .avatar {
-    width: 72px;
-    height: 72px;
+    width: 112px;
+    height: 112px;
     border-radius: 50%;
     background: var(--code-bg);
     object-fit: cover;
