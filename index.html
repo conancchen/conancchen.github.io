@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LeBron Chen</title>
+  <meta name="description" content="Personal website of LeBron Chen, Princeton University." />
+  <style>
+    :root {
+      --bg: #fafaf7;
+      --text: #1a1a1a;
+      --muted: #666;
+      --accent: #c0392b;
+      --border: #e5e5e0;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 60px 24px 80px;
+      line-height: 1.6;
+      font-size: 17px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .avatar {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: #ddd;
+      flex-shrink: 0;
+      object-fit: cover;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin: 0 0 4px 0;
+      font-weight: 600;
+    }
+
+    .tagline {
+      color: var(--muted);
+      margin: 0;
+    }
+
+    h2 {
+      font-size: 1.15rem;
+      margin-top: 40px;
+      margin-bottom: 12px;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 6px;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .links {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+      font-size: 0.95rem;
+    }
+
+    .project {
+      margin-bottom: 18px;
+    }
+
+    .project-title {
+      font-weight: 600;
+    }
+
+    .project-desc {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-top: 2px;
+    }
+
+    footer {
+      margin-top: 60px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      text-align: center;
+    }
+
+    @media (max-width: 500px) {
+      header { flex-direction: column; text-align: center; gap: 16px; }
+      body { padding: 40px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <!-- Replace src with your photo, or delete this line -->
+    <img src="profile.jpg" alt="LeBron Chen" class="avatar" onerror="this.style.display='none'" />
+    <div>
+      <h1>LeBron Chen</h1>
+      <p class="tagline">Undergraduate @ Princeton University · Research in 3D scene generation</p>
+      <div class="links">
+        <a href="mailto:your-email@princeton.edu">Email</a>
+        <a href="https://github.com/conancchen">GitHub</a>
+        <a href="#">CV</a>
+        <a href="#">Scholar</a>
+      </div>
+    </div>
+  </header>
+
+  <section>
+    <h2>About</h2>
+    <p>
+      Hi, I'm LeBron — a student at Princeton studying computer science.
+      I'm currently doing research at Princeton SEAS on the
+      <a href="https://infinigen.org/">Infinigen</a> procedural 3D scene
+      generation project. I'm interested in simulation, graphics, and
+      embodied AI.
+    </p>
+    <p>
+      Outside of research, I enjoy [hobbies here] and occasionally write
+      about things I'm learning.
+    </p>
+  </section>
+
+  <section>
+    <h2>Research &amp; Projects</h2>
+
+    <div class="project">
+      <div class="project-title">Infinigen — Procedural 3D Scene Generation</div>
+      <div class="project-desc">
+        Working with the Princeton Vision &amp; Learning Lab on tools for
+        generating diverse synthetic environments for sim-to-real training.
+      </div>
+    </div>
+
+    <div class="project">
+      <div class="project-title">Project Two</div>
+      <div class="project-desc">
+        Short description of another project — what you built and why.
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Coursework</h2>
+    <p>
+      Selected courses: SML301 (Data Analysis), [others] …
+    </p>
+  </section>
+
+  <footer>
+    Last updated April 2026 · Built with HTML and coffee
+  </footer>
+
+</body>
+</html>
