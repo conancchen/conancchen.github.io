@@ -173,3 +173,53 @@
   @media (max-width: 500px) {
     body { padding: 56px 20px 80px; font-size: 15px; }
   }
+
+
+  /* ---------- Collapsible coursework ---------- */
+details {
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+  }
+  
+  details:last-of-type {
+    border-bottom: none;
+  }
+  
+  summary {
+    cursor: pointer;
+    padding: 6px 0;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    user-select: none;
+  }
+  
+  /* hide default disclosure triangle */
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  
+  
+  /* +/- when openning */
+
+  summary::before {
+    content: "+";
+    color: var(--subtle);
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.9em;
+    width: 14px;
+    display: inline-block;
+  }
+  
+  details[open] summary::before {
+    content: "−";
+  }
+
+  
+  details p {
+    padding: 4px 0 8px 22px;
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
