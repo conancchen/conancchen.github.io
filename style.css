@@ -119,13 +119,11 @@
   a {
     color: var(--text);
     text-decoration: none;
-    border-bottom: 1px solid var(--border);
-    transition: border-color 0.15s ease, color 0.15s ease;
+    transition: color 0.15s ease;
   }
-  
+
   a:hover {
     color: var(--hover);
-    border-bottom-color: var(--text);
   }
   
   .links {
