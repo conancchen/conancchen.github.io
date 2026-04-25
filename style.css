@@ -199,9 +199,24 @@
   
   /* ---------- Mobile ---------- */
   @media (max-width: 500px) {
-    body { padding: 56px 20px 80px; font-size: 17px; }
+    body {
+      padding: 56px 20px 80px;
+      font-size: 15px;
+    }
+  
+    h1 {
+      font-size: 1.6rem;
+    }
+  
+    .tagline {
+      font-size: 0.95rem;
+    }
+  
+    p {
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
   }
-
   /* ---------- Collapsible coursework ---------- */
 details {
     margin-bottom: 8px;
@@ -280,16 +295,4 @@ details {
     font-size: 0.75em;
     top: 0.15em;
     color: var(--subtle);
-  }
-
-  /* Default (desktop) */
-html {
-    font-size: 16px;
-  }
-  
-  /* Phones */
-  @media (max-width: 640px) {
-    html {
-      font-size: 14px; /* try 13–15px to taste */
-    }
   }
