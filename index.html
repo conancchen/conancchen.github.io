@@ -13,54 +13,123 @@
 <body>
 
   <header>
-    <img src="profile2.jpg" alt="Conan Chen" class="avatar" onerror="this.style.display='none'" />
-    <h1>Conan Chen</h1>
-    <p class="tagline">ORFE @ Princeton · Undergrad Research @ Princeton Vision & Learning Lab</p>
-    <div class="links">
-      <a href="mailto:conanc@princeton.edu">email</a>
-      <a href="https://www.linkedin.com/in/conan-chen/">linkedin</a>
-      <a href="https://www.strava.com/athletes/42953307">follow me on strava</a>
-
+    <img src="images/profile.jpg" alt="Conan Chen" class="avatar" onerror="this.style.display='none'" />
+    <div class="header-text">
+      <h1>Conan Chen</h1>
+      <p class="tagline">ORFE @ Princeton · Undergrad Researcher @ Princeton Vision &amp; Learning Lab</p>
+      <div class="links">
+        <a href="mailto:conanc@princeton.edu">email</a>
+        <a href="https://www.linkedin.com/in/conan-chen/">linkedin</a>
+        <a href="https://www.strava.com/athletes/42953307">follow me on strava</a>
+      </div>
     </div>
   </header>
 
-  <section>
+  <section class="about">
     <h2>About</h2>
     <p>
-      Hi, I'm Conan. Currently I'm a sophomore at Princeton studying Operations Research & Financial Engineering with minors in Classics, CS, and Stats & Machine Learning.
+      Hi, I'm Conan, a sophomore at Princeton. I'm a Division 1 swimmer on the Princeton Men's Swim Team and study Operations Research
+      & Financial Engineering with minors in Classics, Computer Science, and Stats & Machine Learning.
     </p>
+  </section>
+
+  <section>
+    <h2>Experience</h2>
+
+    <details>
+      <summary>
+        <img src="images/logo1.png" alt="" class="logo" onerror="this.style.visibility='hidden'" />
+        <span class="exp-text"><strong>Quant Researcher @ Paragon Global Investments</strong></span>
+      </summary>
+      <ul>
+        <li>Built time-series momentum strategy weighting 1–24 month signals via mean-variance, penalized logistic, and Bayesian model averaging.</li>
+        <li>Improved out-of-sample Sharpe by 8% over equal-weight baseline on sector ETF backtests.</li>
+        <li>Reduced portfolio turnover with a trend-based gate using t-stats from OLS regressions on past returns.</li>
+      </ul>
+    </details>
+
+    <details>
+      <summary>
+        <img src="images/logo2.png" alt="" class="logo" onerror="this.style.visibility='hidden'" />
+        <span class="exp-text"><strong>Intern @ Scale AI</strong></span>
+      </summary>
+      <ul>
+        <li>Designed AIME/USAMO-level math problems to benchmark reasoning capabilities of frontier LLMs.</li>
+        <li>Built evaluation frameworks to test deep research models on multi-step reasoning tasks.</li>
+      </ul>
+    </details>
+
+    <details>
+      <summary>
+        <img src="images/logo3.png" alt="" class="logo" onerror="this.style.visibility='hidden'" />
+        <span class="exp-text"><strong>Summer Analyst @ WOWS Global</strong></span>
+      </summary>
+      <ul>
+        <li>Selected for the Princeton International Internship Program in Bangkok at a Southeast Asia-focused VC firm.</li>
+        <li>Supported early-stage startups through investor outreach and fundraising prep across the SEA venture ecosystem.</li>
+      </ul>
+    </details>
   </section>
 
   <section>
     <h2>Coursework</h2>
   
-    <details open>
+    <details>
       <summary><strong>Fall 26 (planned)</strong></summary>
-      <p>Optimal Control (ORF418), Computer Vision (COS429), Differential Equations (MAE305), Monte Carlo Simulation (ORF409), Energy &amp; Commodities Markets (ORF455)</p>
+      <ul>
+        <li>ORF 418: Optimal Control</li>
+        <li>COS 429: Computer Vision</li>
+        <li>MAE 305: Differential Equations</li>
+        <li>ORF 409: Monte Carlo Simulation</li>
+        <li>ORF 455: Energy &amp; Commodities Markets</li>
+      </ul>
     </details>
-  
+
     <details>
       <summary><strong>Spring 26</strong></summary>
-      <p>Optimization (ORF307), Financial Mathematics (ORF335), Game Theory (MAT378), Machine Learning &amp; Data Science Methods (SML301), Genomics (QCB311)</p>
+      <ul>
+        <li>ORF 307: Optimization</li>
+        <li>ORF 335: Financial Mathematics</li>
+        <li>MAT 378: Game Theory</li>
+        <li>SML 301: Machine Learning &amp; Data Science Methods</li>
+        <li>QCB 311: Genomics</li>
+      </ul>
     </details>
-  
+
     <details>
       <summary><strong>Fall 25</strong></summary>
-      <p>Algorithms &amp; Data Structures (COS226), Econometrics (ECO312), Probability &amp; Stochastic Systems (ORF309), Roman Empire (CLA219), Intro Logic (PHI201)</p>
+      <ul>
+        <li>COS 226: Algorithms &amp; Data Structures</li>
+        <li>ECO 312: Econometrics</li>
+        <li>ORF 309: Probability &amp; Stochastic Systems</li>
+        <li>CLA 219: Roman Empire</li>
+        <li>PHI 201: Intro Logic</li>
+      </ul>
     </details>
-  
+
     <details>
       <summary><strong>Spring 25</strong></summary>
-      <p>Intro CS (COS126), Macroeconomics (ECO101), Linear Algebra (MAT202), Fundamentals of Statistics (ORF245), Physics E&amp;M (PHY104)</p>
+      <ul>
+        <li>COS 126: Intro CS</li>
+        <li>ECO 101: Macroeconomics</li>
+        <li>MAT 202: Linear Algebra</li>
+        <li>ORF 245: Fundamentals of Statistics</li>
+        <li>PHY 104: Physics E&amp;M</li>
+      </ul>
     </details>
-  
+
     <details>
       <summary><strong>Fall 24</strong></summary>
-      <p>Multivariable Calculus (MAT201), Physics Mechanics (PHY103), Writing Seminar (WRI183), American &amp; Russian Sci-Fi (FRS197)</p>
+      <ul>
+        <li>MAT 201: Multivariable Calculus</li>
+        <li>PHY 103: Physics Mechanics</li>
+        <li>WRI 183: Writing Seminar</li>
+        <li>FRS 197: American &amp; Russian Sci-Fi</li>
+      </ul>
     </details>
   </section>
 
-  
+
   <footer>
     last updated apr 2026
   </footer>
