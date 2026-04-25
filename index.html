@@ -18,9 +18,9 @@
       <h1>Conan Chen</h1>
       <p class="tagline">ORFE @ Princeton · Undergrad Researcher @ Princeton Vision &amp; Learning Lab</p>
       <div class="links">
-        <a href="mailto:conanc@princeton.edu">email</a>
-        <a href="https://www.linkedin.com/in/conan-chen/">linkedin</a>
-        <a href="https://www.strava.com/athletes/42953307">follow me on strava</a>
+        <a href="#" id="email-link" data-email="conanc@princeton.edu">email</a>
+        <a href="https://www.linkedin.com/in/conan-chen/" target="_blank" rel="noopener noreferrer">linkedin</a>
+        <a href="https://www.strava.com/athletes/42953307" target="_blank" rel="noopener noreferrer">follow me on strava</a>
       </div>
     </div>
   </header>
@@ -28,13 +28,13 @@
   <section class="about">
     <h2>About</h2>
     <p>
-      Hi, I'm Conan, a sophomore at Princeton. I'm a Division 1 athlete on the Princeton Men's Swim Team and study <a href="https://orfe.princeton.edu">Operations Research
+      Hi, I'm Conan, a sophomore at Princeton. I'm a Division 1 athlete on the Princeton Men's Swim Team and study <a href="https://orfe.princeton.edu" target="_blank" rel="noopener noreferrer">Operations Research
         & Financial Engineering</a> with minors in Classics, Computer Science, and Stats & Machine Learning.
     </p>
     <p>
-      Besides swimming, I love running and biking and plan to do my first <a href="https://www.ironman.com/races/im703-musselman">Ironman 70.3</a> this summer. I am also a mediocre but passionate chess and poker player.
+      On top of swimming, I love biking and running and am training for my firstm <a href="https://www.ironman.com/races/im703-musselman" target="_blank" rel="noopener noreferrer">Ironman 70.3</a> this summer. I am also a mediocre but passionate chess and poker player.
     </p>
-    <p>Reach out: conanc [at] princeton [dot] edu</p>
+    <p>Email: conanc [at] princeton [dot] edu</p>
   </section>
 
   <section class="experience">
@@ -55,10 +55,10 @@
     <details>
       <summary>
         <img src="images/logo2.png" alt="" class="logo" onerror="this.style.visibility='hidden'" />
-        <span class="exp-text"><strong>Intern @ Scale AI</strong></span>
+        <span class="exp-text"><strong>GenAI Intern @ Scale AI</strong></span>
       </summary>
       <ul>
-        <li>Designed AIME/USAMO-level math problems to benchmark reasoning capabilities of frontier LLMs.</li>
+        <li>Designed AIME/USAMO-level math problems to benchmark reasoning capabilities of frontier LLMs (<a href="https://arxiv.org/abs/2501.14249" target="_blank" rel="noopener noreferrer">paper</a>).</li>
         <li>Built evaluation frameworks to test deep research models on multi-step reasoning tasks.</li>
       </ul>
     </details>
@@ -137,6 +137,21 @@
   <footer>
     last updated apr 2026
   </footer>
+
+  <script>
+    document.getElementById('email-link').addEventListener('click', function (e) {
+      e.preventDefault();
+      const original = this.textContent;
+      navigator.clipboard.writeText(this.dataset.email).then(() => {
+        this.textContent = 'copied';
+        this.classList.add('copied');
+        setTimeout(() => {
+          this.textContent = original;
+          this.classList.remove('copied');
+        }, 1500);
+      });
+    });
+  </script>
 
 </body>
 </html>

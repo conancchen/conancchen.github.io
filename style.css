@@ -31,7 +31,7 @@
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--bg);
     color: var(--text);
-    max-width: 640px;
+    max-width: 700px;
     margin: 0 auto;
     padding: 80px 24px 120px;
     line-height: 1.65;
@@ -143,6 +143,18 @@
     color: var(--text);
     border-bottom: none;
   }
+
+  .links a.copied {
+    color: #000000;
+    background: #ffffff;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-weight: 500;
+  }
+
+  .links a.copied::after {
+    content: "";
+  }
   
   .links a::after {
     content: " →";
@@ -214,6 +226,12 @@
       font-size: 0.8rem;
       line-height: 1.6;
     }
+
+    details ul,
+    details p {
+      font-size: 0.8rem;
+      line-height: 1.6;
+    }
   }
   /* ---------- Collapsible coursework ---------- */
 details {
@@ -262,7 +280,17 @@ details {
   }
 
   .exp-text {
-    font-size: 1rem;
+    font-size: 0.95rem;
+  }
+
+  summary strong {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    background: none;
+    padding: 0;
+    border-radius: 0;
+    margin-right: 0;
   }
 
   
