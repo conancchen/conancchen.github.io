@@ -4,7 +4,25 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Conan Chen</title>
-  <meta name="description" content="Conan's personal website" />
+  <meta name="description" content="ORFE @ Princeton · Undergrad Researcher @ Princeton Vision & Learning Lab" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Conan Chen" />
+  <meta property="og:description" content="ORFE @ Princeton · Undergrad Researcher @ Princeton Vision & Learning Lab" />
+  <meta property="og:url" content="https://conancchen.github.io/" />
+  <meta property="og:image" content="https://conancchen.github.io/images/profile.jpg" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Conan Chen" />
+  <meta name="twitter:description" content="ORFE @ Princeton · Undergrad Researcher @ Princeton Vision & Learning Lab" />
+  <meta name="twitter:image" content="https://conancchen.github.io/images/profile.jpg" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="apple-touch-icon" href="images/profile.jpg" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -13,7 +31,7 @@
 <body>
 
   <header>
-    <img src="images/profile.jpg" alt="Conan Chen" class="avatar" onerror="this.style.display='none'" />
+    <img src="images/profile.jpg" alt="Conan Chen" class="avatar" onload="this.onerror=null" onerror="this.style.display='none'" />
     <div class="header-text">
       <h1>Conan Chen</h1>
       <p class="tagline">ORFE @ Princeton · Undergrad Researcher @ Princeton Vision &amp; Learning Lab</p>
@@ -49,7 +67,7 @@
 
     <details>
       <summary>
-        <img src="images/logo1.png" alt="" class="logo" onerror="this.style.visibility='hidden'" />
+        <img src="images/logo1.png" alt="" class="logo" onload="this.onerror=null" onerror="this.style.visibility='hidden'" />
         <span class="exp-text"><strong>Quant Researcher @ Paragon Global Investments</strong></span>
       </summary>
       <ul>
@@ -61,7 +79,7 @@
 
     <details>
       <summary>
-        <img src="images/logo2.png" alt="" class="logo" onerror="this.style.visibility='hidden'" />
+        <img src="images/logo2.png" alt="" class="logo" onload="this.onerror=null" onerror="this.style.visibility='hidden'" />
         <span class="exp-text"><strong>GenAI Intern @ Scale AI</strong></span>
       </summary>
       <ul>
@@ -73,7 +91,7 @@
 
     <details>
       <summary>
-        <img src="images/logo3.png" alt="" class="logo" onerror="this.style.visibility='hidden'" />
+        <img src="images/logo3.png" alt="" class="logo" onload="this.onerror=null" onerror="this.style.visibility='hidden'" />
         <span class="exp-text"><strong>Summer Analyst @ WOWS Global</strong></span>
       </summary>
       <ul>
@@ -84,59 +102,62 @@
   </section>
 
   <section class="coursework">
-    <h2>Coursework & Reviews</h2>
-  
-    <details>
-      <summary><strong>Fall 26 (planned)</strong></summary>
-      <ul>
-        <li>ORF 418: Optimal Control</li>
-        <li>COS 429: Computer Vision</li>
-        <li>MAE 305: Differential Equations</li>
-        <li>ORF 409: Monte Carlo Simulation</li>
-        <li>ORF 455: Energy &amp; Commodities Markets</li>
-      </ul>
-    </details>
+    <h2>Coursework</h2>
 
     <details>
-      <summary><strong>Spring 26</strong></summary>
-      <div class="courses">
-        <details><summary>ORF 307: Optimization</summary><p>review coming soon</p></details>
-        <details><summary>ORF 335: Financial Mathematics</summary><p>review coming soon</p></details>
-        <details><summary>MAT 378: Game Theory</summary><p>review coming soon</p></details>
-        <details><summary>SML 301: Machine Learning &amp; Data Science Methods</summary><p>review coming soon</p></details>
-        <details><summary>QCB 311: Genomics</summary><p>review coming soon</p></details>
+      <summary><strong>Current</strong></summary>
+      <div class="semesters">
+        <p class="semester-label">Spring 26</p>
+        <ul>
+          <li>ORF 307: Optimization</li>
+          <li>ORF 335: Financial Mathematics</li>
+          <li>MAT 378: Game Theory</li>
+          <li>SML 301: Machine Learning &amp; Data Science Methods</li>
+          <li>QCB 311: Genomics</li>
+        </ul>
       </div>
     </details>
 
     <details>
-      <summary><strong>Fall 25</strong></summary>
-      <div class="courses">
-        <details><summary>COS 226: Algorithms &amp; Data Structures</summary><p>review coming soon</p></details>
-        <details><summary>ECO 312: Econometrics</summary><p>review coming soon</p></details>
-        <details><summary>ORF 309: Probability &amp; Stochastic Systems</summary><p>review coming soon</p></details>
-        <details><summary>CLA 219: Roman Empire</summary><p>review coming soon</p></details>
-        <details><summary>PHI 201: Intro Logic</summary><p>review coming soon</p></details>
+      <summary><strong>Planned</strong></summary>
+      <div class="semesters">
+        <p class="semester-label">Fall 26</p>
+        <ul>
+          <li>ORF 418: Optimal Control</li>
+          <li>COS 429: Computer Vision</li>
+          <li>MAE 305: Differential Equations</li>
+          <li>ORF 409: Monte Carlo Simulation</li>
+          <li>ORF 455: Energy &amp; Commodities Markets</li>
+        </ul>
       </div>
     </details>
 
     <details>
-      <summary><strong>Spring 25</strong></summary>
-      <div class="courses">
-        <details><summary>COS 126: Intro CS</summary><p>review coming soon</p></details>
-        <details><summary>ECO 101: Macroeconomics</summary><p>review coming soon</p></details>
-        <details><summary>MAT 202: Linear Algebra</summary><p>review coming soon</p></details>
-        <details><summary>ORF 245: Fundamentals of Statistics</summary><p>review coming soon</p></details>
-        <details><summary>PHY 104: Physics E&amp;M</summary><p>review coming soon</p></details>
-      </div>
-    </details>
-
-    <details>
-      <summary><strong>Fall 24</strong></summary>
-      <div class="courses">
-        <details><summary>MAT 201: Multivariable Calculus</summary><p>review coming soon</p></details>
-        <details><summary>PHY 103: Physics Mechanics</summary><p>review coming soon</p></details>
-        <details><summary>WRI 183: Writing Seminar</summary><p>review coming soon</p></details>
-        <details><summary>FRS 197: American &amp; Russian Sci-Fi</summary><p>review coming soon</p></details>
+      <summary><strong>Past</strong></summary>
+      <div class="semesters">
+        <p class="semester-label">Fall 25</p>
+        <ul>
+          <li>COS 226: Algorithms &amp; Data Structures</li>
+          <li>ECO 312: Econometrics</li>
+          <li>ORF 309: Probability &amp; Stochastic Systems</li>
+          <li>CLA 219: Roman Empire</li>
+          <li>PHI 201: Intro Logic</li>
+        </ul>
+        <p class="semester-label">Spring 25</p>
+        <ul>
+          <li>COS 126: Intro CS</li>
+          <li>ECO 101: Macroeconomics</li>
+          <li>MAT 202: Linear Algebra</li>
+          <li>ORF 245: Fundamentals of Statistics</li>
+          <li>PHY 104: Physics E&amp;M</li>
+        </ul>
+        <p class="semester-label">Fall 24</p>
+        <ul>
+          <li>MAT 201: Multivariable Calculus</li>
+          <li>PHY 103: Physics Mechanics</li>
+          <li>WRI 183: Writing Seminar</li>
+          <li>FRS 197: American &amp; Russian Sci-Fi</li>
+        </ul>
       </div>
     </details>
   </section>

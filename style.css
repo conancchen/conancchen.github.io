@@ -25,7 +25,11 @@
   
   /* ---------- Base ---------- */
   * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
   
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -47,7 +51,9 @@
     display: flex;
     align-items: flex-start;
     gap: 36px;
-    margin-bottom: 56px;
+    margin-bottom: 8px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border);
   }
   
   .avatar {
@@ -75,6 +81,30 @@
       width: 120px;
       height: 120px;
     }
+
+    body {
+      padding: 56px 20px 80px;
+      font-size: 16px;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+    }
+
+    .tagline {
+      font-size: 0.95rem;
+    }
+
+    p {
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    details ul,
+    details p {
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
   }
   
   h1 {
@@ -99,7 +129,6 @@
     color: var(--text);
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    word-spacing: -0.3em;
     font-family: 'JetBrains Mono', ui-monospace, monospace;
   }
   
@@ -186,18 +215,6 @@
     line-height: 1.55;
   }
   
-  /* ---------- Coursework labels ---------- */
-  strong {
-    font-weight: 500;
-    color: var(--text);
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 0.85em;
-    background: var(--code-bg);
-    padding: 1px 6px;
-    border-radius: 3px;
-    margin-right: 2px;
-  }
-  
   /* ---------- Footer ---------- */
   footer {
     margin-top: 80px;
@@ -208,32 +225,6 @@
     font-family: 'JetBrains Mono', ui-monospace, monospace;
   }
   
-  /* ---------- Mobile ---------- */
-  @media (max-width: 500px) {
-    body {
-      padding: 56px 20px 80px;
-      font-size: 16px;
-    }
-  
-    h1 {
-      font-size: 1.6rem;
-    }
-  
-    .tagline {
-      font-size: 0.95rem;
-    }
-  
-    p {
-      font-size: 0.7rem;
-      line-height: 1.6;
-    }
-
-    details ul,
-    details p {
-      font-size: 0.7rem;
-      line-height: 1.6;
-    }
-  }
   /* ---------- Collapsible coursework ---------- */
 details {
     margin-bottom: 8px;
@@ -258,7 +249,7 @@ details {
   /* +/- when openning */
 
   summary::before {
-    content: "▸";
+    content: "+";
     color: var(--subtle);
     font-family: 'JetBrains Mono', ui-monospace, monospace;
     font-size: 0.9em;
@@ -267,7 +258,7 @@ details {
   }
 
   details[open] > summary::before {
-    content: "▾";
+    content: "−";
   }
 
   .logo {
@@ -324,32 +315,21 @@ details {
     color: var(--subtle);
   }
 
-  .courses {
-    margin: 4px 0 8px 22px;
+  .semesters {
+    padding-left: 22px;
   }
 
-  .courses details {
-    margin-bottom: 2px;
+  .semesters ul {
+    padding-left: 18px;
+    margin: 4px 0 12px 0;
   }
 
-  .courses summary {
-    color: var(--muted);
-    font-size: 0.95rem;
-    padding: 2px 0;
+  .semester-label {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--subtle);
+    margin: 8px 0 4px 0;
   }
 
-  .courses summary:hover {
-    color: var(--text);
-  }
-
-  .courses summary::before {
-    content: "+";
-  }
-
-  .courses details[open] > summary::before {
-    content: "−";
-  }
-
-  .courses details p {
-    padding: 4px 0 8px 22px;
-  }
