@@ -21,6 +21,8 @@
   --link-hover: #f5a75c;
   --toast-bg: #e4e4e4;
   --toast-text: #111111;
+  // The icon art is solid black, so it gets inverted on the dark background
+  --icon-invert: 1;
 }
 
 :root[data-theme="light"] {
@@ -31,30 +33,30 @@
   --link-hover: #f09228;
   --toast-bg: #333333;
   --toast-text: #ffffff;
+  --icon-invert: 0;
 }
 
-// Sits in the flow above the content, so it can never overlap the photo
-.site-header {
-  display: flex;
-  justify-content: flex-end;
-  width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 14px 2.5% 0;
-  box-sizing: border-box;
-}
-
+// Sits inline just before the name
 #theme-toggle {
   background: transparent;
   border: none;
-  padding: 4px 6px;
-  color: var(--text);
-  font-family: 'Lato', Verdana, Helvetica, sans-serif;
-  font-size: 14px;
-  text-transform: lowercase;
+  padding: 0;
+  margin-right: 6px;
+  line-height: 0;
+  // Sits at the optical middle of the capital letters, not the x-height
+  vertical-align: middle;
+  position: relative;
+  bottom: 0.06em;
   cursor: pointer;
   opacity: 0.5;
   transition: opacity 0.2s ease;
+}
+
+#theme-toggle img {
+  display: block;
+  width: 1.05em;
+  height: 1.05em;
+  filter: invert(var(--icon-invert));
 }
 
 #theme-toggle:hover {

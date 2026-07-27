@@ -23,13 +23,12 @@
 </head>
 
 <body>
-  <header class="site-header">
-    <button id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark mode"></button>
-  </header>
-
   <div class="page">
     <div class="intro">
       <h1>
+        <button id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark mode">
+          <img src="{{ site.baseurl }}/images/night-mode.png" alt="">
+        </button>
         Conan Chen
       </h1>
       <p class="links">
@@ -68,7 +67,10 @@
   <script>
     function applyTheme(theme) {
       document.documentElement.setAttribute('data-theme', theme);
-      document.getElementById('theme-toggle').textContent = theme === 'dark' ? 'light mode' : 'dark mode';
+      var label = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+      var toggle = document.getElementById('theme-toggle');
+      toggle.setAttribute('aria-label', label);
+      toggle.setAttribute('title', label);
     }
 
     function toggleTheme() {
