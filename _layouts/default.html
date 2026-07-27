@@ -2,16 +2,14 @@
 <html lang="en">
 
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E00L9PT3V9"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-E00L9PT3V9');
-  </script>
   <title>{{ site.name }}</title>
+
+  <!-- Runs before paint so the saved theme applies without a flash -->
+  <script>
+    (function () {
+      document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'dark');
+    })();
+  </script>
 
   <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
 
@@ -25,45 +23,88 @@
 </head>
 
 <body>
-  <table style="width:100%;max-width:800px;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
-    <tr style="padding:0px">
-      <td style="padding:0px">
-        <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
-          <tr style="padding:0px">
-            <td style="padding:2.5%;width:60%;vertical-align:middle">
-              <h1>
-                Conan Chen
-              </h1>
-              <p>
-                I am an undergraduate at Princeton studying <a href="https://orfe.princeton.edu/">Operations Research and Financial Engineering</a>.
-              </p>
-              <p>
-                I also work as an undergraduate researcher in the <a href="https://pvl.cs.princeton.edu/">Princeton Vision & Learning Lab</a>, where I am working on data generation and reinforcement learning methods to train humanoid robots. I am fortunate enough to be mentored by <a href="https://erichliang.github.io/">Erich Liang</a> and <a href="https://www.cs.princeton.edu/~jiadeng/">Jia Deng</a>.
-              </p>
-              <p>
-                Outside the classroom, I am an NCAA Division I Swimmer on the <a href="https://goprincetontigers.com/sports/mens-swimming-and-diving/roster/conan-chen/24514">Princeton Men's Swimming Team</a>.
-              </p>
-              <p>
-                Previously, I served as a Technical Advisor Intern at <a href="https://scale.com/">Scale AI</a>, where I wrote Olympiad-level math and coding to fine-tune frontier LLMs and contribute to benchmarks such as <a href="https://agi.safe.ai/">Humanity's Last Exam</a>.
-              </p>
-              <p>
-                Last summer, I also worked as a Financial Analyst at the Thai VC <a href="https://wowsglobal.com/">WOWS Global</a> as part of Princeton's International Internship Program.
-              </p>
-              <p>
-              </p>
-              <p style="text-align:center">
-                <a href="https://www.linkedin.com/in/conan-chen"> LinkedIn </a>
-              </p>
-            </td>
-            <td style="padding:2.5%;width:40%;max-width:40%">
-              <img style="width:100%;max-width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:50%" alt="profile photo" src="images/profile.jpg">
-            </td>
-          </tr>
-        </table>
+  <button id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark mode"></button>
 
-      </td>
-    </tr>
-  </table>
+  <div class="page">
+    <div class="intro">
+      <h1>
+        Conan Chen
+      </h1>
+      <p class="links">
+        <a href="#" id="email-link" onclick="revealEmail(event)">Email</a> &nbsp;/&nbsp;
+        <a href="https://www.linkedin.com/in/conan-chen">LinkedIn</a> &nbsp;/&nbsp;
+        <a href="https://github.com/conancchen">GitHub</a> &nbsp;/&nbsp;
+        <a href="https://www.strava.com/athletes/42953307">Follow my Strava! :)</a>
+      </p>
+    </div>
+
+    <div class="photo">
+      <img alt="profile photo" src="images/profile.jpg">
+    </div>
+
+    <div class="bio">
+      <p>
+        I am an undergraduate at Princeton studying <a href="https://orfe.princeton.edu/">Operations Research and Financial Engineering</a> with minors in Classics, Computer Science, and Statistics & Machine Learning.
+      </p>
+      <p>
+        This summer, I am working as an undergraduate researcher in the <a href="https://pvl.cs.princeton.edu/">Princeton Vision & Learning Lab</a>, working with data generation pipelines and reinforcement learning methods to train humanoid robots.
+      </p>
+      <p>
+        Outside the classroom, I compete as an NCAA Division I athlete on the <a href="https://goprincetontigers.com/sports/mens-swimming-and-diving">Princeton Men's Swimming Team</a>. I occasionally do triathlons and recently completed my first <a href="https://feathersprod.blob.core.windows.net/api-public/d8c9cf17-94f9-4a25-9f7f-de66b962c407.pdf">Ironman 70.3</a> in Geneva, NY in under 5 hours!
+      </p>
+      <p>
+        Previously, I was a Technical Advisor Intern at <a href="https://scale.com/">Scale AI</a>, fine-tuning frontier LLMs and contributing to benchmarks such as <a href="https://agi.safe.ai/">Humanity's Last Exam</a>.
+      </p>
+      <p>
+        Last summer, I worked as a Financial Analyst in Bangkok, Thailand at the Thai VC <a href="https://wowsglobal.com/">WOWS Global</a> as part of Princeton's <a href="https://oip.princeton.edu/our-programs/international-internships">International Internship Program</a>.
+      </p>
+    </div>
+  </div>
+
+  <div id="copy-toast">Copied to clipboard</div>
+
+  <script>
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      document.getElementById('theme-toggle').textContent = theme === 'dark' ? 'light mode' : 'dark mode';
+    }
+
+    function toggleTheme() {
+      var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('theme', next);
+      applyTheme(next);
+    }
+
+    applyTheme(document.documentElement.getAttribute('data-theme'));
+
+    function copyText(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text);
+      }
+      var field = document.createElement('textarea');
+      field.value = text;
+      field.style.position = 'fixed';
+      field.style.opacity = '0';
+      document.body.appendChild(field);
+      field.select();
+      document.execCommand('copy');
+      document.body.removeChild(field);
+      return Promise.resolve();
+    }
+
+    function revealEmail(event) {
+      event.preventDefault();
+      var address = ['conanc', 'princeton.edu'].join('@');
+      document.getElementById('email-link').textContent = address;
+
+      var toast = document.getElementById('copy-toast');
+      function notify() {
+        toast.style.opacity = '1';
+        setTimeout(function () { toast.style.opacity = '0'; }, 2000);
+      }
+      copyText(address).then(notify, notify);
+    }
+  </script>
 </body>
 
 </html>
