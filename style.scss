@@ -36,7 +36,7 @@
 #theme-toggle {
   position: fixed;
   top: 16px;
-  right: 16px;
+  left: 16px;
   background: transparent;
   border: none;
   padding: 4px 6px;
@@ -57,6 +57,14 @@
 /**************/
 /* LAYOUT     */
 /**************/
+// Renders at 1.5x, the equivalent of a 150% browser zoom.
+// Left off below the mobile breakpoint, where things are already sized to fit.
+@media screen and (min-width: 641px) {
+  html {
+    zoom: 1.5;
+  }
+}
+
 .page {
   width: 100%;
   max-width: 900px;
