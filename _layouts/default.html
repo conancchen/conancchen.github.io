@@ -27,6 +27,9 @@
   <div class="page">
     <div class="intro">
       <h1>
+        <button id="dino-toggle" onclick="toggleDino()" aria-label="Play the dinosaur game" title="Play the dinosaur game" aria-pressed="false">
+          <img src="{{ site.baseurl }}/images/dino.png" alt="">
+        </button>
         <button id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark mode">
           <img src="{{ site.baseurl }}/images/night-mode.png" alt="">
         </button>
@@ -38,6 +41,14 @@
         <a href="https://github.com/conancchen">GitHub</a> &nbsp;/&nbsp;
         <a href="https://www.strava.com/athletes/42953307">Follow my Strava!</a>
       </p>
+
+      <!-- Collapsed to zero height until the dino icon opens it; when it does,
+           a gap slides open between the links and the bio -->
+      <div id="dino-game" aria-hidden="true">
+        <div id="dino-stage">
+          <canvas id="dino-canvas" tabindex="0" aria-label="Dinosaur game"></canvas>
+        </div>
+      </div>
     </div>
 
     <div class="photo">
@@ -118,6 +129,8 @@
       copyText(address).then(notify, notify);
     }
   </script>
+
+  <script src="{{ site.baseurl }}/dino.js?v={{ site.time | date: '%s' }}"></script>
 </body>
 
 </html>

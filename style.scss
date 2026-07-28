@@ -24,6 +24,8 @@
   // The icon art is solid black, so it gets inverted on the dark background
   --icon-invert: 1;
   --faint: 0.4;
+  // The game reads this: a soft grey reads better than full-contrast ink
+  --game-ink: #9a9a9a;
 }
 
 :root[data-theme="light"] {
@@ -36,10 +38,12 @@
   --toast-text: #ffffff;
   --icon-invert: 0;
   --faint: 0.3;
+  --game-ink: #6d6d6d;
 }
 
-// Sits inline just before the name
-#theme-toggle {
+// Sit inline just before the name
+#theme-toggle,
+#dino-toggle {
   background: transparent;
   border: none;
   padding: 0;
@@ -54,7 +58,8 @@
   transition: opacity 0.2s ease;
 }
 
-#theme-toggle img {
+#theme-toggle img,
+#dino-toggle img {
   display: block;
   width: 1.05em;
   height: 1.05em;
@@ -62,8 +67,59 @@
   filter: unquote("invert(var(--icon-invert))");
 }
 
-#theme-toggle:hover {
+// The dino art sits small inside its own frame, so it needs a larger box to
+// read at the same weight as the moon. Must come after the shared rule above,
+// which is equally specific and would otherwise win
+#dino-toggle img {
+  width: 2.1em;
+  height: 2.1em;
+}
+
+#dino-toggle {
+  margin-right: 2px;
+}
+
+#theme-toggle:hover,
+#dino-toggle:hover {
   opacity: 1;
+}
+
+// While the game is open the icon stays lit, but softly rather than at full ink
+#dino-toggle[aria-pressed="true"] {
+  opacity: 0.8;
+}
+
+/**************/
+/* DINO GAME  */
+/**************/
+// The panel is height-animated so the game slides a gap open between the
+// links and the bio instead of popping the page around
+#dino-game {
+  height: 0;
+  overflow: hidden;
+  transition: height 0.35s ease;
+}
+
+// Sits between the links and the bio, so it carries its own breathing room
+#dino-stage {
+  padding: 2px 0 16px;
+}
+
+#dino-canvas {
+  display: block;
+  width: 100%;
+  margin: 0 auto;
+  // The game reads this to colour its sprites, so it follows the theme
+  color: var(--game-ink);
+  touch-action: manipulation;
+  outline: none;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #dino-game {
+    transition: none;
+  }
 }
 
 /**************/
