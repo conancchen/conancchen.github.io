@@ -59,6 +59,8 @@
 
       </p>
 
+      <hr class="bio-rule">
+      <p class="updated">Last updated July 2026</p>
     </div>
   </div>
 
@@ -96,10 +98,19 @@
       return Promise.resolve();
     }
 
+    var emailResetTimer;
+
     function revealEmail(event) {
       event.preventDefault();
       var address = ['conanc', 'princeton.edu'].join('@');
-      document.getElementById('email-link').textContent = address;
+      var link = document.getElementById('email-link');
+      link.textContent = address;
+
+      // Rapid clicks restart the countdown instead of stacking timers
+      clearTimeout(emailResetTimer);
+      emailResetTimer = setTimeout(function () {
+        link.textContent = 'Email';
+      }, 3000);
 
       var toast = document.getElementById('copy-toast');
       function notify() {
