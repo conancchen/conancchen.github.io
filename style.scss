@@ -56,7 +56,8 @@
   display: block;
   width: 1.05em;
   height: 1.05em;
-  filter: invert(var(--icon-invert));
+  // unquote() keeps Sass's own invert() color function from claiming this
+  filter: unquote("invert(var(--icon-invert))");
 }
 
 #theme-toggle:hover {
