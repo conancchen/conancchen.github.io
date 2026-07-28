@@ -16,7 +16,8 @@
   <meta name="author" content="{{ site.name }}" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/style.css" />
+  <!-- Build timestamp busts the browser cache whenever the site is rebuilt -->
+  <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/style.css?v={{ site.time | date: '%s' }}" />
   <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}">
   <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
 
@@ -35,7 +36,7 @@
         <a href="#" id="email-link" onclick="revealEmail(event)">Email</a> &nbsp;/&nbsp;
         <a href="https://www.linkedin.com/in/conan-chen">LinkedIn</a> &nbsp;/&nbsp;
         <a href="https://github.com/conancchen">GitHub</a> &nbsp;/&nbsp;
-        <a href="https://www.strava.com/athletes/42953307">Follow my Strava! :)</a>
+        <a href="https://www.strava.com/athletes/42953307">Follow my Strava!</a>
       </p>
     </div>
 
