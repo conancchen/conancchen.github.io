@@ -130,6 +130,11 @@
     margin: 8px auto 0;
   }
 
+  // The photo's line-box leaves dead space under it; h1 has none of its own
+  .photo img {
+    margin-bottom: 0;
+  }
+
   .intro {
     grid-column: 1;
     grid-row: 2;
@@ -142,7 +147,7 @@
 
   h1 {
     font-size: 26px;
-    margin-block-start: 18px;
+    margin-block-start: 4px;
   }
 
   .links {
