@@ -23,6 +23,7 @@
   --toast-text: #111111;
   // The icon art is solid black, so it gets inverted on the dark background
   --icon-invert: 1;
+  --faint: 0.4;
 }
 
 :root[data-theme="light"] {
@@ -34,6 +35,7 @@
   --toast-bg: #333333;
   --toast-text: #ffffff;
   --icon-invert: 0;
+  --faint: 0.3;
 }
 
 // Sits inline just before the name
@@ -103,7 +105,8 @@
 
 .updated {
   color: var(--text);
-  opacity: 0.4;
+  // Black on white reads stronger than white on dark at the same opacity
+  opacity: var(--faint);
   font-size: 12.5px;
   margin: 0;
 }
@@ -126,47 +129,7 @@
 
 .links {
   text-align: center;
-  margin-bottom: 32px;
-}
-
-// On narrow screens everything stacks in one column: photo, then name, then bio
-@media screen and (max-width: 640px) {
-  .page {
-    grid-template-columns: 1fr;
-    column-gap: 0;
-  }
-
-  .photo {
-    grid-column: 1;
-    grid-row: 1;
-    transform: none;
-    width: 150px;
-    margin: 8px auto 0;
-  }
-
-  // The photo's line-box leaves dead space under it; h1 has none of its own
-  .photo img {
-    margin-bottom: 0;
-  }
-
-  .intro {
-    grid-column: 1;
-    grid-row: 2;
-  }
-
-  .bio {
-    grid-column: 1;
-    grid-row: 3;
-  }
-
-  h1 {
-    font-size: 26px;
-    margin-block-start: 4px;
-  }
-
-  .links {
-    margin-bottom: 20px;
-  }
+  margin-bottom: 22px;
 }
 
 body {
@@ -237,6 +200,43 @@ h1 {
   margin-left: 0px;
   margin-right: 0px;
 
+}
+
+// Must sit after the base rules — a media query adds no specificity, so an
+// equally-specific rule further down the file would win instead
+// On narrow screens everything stacks in one column: photo, then name, then bio
+@media screen and (max-width: 640px) {
+  .page {
+    grid-template-columns: 1fr;
+    column-gap: 0;
+  }
+
+  .photo {
+    grid-column: 1;
+    grid-row: 1;
+    transform: none;
+    width: 150px;
+    margin: 0 auto;
+  }
+
+  .intro {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .bio {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  h1 {
+    font-size: 26px;
+    margin-block-start: 10px;
+  }
+
+  .links {
+    margin-bottom: 20px;
+  }
 }
 
 .one {
