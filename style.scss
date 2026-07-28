@@ -15,7 +15,7 @@
 // Dark is the default; the toggle opts into light and remembers the choice
 :root {
   color-scheme: dark;
-  --bg: #111111;
+  --bg: #222222;
   --text: #e4e4e4;
   --link: #5fa8f0;
   --link-hover: #f5a75c;
@@ -70,7 +70,7 @@
 
 .page {
   width: 100%;
-  max-width: 900px;
+  max-width: 842px;
   margin: 0 auto;
   padding: 2.5%;
   box-sizing: border-box;
@@ -87,6 +87,11 @@
 .bio {
   grid-column: 1;
   grid-row: 2;
+}
+
+// Keeps lines full while pulling words down so the last one isn't a stub
+.bio p {
+  text-wrap: pretty;
 }
 
 // Photo spans both rows so it stays centered against the full text column
@@ -170,13 +175,13 @@ tr,
 p,
 a {
   font-family: 'Lato', Verdana, Helvetica, sans-serif;
-  font-size: 13px;
+  font-size: 14.5px;
   font-display: auto;
 }
 
 strong {
   font-family: 'Lato', Verdana, Helvetica, sans-serif;
-  font-size: 13px;
+  font-size: 14.5px;
   font-display: auto;
 }
 
