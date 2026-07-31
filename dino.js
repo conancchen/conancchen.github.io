@@ -589,6 +589,8 @@
   /**************/
   window.toggleDino = function () {
     open = !open;
+    // Only one game holds the gap at a time, so the other one steps aside
+    if (open && window.closeFlappy) window.closeFlappy();
     panel.classList.toggle('is-open', open);
     panel.setAttribute('aria-hidden', open ? 'false' : 'true');
     if (toggleBtn) toggleBtn.setAttribute('aria-pressed', open ? 'true' : 'false');
@@ -602,6 +604,10 @@
       panel.style.height = '0px';
       stop();
     }
+  };
+
+  window.closeDino = function () {
+    if (open) window.toggleDino();
   };
 
   resize();

@@ -26,15 +26,7 @@
 <body>
   <div class="page">
     <div class="intro">
-      <h1>
-        <button id="dino-toggle" onclick="toggleDino()" aria-label="Play the dinosaur game" title="Play the dinosaur game" aria-pressed="false">
-          <img src="{{ site.baseurl }}/images/dino.png" alt="">
-        </button>
-        <button id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark mode">
-          <img src="{{ site.baseurl }}/images/night-mode.png" alt="">
-        </button>
-        Conan Chen
-      </h1>
+      <h1>Conan Chen</h1>
       <p class="links">
         <a href="#" id="email-link" onclick="revealEmail(event)">Email</a> &nbsp;/&nbsp;
         <a href="https://www.linkedin.com/in/conan-chen">LinkedIn</a> &nbsp;/&nbsp;
@@ -42,17 +34,37 @@
         <a href="https://www.strava.com/athletes/42953307">Follow my Strava!</a>
       </p>
 
-      <!-- Collapsed to zero height until the dino icon opens it; when it does,
+      <!-- Collapsed to zero height until an icon opens one; when it does,
            a gap slides open between the links and the bio -->
       <div id="dino-game" aria-hidden="true">
         <div id="dino-stage">
           <canvas id="dino-canvas" tabindex="0" aria-label="Dinosaur game"></canvas>
         </div>
       </div>
+
+      <div id="flappy-game" aria-hidden="true">
+        <div id="flappy-stage">
+          <canvas id="flappy-canvas" tabindex="0" aria-label="Flappy bird game"></canvas>
+        </div>
+      </div>
     </div>
 
     <div class="photo">
       <img alt="profile photo" src="images/profile.jpg">
+
+      <!-- The two games and the theme switch, tucked under the photo so the
+           name heading can sit dead centre -->
+      <div class="toys">
+        <button id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark mode">
+          <img src="{{ site.baseurl }}/images/night-mode.png" alt="">
+        </button>
+        <button id="dino-toggle" onclick="toggleDino()" aria-label="Play the dinosaur game" title="Play the dinosaur game" aria-pressed="false">
+          <img src="{{ site.baseurl }}/images/dino.png" alt="">
+        </button>
+        <button id="flappy-toggle" onclick="toggleFlappy()" aria-label="Play the flappy bird game" title="Play the flappy bird game" aria-pressed="false">
+          <img src="{{ site.baseurl }}/images/bird.png" alt="">
+        </button>
+      </div>
     </div>
 
     <div class="bio">
@@ -61,8 +73,9 @@
       </p>
       <p>
         This summer, I've been researching data generation and reinforcement learning methods for training humanoid robots in the <a href="https://pvl.cs.princeton.edu/">Princeton Vision & Learning Lab</a>.
+      </p>
       <p>
-        Previously, I interned at <a href="https://scale.com/">Scale AI</a>, fine-tuning frontier LLMs and building benchmarks such as <a href="https://agi.safe.ai/">Humanity's Last Exam</a>.
+        Previously, I interned at <a href="https://scale.com/">Scale AI</a>, fine-tuning frontier LLMs and building benchmarks like <a href="https://agi.safe.ai/">Humanity's Last Exam</a>.
       </p>
       <p>
         I also compete as an NCAA Division I athlete on the <a href="https://goprincetontigers.com/sports/mens-swimming-and-diving">Princeton Men's Swimming Team</a>. Recently, I finished my first <a href="{{ site.baseurl }}/pdfs/im70.3.pdf">Ironman 70.3</a> in&nbsp;under&nbsp;5&nbsp;hours!
@@ -131,6 +144,7 @@
   </script>
 
   <script src="{{ site.baseurl }}/dino.js?v={{ site.time | date: '%s' }}"></script>
+  <script src="{{ site.baseurl }}/flappy.js?v={{ site.time | date: '%s' }}"></script>
 </body>
 
 </html>

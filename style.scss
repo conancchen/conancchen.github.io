@@ -41,71 +41,91 @@
   --game-ink: #6d6d6d;
 }
 
-// Sit inline just before the name
-#theme-toggle,
-#dino-toggle {
+// A row of toys under the profile photo
+.toys {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 14px;
+  // The bird carries more transparent margin on its right than the moon does
+  // on its left, so the row is nudged to centre the art, not the boxes
+  transform: translateX(1px);
+}
+
+.toys button {
   background: transparent;
   border: none;
   padding: 0;
-  margin-right: 6px;
   line-height: 0;
-  // Sits at the optical middle of the capital letters, not the x-height
-  vertical-align: middle;
-  position: relative;
-  bottom: 0.06em;
   cursor: pointer;
   opacity: 0.5;
   transition: opacity 0.2s ease;
 }
 
-#theme-toggle img,
-#dino-toggle img {
+.toys img {
   display: block;
-  width: 1.05em;
-  height: 1.05em;
   // unquote() keeps Sass's own invert() color function from claiming this
   filter: unquote("invert(var(--icon-invert))");
 }
 
-// The dino art sits small inside its own frame, so it needs a larger box to
-// read at the same weight as the moon. Must come after the shared rule above,
-// which is equally specific and would otherwise win
+// Each icon's art fills a different share of its own frame, so the boxes are
+// sized against each other rather than set to one number
+#theme-toggle img {
+  width: 15px;
+  height: 15px;
+}
+
+#flappy-toggle img {
+  width: 23px;
+  height: 23px;
+}
+
 #dino-toggle img {
-  width: 2.1em;
-  height: 2.1em;
+  width: 30px;
+  height: 30px;
+}
+
+// Each icon's art stops at a different distance from the edge of its own PNG,
+// so the gaps are set per pair to leave an even 14px between the drawings.
+// Worth re-measuring if any of the three images is swapped out
+#theme-toggle {
+  margin-right: 9px;
 }
 
 #dino-toggle {
-  margin-right: 2px;
+  margin-right: 7px;
 }
 
-#theme-toggle:hover,
-#dino-toggle:hover {
+.toys button:hover {
   opacity: 1;
 }
 
-// While the game is open the icon stays lit, but softly rather than at full ink
-#dino-toggle[aria-pressed="true"] {
+// While a game is open its icon stays lit, but softly rather than at full ink
+#dino-toggle[aria-pressed="true"],
+#flappy-toggle[aria-pressed="true"] {
   opacity: 0.8;
 }
 
 /**************/
-/* DINO GAME  */
+/* GAMES      */
 /**************/
-// The panel is height-animated so the game slides a gap open between the
+// The panels are height-animated so a game slides a gap open between the
 // links and the bio instead of popping the page around
-#dino-game {
+#dino-game,
+#flappy-game {
   height: 0;
   overflow: hidden;
   transition: height 0.35s ease;
 }
 
 // Sits between the links and the bio, so it carries its own breathing room
-#dino-stage {
+#dino-stage,
+#flappy-stage {
   padding: 2px 0 16px;
 }
 
-#dino-canvas {
+#dino-canvas,
+#flappy-canvas {
   display: block;
   width: 100%;
   margin: 0 auto;
@@ -117,7 +137,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #dino-game {
+  #dino-game,
+  #flappy-game {
     transition: none;
   }
 }
@@ -185,7 +206,7 @@
 
 .links {
   text-align: center;
-  margin-bottom: 22px;
+  margin-bottom: 17px;
 }
 
 body {
