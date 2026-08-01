@@ -31,7 +31,7 @@
         <a href="#" id="email-link" onclick="revealEmail(event)">Email</a> &nbsp;/&nbsp;
         <a href="https://www.linkedin.com/in/conan-chen">LinkedIn</a> &nbsp;/&nbsp;
         <a href="https://github.com/conancchen">GitHub</a> &nbsp;/&nbsp;
-        <a href="https://www.strava.com/athletes/42953307">Follow my Strava!</a>
+        <a href="https://www.strava.com/athletes/42953307">Strava</a>
       </p>
 
       <!-- Collapsed to zero height until an icon opens one; when it does,
@@ -47,21 +47,30 @@
           <canvas id="flappy-canvas" tabindex="0" aria-label="Flappy bird game"></canvas>
         </div>
       </div>
+
+      <div id="geometry-game" aria-hidden="true">
+        <div id="geometry-stage">
+          <canvas id="geometry-canvas" tabindex="0" aria-label="Geometry dash game"></canvas>
+        </div>
+      </div>
     </div>
 
     <div class="photo">
-      <img alt="profile photo" src="images/profile.jpg">
+      <!-- The photo is the light/dark switch -->
+      <button id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark mode">
+        <img alt="profile photo" src="images/profile.jpg">
+      </button>
 
-      <!-- The two games and the theme switch, tucked under the photo so the
-           name heading can sit dead centre -->
+      <!-- The games, tucked under the photo so the name heading can sit
+           dead centre -->
       <div class="toys">
-        <button id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark mode">
-          <img src="{{ site.baseurl }}/images/night-mode.png" alt="">
+        <button class="icon-btn" id="geometry-toggle" onclick="toggleGeometry()" aria-label="Play the geometry dash game" title="Play the geometry dash game" aria-pressed="false">
+          <img src="{{ site.baseurl }}/images/geometry.png" alt="">
         </button>
-        <button id="dino-toggle" onclick="toggleDino()" aria-label="Play the dinosaur game" title="Play the dinosaur game" aria-pressed="false">
+        <button class="icon-btn" id="dino-toggle" onclick="toggleDino()" aria-label="Play the dinosaur game" title="Play the dinosaur game" aria-pressed="false">
           <img src="{{ site.baseurl }}/images/dino.png" alt="">
         </button>
-        <button id="flappy-toggle" onclick="toggleFlappy()" aria-label="Play the flappy bird game" title="Play the flappy bird game" aria-pressed="false">
+        <button class="icon-btn" id="flappy-toggle" onclick="toggleFlappy()" aria-label="Play the flappy bird game" title="Play the flappy bird game" aria-pressed="false">
           <img src="{{ site.baseurl }}/images/bird.png" alt="">
         </button>
       </div>
@@ -145,6 +154,7 @@
 
   <script src="{{ site.baseurl }}/dino.js?v={{ site.time | date: '%s' }}"></script>
   <script src="{{ site.baseurl }}/flappy.js?v={{ site.time | date: '%s' }}"></script>
+  <script src="{{ site.baseurl }}/geometry.js?v={{ site.time | date: '%s' }}"></script>
 </body>
 
 </html>

@@ -41,18 +41,9 @@
   --game-ink: #6d6d6d;
 }
 
-// A row of toys under the profile photo
-.toys {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 14px;
-  // The bird carries more transparent margin on its right than the moon does
-  // on its left, so the row is nudged to centre the art, not the boxes
-  transform: translateX(1px);
-}
-
-.toys button {
+// Every icon button — the games under the photo and the theme switch beside
+// the name — shares one look
+.icon-btn {
   background: transparent;
   border: none;
   padding: 0;
@@ -62,17 +53,36 @@
   transition: opacity 0.2s ease;
 }
 
-.toys img {
+.icon-btn:hover {
+  opacity: 1;
+}
+
+.icon-btn img {
   display: block;
   // unquote() keeps Sass's own invert() color function from claiming this
   filter: unquote("invert(var(--icon-invert))");
 }
 
+// A row of toys under the profile photo
+.toys {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 14px;
+  // The bird carries more transparent margin on its right than the cube does
+  // on its left, so the row is nudged to centre the art, not the boxes
+  transform: translateX(1px);
+}
+
 // Each icon's art fills a different share of its own frame, so the boxes are
 // sized against each other rather than set to one number
-#theme-toggle img {
-  width: 15px;
-  height: 15px;
+// Greyscale art rather than the flat black silhouettes the others use, so it
+// opts out of the theme inversion — it already reads on either background
+#geometry-toggle img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  filter: none;
 }
 
 #flappy-toggle img {
@@ -87,22 +97,19 @@
 
 // Each icon's art stops at a different distance from the edge of its own PNG,
 // so the gaps are set per pair to leave an even 14px between the drawings.
-// Worth re-measuring if any of the three images is swapped out
-#theme-toggle {
-  margin-right: 9px;
+// Worth re-measuring if any of the images is swapped out
+#geometry-toggle {
+  margin-right: 8px;
 }
 
 #dino-toggle {
   margin-right: 7px;
 }
 
-.toys button:hover {
-  opacity: 1;
-}
-
 // While a game is open its icon stays lit, but softly rather than at full ink
 #dino-toggle[aria-pressed="true"],
-#flappy-toggle[aria-pressed="true"] {
+#flappy-toggle[aria-pressed="true"],
+#geometry-toggle[aria-pressed="true"] {
   opacity: 0.8;
 }
 
@@ -112,7 +119,8 @@
 // The panels are height-animated so a game slides a gap open between the
 // links and the bio instead of popping the page around
 #dino-game,
-#flappy-game {
+#flappy-game,
+#geometry-game {
   height: 0;
   overflow: hidden;
   transition: height 0.35s ease;
@@ -120,12 +128,14 @@
 
 // Sits between the links and the bio, so it carries its own breathing room
 #dino-stage,
-#flappy-stage {
+#flappy-stage,
+#geometry-stage {
   padding: 2px 0 16px;
 }
 
 #dino-canvas,
-#flappy-canvas {
+#flappy-canvas,
+#geometry-canvas {
   display: block;
   width: 100%;
   margin: 0 auto;
@@ -138,7 +148,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   #dino-game,
-  #flappy-game {
+  #flappy-game,
+  #geometry-game {
     transition: none;
   }
 }
@@ -196,12 +207,31 @@
   transform: translateY(24px);
 }
 
-.photo img {
+// The photo doubles as the theme switch, so it carries a button's affordances
+// without any of a button's chrome
+#theme-toggle {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 0;
+  line-height: 0;
+  cursor: pointer;
+}
+
+// Scoped to the photo itself rather than `.photo img` — the toy icons live in
+// this column too, and a bare `.photo img` was rounding them off into circles
+#theme-toggle img {
   display: block;
   width: 100%;
   aspect-ratio: 1/1;
   object-fit: cover;
   border-radius: 50%;
+  transition: filter 0.2s ease;
+}
+
+#theme-toggle:hover img {
+  filter: brightness(1.08);
 }
 
 .links {

@@ -476,8 +476,9 @@
   /**************/
   window.toggleFlappy = function () {
     open = !open;
-    // Only one game holds the gap at a time, so the other one steps aside
+    // Only one game holds the gap at a time, so the others step aside
     if (open && window.closeDino) window.closeDino();
+    if (open && window.closeGeometry) window.closeGeometry();
     panel.classList.toggle('is-open', open);
     panel.setAttribute('aria-hidden', open ? 'false' : 'true');
     if (toggleBtn) toggleBtn.setAttribute('aria-pressed', open ? 'true' : 'false');

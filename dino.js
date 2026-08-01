@@ -122,13 +122,19 @@
   /**************/
   // PX is the unit for the scenery, U the finer unit the dino sprite uses
   var W = 600, H = 150, PX = 2, U = 1, scale = 1, groundY = 138;
+
+  // Trunk height of the tall cactus, in scenery cells. Both the drawing and
+  // the spawner measure off this, so they can't drift apart
+  var TALL_H = 20;
   var DINO_X = 24;
   var fg = '#e4e4e4';
   var open = false, rafId = null, lastTime = 0;
 
   var GRAVITY = 0.62;
   var JUMP_VELOCITY = -10.4;
-  var SPEED_START = 5.6;
+  // Eased off 15% from where it used to open, so the first few obstacles are a
+  // warm-up. ACCELERATION is untouched, so it still climbs to the same top end
+  var SPEED_START = 4.76;
   var SPEED_MAX = 12.6;
   var ACCELERATION = 0.0009;
   var BIRD_AFTER = 320;
@@ -180,7 +186,10 @@
     W = cssW;
     H = cssH;
     scale = H / 150;
-    U = Math.max(1, Math.round(scale));
+    // The sprite grid is 47 rows tall, which is a lot of the canvas at 1:1, so
+    // the dino runs at four fifths of a pixel per cell. drawGrid snaps the
+    // edges, so the fractional unit costs nothing in crispness
+    U = Math.max(0.5, Math.round(scale) * 0.8);
     PX = Math.max(1, Math.round(2 * scale));
     groundY = H - 12 * scale;
     if (dino) dino.y = Math.min(dino.y, groundY - dinoHeight());
@@ -200,17 +209,23 @@
   /**************/
   /* DRAWING    */
   /**************/
+  // Cell edges are snapped to whole pixels rather than the rects being drawn at
+  // their true size, so a fractional unit still lands on crisp pixels and
+  // neighbouring cells share an edge instead of both half-covering it
   function drawGrid(grid, x, y, unit) {
     ctx.fillStyle = fg;
     for (var r = 0; r < grid.length; r++) {
       var row = grid[r];
+      var top = Math.round(y + r * unit);
+      var h = Math.round(y + (r + 1) * unit) - top;
       var runStart = -1;
       for (var c = 0; c <= row.length; c++) {
         var on = row.charAt(c) === '#';
         if (on && runStart < 0) runStart = c;
         // Painting each horizontal run as one rect keeps the fill count low
         if (!on && runStart >= 0) {
-          ctx.fillRect(x + runStart * unit, y + r * unit, (c - runStart) * unit, unit);
+          var left = Math.round(x + runStart * unit);
+          ctx.fillRect(left, top, Math.round(x + c * unit) - left, h);
           runStart = -1;
         }
       }
@@ -244,16 +259,16 @@
     var u = PX;
     var big = o.kind === 'large';
     var tw = big ? 4 : 3;      // trunk width in cells
-    var th = big ? 25 : 17;    // trunk height in cells
+    var th = big ? TALL_H : 17; // trunk height in cells
     var top = o.y;
     for (var i = 0; i < o.count; i++) {
       var x = o.x + i * (big ? 12 : 9) * u;
       rect(x + 3 * u, top, tw * u, th * u);
       // Left arm with its elbow, then the right one a little higher up
-      rect(x, top + (big ? 8 : 5) * u, 2 * u, (big ? 6 : 4) * u);
-      rect(x, top + (big ? 12 : 8) * u, 3 * u, 2 * u);
-      rect(x + (big ? 8 : 7) * u, top + (big ? 5 : 3) * u, 2 * u, (big ? 6 : 4) * u);
-      rect(x + (big ? 7 : 6) * u, top + (big ? 9 : 6) * u, 3 * u, 2 * u);
+      rect(x, top + (big ? 6 : 5) * u, 2 * u, (big ? 5 : 4) * u);
+      rect(x, top + (big ? 9 : 8) * u, 3 * u, 2 * u);
+      rect(x + (big ? 8 : 7) * u, top + (big ? 4 : 3) * u, 2 * u, (big ? 5 : 4) * u);
+      rect(x + (big ? 7 : 6) * u, top + (big ? 7 : 6) * u, 3 * u, 2 * u);
     }
   }
 
@@ -361,7 +376,7 @@
       var big = roll > 0.6;
       var count = 1 + Math.floor(Math.random() * (speed > 8 ? 3 : 2));
       var cellW = (big ? 12 : 9) * u;
-      var h = (big ? 25 : 17) * u;
+      var h = (big ? TALL_H : 17) * u;
       o = {
         type: 'cactus',
         kind: big ? 'large' : 'small',
@@ -589,8 +604,9 @@
   /**************/
   window.toggleDino = function () {
     open = !open;
-    // Only one game holds the gap at a time, so the other one steps aside
+    // Only one game holds the gap at a time, so the others step aside
     if (open && window.closeFlappy) window.closeFlappy();
+    if (open && window.closeGeometry) window.closeGeometry();
     panel.classList.toggle('is-open', open);
     panel.setAttribute('aria-hidden', open ? 'false' : 'true');
     if (toggleBtn) toggleBtn.setAttribute('aria-pressed', open ? 'true' : 'false');
