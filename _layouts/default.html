@@ -34,8 +34,10 @@
         <a href="https://www.strava.com/athletes/42953307">Follow my Strava!</a>
       </p>
 
-      <!-- Collapsed to zero height until an icon opens one; when it does,
-           a gap slides open between the links and the bio -->
+      <!-- Games disabled for now. Collapsed to zero height until an icon opens
+           one; when it does, a gap slides open between the links and the bio.
+           Re-enable together with the .toys icon row and the scripts below. -->
+      <!--
       <div id="dino-game" aria-hidden="true">
         <div id="dino-stage">
           <canvas id="dino-canvas" tabindex="0" aria-label="Dinosaur game"></canvas>
@@ -53,6 +55,7 @@
           <canvas id="geometry-canvas" tabindex="0" aria-label="Geometry dash game"></canvas>
         </div>
       </div>
+      -->
     </div>
 
     <div class="photo">
@@ -62,7 +65,9 @@
       </button>
 
       <!-- The games, tucked under the photo so the name heading can sit
-           dead centre -->
+           dead centre. Disabled for now — the whole row is commented out
+           rather than emptied so its margin doesn't leave a gap. -->
+      <!--
       <div class="toys">
         <button class="icon-btn" id="geometry-toggle" onclick="toggleGeometry()" aria-label="Play the geometry dash game" title="Play the geometry dash game" aria-pressed="false">
           <img src="{{ site.baseurl }}/images/geometry.png" alt="">
@@ -74,6 +79,8 @@
           <img src="{{ site.baseurl }}/images/bird.png" alt="">
         </button>
       </div>
+      -->
+
     </div>
 
     <div class="bio">
@@ -152,9 +159,11 @@
     }
   </script>
 
+  <!-- Games disabled for now; the sources still live in the repo root
   <script src="{{ site.baseurl }}/dino.js?v={{ site.time | date: '%s' }}"></script>
   <script src="{{ site.baseurl }}/flappy.js?v={{ site.time | date: '%s' }}"></script>
   <script src="{{ site.baseurl }}/geometry.js?v={{ site.time | date: '%s' }}"></script>
+  -->
 </body>
 
 </html>
