@@ -1,374 +1,240 @@
 ---
 ---
 
-//
-// IMPORTS
-//
-
-//@import "reset";
-//@import "variables";
-// Syntax highlighting @import is at the bottom of this file
-
 /**************/
 /* THEME      */
 /**************/
 // Dark is the default; the toggle opts into light and remembers the choice
 :root {
   color-scheme: dark;
-  --bg: #222222;
-  --text: #e4e4e4;
-  --link: #5fa8f0;
-  --link-hover: #f5a75c;
-  --toast-bg: #e4e4e4;
-  --toast-text: #111111;
-  // The icon art is solid black, so it gets inverted on the dark background
-  --icon-invert: 1;
-  --faint: 0.4;
-  // The game reads this: a soft grey reads better than full-contrast ink
-  --game-ink: #9a9a9a;
+  --bg: #202020;
+  --text: #f2f2f0;
+  --muted: #8a8a8a;
+  --rule: #3a3a3a;
+  --link: #9a9a98;
+  --toast-bg: #f2f2f0;
+  --toast-text: #202020;
 }
 
 :root[data-theme="light"] {
   color-scheme: light;
-  --bg: #ffffff;
-  --text: #000000;
-  --link: #1772d0;
-  --link-hover: #f09228;
-  --toast-bg: #333333;
-  --toast-text: #ffffff;
-  --icon-invert: 0;
-  --faint: 0.3;
-  --game-ink: #6d6d6d;
-}
-
-// Every icon button — the games under the photo and the theme switch beside
-// the name — shares one look
-.icon-btn {
-  background: transparent;
-  border: none;
-  padding: 0;
-  line-height: 0;
-  cursor: pointer;
-  opacity: 0.5;
-  transition: opacity 0.2s ease;
-}
-
-.icon-btn:hover {
-  opacity: 1;
-}
-
-.icon-btn img {
-  display: block;
-  // unquote() keeps Sass's own invert() color function from claiming this
-  filter: unquote("invert(var(--icon-invert))");
-}
-
-// A row of toys under the profile photo
-.toys {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 14px;
-  // The bird carries more transparent margin on its right than the cube does
-  // on its left, so the row is nudged to centre the art, not the boxes
-  transform: translateX(1px);
-}
-
-// Each icon's art fills a different share of its own frame, so the boxes are
-// sized against each other rather than set to one number
-// Greyscale art rather than the flat black silhouettes the others use, so it
-// opts out of the theme inversion — it already reads on either background
-#geometry-toggle img {
-  width: 20px;
-  height: 20px;
-  object-fit: contain;
-  filter: none;
-}
-
-#flappy-toggle img {
-  width: 23px;
-  height: 23px;
-}
-
-#dino-toggle img {
-  width: 30px;
-  height: 30px;
-}
-
-// Each icon's art stops at a different distance from the edge of its own PNG,
-// so the gaps are set per pair to leave an even 14px between the drawings.
-// Worth re-measuring if any of the images is swapped out
-#geometry-toggle {
-  margin-right: 8px;
-}
-
-#dino-toggle {
-  margin-right: 7px;
-}
-
-// While a game is open its icon stays lit, but softly rather than at full ink
-#dino-toggle[aria-pressed="true"],
-#flappy-toggle[aria-pressed="true"],
-#geometry-toggle[aria-pressed="true"] {
-  opacity: 0.8;
+  --bg: #f7f6f3;
+  --text: #16150f;
+  --muted: #8a8a8a;
+  --rule: #e0dfdb;
+  --link: #6f6e6a;
+  --toast-bg: #16150f;
+  --toast-text: #f7f6f3;
 }
 
 /**************/
-/* GAMES      */
+/* BASE       */
 /**************/
-// The panels are height-animated so a game slides a gap open between the
-// links and the bio instead of popping the page around
-#dino-game,
-#flappy-game,
-#geometry-game {
-  height: 0;
-  overflow: hidden;
-  transition: height 0.35s ease;
+* {
+  box-sizing: border-box;
 }
 
-// Sits between the links and the bio, so it carries its own breathing room
-#dino-stage,
-#flappy-stage,
-#geometry-stage {
-  padding: 2px 0 16px;
+body {
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: Calibri, 'Segoe UI', -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
-#dino-canvas,
-#flappy-canvas,
-#geometry-canvas {
-  display: block;
-  width: 100%;
-  margin: 0 auto;
-  // The game reads this to colour its sprites, so it follows the theme
-  color: var(--game-ink);
-  touch-action: manipulation;
-  outline: none;
-  cursor: pointer;
+a {
+  color: var(--link);
+  text-decoration: none;
+  transition: opacity 0.15s ease;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  #dino-game,
-  #flappy-game,
-  #geometry-game {
-    transition: none;
+a:hover,
+a:focus {
+  opacity: 0.7;
+}
+
+.bio a:hover,
+.bio a:focus {
+  text-decoration: underline;
+}
+
+.type-cursor {
+  display: inline-block;
+  width: 1px;
+  height: 0.9em;
+  margin-left: 1px;
+  background: currentColor;
+  vertical-align: text-bottom;
+  animation: blink 0.9s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
   }
+}
+
+.anim-hide-type .type-target {
+  visibility: hidden;
+}
+
+.fade-target {
+  opacity: 1;
+  transition: opacity 2.4s ease;
+}
+
+.anim-hide-fade .fade-target {
+  opacity: 0;
 }
 
 /**************/
 /* LAYOUT     */
 /**************/
-
 .page {
   width: 100%;
-  max-width: 842px;
+  max-width: 640px;
   margin: 0 auto;
-  padding: 2.5%;
-  box-sizing: border-box;
-  display: grid;
-  grid-template-columns: 76% 24%;
-  column-gap: 2.5%;
+  padding: 64px 24px 48px;
 }
 
-.intro {
-  grid-column: 1;
-  grid-row: 1;
+.header {
+  margin-bottom: 28px;
 }
 
-.bio {
-  grid-column: 1;
-  grid-row: 2;
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
 }
 
-// Keeps lines full while pulling words down so the last one isn't a stub
-.bio p {
-  text-wrap: pretty;
-}
-
-.bio-rule {
-  border: none;
-  border-top: 1px solid var(--text);
-  opacity: 0.15;
-  margin: 24px 0 10px;
-}
-
-.updated {
-  color: var(--text);
-  // Black on white reads stronger than white on dark at the same opacity
-  opacity: var(--faint);
-  font-size: 12.5px;
+.header h1 {
+  font-size: 26px;
+  font-weight: 500;
   margin: 0;
 }
 
-// Photo spans both rows so it stays centered against the full text column
-.photo {
-  grid-column: 2;
-  grid-row: 1 / span 2;
-  align-self: center;
-  transform: translateY(24px);
+.home-link {
+  color: var(--text);
+  text-decoration: none;
 }
 
-// The photo doubles as the theme switch, so it carries a button's affordances
-// without any of a button's chrome
 #theme-toggle {
-  display: block;
-  width: 100%;
   background: transparent;
   border: none;
-  padding: 0;
+  padding: 4px;
+  margin: 0;
   line-height: 0;
+  color: var(--muted);
   cursor: pointer;
+  flex-shrink: 0;
 }
 
-// Scoped to the photo itself rather than `.photo img` — the toy icons live in
-// this column too, and a bare `.photo img` was rounding them off into circles
-#theme-toggle img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 1/1;
-  object-fit: cover;
-  border-radius: 50%;
-  transition: filter 0.2s ease;
-}
-
-#theme-toggle:hover img {
-  filter: brightness(1.08);
-}
-
-.links {
-  text-align: center;
-  margin-bottom: 17px;
-}
-
-body {
-  background-color: var(--bg);
+#theme-toggle:hover {
   color: var(--text);
 }
 
+.icon-sun,
+.icon-moon {
+  display: none;
+}
+
+:root:not([data-theme="light"]) #theme-toggle .icon-sun {
+  display: block;
+}
+
+:root[data-theme="light"] #theme-toggle .icon-moon {
+  display: block;
+}
+
+.bio p {
+  margin: 0 0 16px;
+  text-wrap: pretty;
+}
+
+.bio p:last-child {
+  margin-bottom: 0;
+}
+
 /**************/
-/* BASE RULES */
+/* SECTIONS   */
 /**************/
-a {
-  color: var(--link);
-  text-decoration: none;
+.block {
+  margin-top: 40px;
 }
 
-a:focus,
-a:hover {
-  color: var(--link-hover);
-  text-decoration: none;
-}
-
-body,
-td,
-th,
-tr,
-p,
-a {
-  font-family: 'Lato', Verdana, Helvetica, sans-serif;
-  font-size: 14.5px;
-  font-display: auto;
-}
-
-strong {
-  font-family: 'Lato', Verdana, Helvetica, sans-serif;
-  font-size: 14.5px;
-  font-display: auto;
-}
-
-h2 {
-  font-family: 'Lato', Verdana, Helvetica, sans-serif;
-  font-size: 22px;
-  font-display: auto;
-  font-weight: normal;
-  padding: 0px;
-  margin: 0px;
-  display:inline; 
-}
-
-h3 {
-  font-family: 'Lato', Verdana, Helvetica, sans-serif;
-  font-size: 14px;
+.block-label {
+  font-size: 12.5px;
   font-weight: 700;
-  font-display: auto;
-  padding: 0px;
-  margin: 0px;
-  display:inline; 
+  color: var(--muted);
+  margin: 0 0 12px;
 }
 
-h1 {
-  font-family: 'Lato', Verdana, Helvetica, sans-serif;
-  font-size: 32px;
-  font-weight: normal;
-  font-display: auto;
-  text-align: center;
-  padding: 0px;
-  margin-block-start: 64px;
-  margin-block-end: 14px;
-  margin-left: 0px;
-  margin-right: 0px;
-
+.block-label-current {
+  color: var(--text);
 }
 
-// Must sit after the base rules — a media query adds no specificity, so an
-// equally-specific rule further down the file would win instead
-// On narrow screens everything stacks in one column: photo, then name, then bio
-@media screen and (max-width: 640px) {
-  .page {
-    grid-template-columns: 1fr;
-    column-gap: 0;
-  }
-
-  .photo {
-    grid-column: 1;
-    grid-row: 1;
-    transform: none;
-    width: 150px;
-    margin: 0 auto;
-  }
-
-  .intro {
-    grid-column: 1;
-    grid-row: 2;
-  }
-
-  .bio {
-    grid-column: 1;
-    grid-row: 3;
-  }
-
-  h1 {
-    font-size: 26px;
-    margin-block-start: 10px;
-  }
-
-  .links {
-    margin-bottom: 20px;
-  }
+.row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 7px 0;
 }
 
-.one {
-  width: 160px;
-  height: 160px;
-  position: relative;
+.row-label {
+  font-weight: 400;
 }
 
-.two {
-  width: 160px;
-  height: 160px;
-  position: absolute;
-  transition: opacity .2s ease-in-out;
-  -moz-transition: opacity .2s ease-in-out;
-  -webkit-transition: opacity .2s ease-in-out;
+.row-link {
+  color: var(--text);
+  font-weight: 400;
 }
 
-.fade {
-  transition: opacity .2s ease-in-out;
-  -moz-transition: opacity .2s ease-in-out;
-  -webkit-transition: opacity .2s ease-in-out;
+.row-year {
+  color: var(--muted);
+  font-size: 13px;
+  white-space: nowrap;
 }
 
-span.highlight {
-  background-color: #ffffd0;
+.rule {
+  border: none;
+  border-top: 1px solid var(--rule);
+  margin: 40px 0 14px;
+}
+
+.updated {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 0;
+}
+
+/**************/
+/* COURSEWORK */
+/**************/
+.coursework-title {
+  font-size: 26px;
+  font-weight: 500;
+  margin: 0 0 8px;
+}
+
+.course-row {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 5px 0;
+}
+
+.course-code {
+  color: var(--muted);
+  font-size: 13px;
+  width: 52px;
+  flex-shrink: 0;
+}
+
+.course-title {
+  font-size: 14px;
 }
 
 #copy-toast {
@@ -378,7 +244,6 @@ span.highlight {
   transform: translateX(-50%);
   background: var(--toast-bg);
   color: var(--toast-text);
-  font-family: 'Lato', Verdana, Helvetica, sans-serif;
   font-size: 14px;
   padding: 10px 18px;
   border-radius: 6px;
@@ -388,7 +253,12 @@ span.highlight {
   z-index: 1000;
 }
 
-// Settled on moving the import of syntax highlighting to the bottom of the CSS
-// ... Otherwise it really bloats up the top of the CSS file and makes it difficult to find the start
-//@import "highlights";
-//@import "svg-icons";
+@media screen and (max-width: 480px) {
+  .page {
+    padding: 40px 20px 32px;
+  }
+
+  .row {
+    flex-wrap: wrap;
+  }
+}

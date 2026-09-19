@@ -2,12 +2,20 @@
 <html lang="en">
 
 <head>
-  <title>{{ site.name }}</title>
+  <title>{{ page.title | default: site.name }}</title>
 
   <!-- Runs before paint so the saved theme applies without a flash -->
   <script>
     (function () {
       document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'dark');
+
+      // Hides the page's typed content and fade-in content before first
+      // paint, so neither ever flashes fully rendered first. Skipped
+      // entirely under reduced motion, so that path never hides anything.
+      var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!reduceMotion) {
+        document.documentElement.classList.add('anim-hide-type', 'anim-hide-fade');
+      }
     })();
   </script>
 
@@ -19,87 +27,39 @@
   <!-- Build timestamp busts the browser cache whenever the site is rebuilt -->
   <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/style.css?v={{ site.time | date: '%s' }}" />
   <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}">
-  <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
 
+  <link rel="icon" type="image/x-icon" href="{{ site.baseurl }}/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ site.baseurl }}/images/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ site.baseurl }}/images/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="{{ site.baseurl }}/images/favicon-192.png">
+  <link rel="apple-touch-icon" href="{{ site.baseurl }}/images/apple-touch-icon.png">
 </head>
 
 <body>
   <div class="page">
-    <div class="intro">
-      <h1>Conan Chen</h1>
-      <p class="links">
-        <a href="#" id="email-link" onclick="revealEmail(event)">Email</a> &nbsp;/&nbsp;
-        <a href="https://www.linkedin.com/in/conan-chen">LinkedIn</a> &nbsp;/&nbsp;
-        <a href="https://github.com/conancchen">GitHub</a> &nbsp;/&nbsp;
-        <a href="https://www.strava.com/athletes/42953307">Follow my Strava!</a>
-      </p>
-
-      <!-- Games disabled for now. Collapsed to zero height until an icon opens
-           one; when it does, a gap slides open between the links and the bio.
-           Re-enable together with the .toys icon row and the scripts below. -->
-      <!--
-      <div id="dino-game" aria-hidden="true">
-        <div id="dino-stage">
-          <canvas id="dino-canvas" tabindex="0" aria-label="Dinosaur game"></canvas>
-        </div>
-      </div>
-
-      <div id="flappy-game" aria-hidden="true">
-        <div id="flappy-stage">
-          <canvas id="flappy-canvas" tabindex="0" aria-label="Flappy bird game"></canvas>
-        </div>
-      </div>
-
-      <div id="geometry-game" aria-hidden="true">
-        <div id="geometry-stage">
-          <canvas id="geometry-canvas" tabindex="0" aria-label="Geometry dash game"></canvas>
-        </div>
-      </div>
-      -->
-    </div>
-
-    <div class="photo">
-      <!-- The photo is the light/dark switch -->
-      <button id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark mode">
-        <img alt="profile photo" src="images/profile.jpg">
-      </button>
-
-      <!-- The games, tucked under the photo so the name heading can sit
-           dead centre. Disabled for now — the whole row is commented out
-           rather than emptied so its margin doesn't leave a gap. -->
-      <!--
-      <div class="toys">
-        <button class="icon-btn" id="geometry-toggle" onclick="toggleGeometry()" aria-label="Play the geometry dash game" title="Play the geometry dash game" aria-pressed="false">
-          <img src="{{ site.baseurl }}/images/geometry.png" alt="">
-        </button>
-        <button class="icon-btn" id="dino-toggle" onclick="toggleDino()" aria-label="Play the dinosaur game" title="Play the dinosaur game" aria-pressed="false">
-          <img src="{{ site.baseurl }}/images/dino.png" alt="">
-        </button>
-        <button class="icon-btn" id="flappy-toggle" onclick="toggleFlappy()" aria-label="Play the flappy bird game" title="Play the flappy bird game" aria-pressed="false">
-          <img src="{{ site.baseurl }}/images/bird.png" alt="">
+    <header class="header">
+      <div class="header-row">
+        <h1><a href="{{ site.baseurl }}/" class="home-link">Conan Chen</a></h1>
+        <button id="theme-toggle" onclick="toggleTheme()" aria-label="Switch to light mode" title="Switch to light mode">
+          <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"></circle>
+            <line x1="12" y1="2" x2="12" y2="4"></line>
+            <line x1="12" y1="20" x2="12" y2="22"></line>
+            <line x1="4.93" y1="4.93" x2="6.34" y2="6.34"></line>
+            <line x1="17.66" y1="17.66" x2="19.07" y2="19.07"></line>
+            <line x1="2" y1="12" x2="4" y2="12"></line>
+            <line x1="20" y1="12" x2="22" y2="12"></line>
+            <line x1="4.93" y1="19.07" x2="6.34" y2="17.66"></line>
+            <line x1="17.66" y1="6.34" x2="19.07" y2="4.93"></line>
+          </svg>
+          <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
         </button>
       </div>
-      -->
+    </header>
 
-    </div>
-
-    <div class="bio">
-      <p>
-        I am a rising junior at Princeton studying <a href="https://orfe.princeton.edu/">ORFE</a> with minors in Classics and CS.
-      </p>
-      <p>
-        This summer, I've been researching data generation and reinforcement learning methods for training humanoid robots in the <a href="https://pvl.cs.princeton.edu/">Princeton Vision & Learning Lab</a>.
-      </p>
-      <p>
-        Previously, I interned at <a href="https://scale.com/">Scale AI</a>, fine-tuning frontier LLMs and building benchmarks like <a href="https://agi.safe.ai/">Humanity's Last Exam</a>.
-      </p>
-      <p>
-        I also compete as an NCAA Division I athlete on the <a href="https://goprincetontigers.com/sports/mens-swimming-and-diving">Princeton Men's Swimming Team</a>. Recently, I finished my first <a href="{{ site.baseurl }}/pdfs/im70.3.pdf">Ironman 70.3</a> in&nbsp;under&nbsp;5&nbsp;hours!
-      </p>
-
-      <hr class="bio-rule">
-      <p class="updated">Last updated July 2026</p>
-    </div>
+    {{ content }}
   </div>
 
   <div id="copy-toast">Copied to clipboard!</div>
@@ -138,9 +98,9 @@
 
     var emailResetTimer;
 
-    function revealEmail(event) {
+    function copyEmail(event) {
       event.preventDefault();
-      var address = ['conanc', 'princeton.edu'].join('@');
+      var address = 'conanc@princeton.edu';
       var link = document.getElementById('email-link');
       link.textContent = address;
 
@@ -157,14 +117,119 @@
       }
       copyText(address).then(notify, notify);
     }
-  </script>
 
-  <!-- Games disabled for now; the sources still live in the repo root
-  <script src="{{ site.baseurl }}/dino.js?v={{ site.time | date: '%s' }}"></script>
-  <script src="{{ site.baseurl }}/flappy.js?v={{ site.time | date: '%s' }}"></script>
-  <script src="{{ site.baseurl }}/geometry.js?v={{ site.time | date: '%s' }}"></script>
-  -->
+    // Types out the page's ".type-target" content one character at a time,
+    // walking each item's real nodes (not raw HTML) so links stay clickable
+    // as they're typed. Which children count as "items" is set per page via
+    // data-type-items (defaults to "p"). Once typing finishes, ".fade-target"
+    // (if present) is revealed — either right away or after the visitor
+    // touches a key/mouse/trackpad, per data-fade-trigger ("auto"|"input").
+    (function () {
+      var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var container = document.querySelector('.type-target');
+
+      function revealFade() {
+        document.documentElement.classList.remove('anim-hide-fade');
+      }
+
+      if (reduceMotion || !container) {
+        document.documentElement.classList.remove('anim-hide-type');
+        revealFade();
+        return;
+      }
+
+      var itemSelector = container.getAttribute('data-type-items') || 'p';
+      var fadeTrigger = container.getAttribute('data-fade-trigger') || 'auto';
+      var items = Array.prototype.filter.call(container.children, function (el) {
+        return el.matches(itemSelector);
+      });
+
+      if (!items.length) {
+        document.documentElement.classList.remove('anim-hide-type');
+        revealFade();
+        return;
+      }
+
+      var CHAR_DELAY = 16;
+      var ITEM_PAUSE = 250;
+
+      var originals = items.map(function (item) {
+        // Drop pure-whitespace text nodes (source indentation/newlines) —
+        // typing them either leaves a stray trailing space once the cursor
+        // moves past it, or just wastes time on invisible characters
+        var nodes = Array.prototype.slice.call(item.childNodes).filter(function (n) {
+          return !(n.nodeType === Node.TEXT_NODE && /^\s*$/.test(n.textContent));
+        });
+        item.innerHTML = '';
+        return nodes;
+      });
+
+      // The container was hidden pre-paint; now that it's empty, reveal it
+      // so typing fills already-visible (but blank) items
+      document.documentElement.classList.remove('anim-hide-type');
+
+      var cursor = document.createElement('span');
+      cursor.className = 'type-cursor';
+
+      function typeText(target, text, i, done) {
+        if (i >= text.length) return done();
+        target.appendChild(document.createTextNode(text[i]));
+        target.appendChild(cursor);
+        setTimeout(function () {
+          typeText(target, text, i + 1, done);
+        }, CHAR_DELAY);
+      }
+
+      function typeNodesInto(target, nodes, i, done) {
+        if (i >= nodes.length) return done();
+        var node = nodes[i];
+        var next = function () { typeNodesInto(target, nodes, i + 1, done); };
+        if (node.nodeType === Node.TEXT_NODE) {
+          typeText(target, node.textContent, 0, next);
+        } else {
+          var el = document.createElement(node.tagName);
+          Array.prototype.forEach.call(node.attributes, function (attr) {
+            el.setAttribute(attr.name, attr.value);
+          });
+          target.appendChild(el);
+          typeText(el, node.textContent, 0, next);
+        }
+      }
+
+      function waitForInputThenReveal() {
+        var revealed = false;
+        var events = ['keydown', 'mousedown', 'touchstart', 'wheel', 'mousemove'];
+        function reveal() {
+          if (revealed) return;
+          revealed = true;
+          revealFade();
+          events.forEach(function (evt) {
+            window.removeEventListener(evt, reveal);
+          });
+        }
+        events.forEach(function (evt) {
+          window.addEventListener(evt, reveal, { passive: true });
+        });
+      }
+
+      function typeItem(index) {
+        if (index >= items.length) {
+          cursor.remove();
+          if (fadeTrigger === 'input') {
+            waitForInputThenReveal();
+          } else {
+            revealFade();
+          }
+          return;
+        }
+        typeNodesInto(items[index], originals[index], 0, function () {
+          setTimeout(function () { typeItem(index + 1); }, ITEM_PAUSE);
+        });
+      }
+
+      typeItem(0);
+    })();
+  </script>
 </body>
 
 </html>
-
