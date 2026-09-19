@@ -12,6 +12,7 @@
   --muted: #8a8a8a;
   --rule: #3a3a3a;
   --link: #9a9a98;
+  --underline: #55554f;
   --toast-bg: #f2f2f0;
   --toast-text: #202020;
 }
@@ -23,6 +24,7 @@
   --muted: #8a8a8a;
   --rule: #e0dfdb;
   --link: #6f6e6a;
+  --underline: #d3d2ce;
   --toast-bg: #16150f;
   --toast-text: #f7f6f3;
 }
@@ -38,7 +40,7 @@ body {
   margin: 0;
   background-color: var(--bg);
   color: var(--text);
-  font-family: Calibri, 'Segoe UI', -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
   font-size: 14px;
   line-height: 1.6;
 }
@@ -54,9 +56,21 @@ a:focus {
   opacity: 0.7;
 }
 
+// Bio links read as body text with a faint underline that darkens on hover
+.bio a {
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-color: var(--underline);
+  text-decoration-thickness: 1px;
+  text-decoration-skip-ink: none;
+  text-underline-offset: 4px;
+  transition: text-decoration-color 0.15s ease;
+}
+
 .bio a:hover,
 .bio a:focus {
-  text-decoration: underline;
+  opacity: 1;
+  text-decoration-color: var(--text);
 }
 
 .type-cursor {

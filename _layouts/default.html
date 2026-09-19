@@ -24,6 +24,10 @@
   <meta name="author" content="{{ site.name }}" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap">
+
   <!-- Build timestamp busts the browser cache whenever the site is rebuilt -->
   <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/style.css?v={{ site.time | date: '%s' }}" />
   <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}">
@@ -196,23 +200,27 @@
     }
 
     var emailResetTimer;
+    var toastTimer;
 
     function copyEmail(event) {
       event.preventDefault();
+      // The link is typed out live; overwriting it mid-typing would garble it
+      if (document.querySelector('.type-cursor')) return;
       var address = 'conanc@princeton.edu';
       var link = document.getElementById('email-link');
-      link.textContent = address;
+      link.textContent = 'at ' + address;
 
       // Rapid clicks restart the countdown instead of stacking timers
       clearTimeout(emailResetTimer);
       emailResetTimer = setTimeout(function () {
-        link.textContent = 'Email';
+        link.textContent = 'by email';
       }, 3000);
 
       var toast = document.getElementById('copy-toast');
       function notify() {
         toast.style.opacity = '1';
-        setTimeout(function () { toast.style.opacity = '0'; }, 2000);
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toast.style.opacity = '0'; }, 2000);
       }
       copyText(address).then(notify, notify);
     }
@@ -250,8 +258,8 @@
         return;
       }
 
-      var CHAR_DELAY = 11;
-      var ITEM_PAUSE = 96;
+      var CHAR_DELAY = 10;
+      var ITEM_PAUSE = 86;
 
       var originals = items.map(function (item) {
         // Drop pure-whitespace text nodes (source indentation/newlines) —
