@@ -6,13 +6,13 @@ layout: default
     I am a junior at Princeton studying ORFE with minors in Classics and Computer Science.
   </p>
   <p>
-    Currently, I am researching data generation and reinforcement learning for humanoid robot navigation in the <a href="https://pvl.cs.princeton.edu/">Princeton Vision and Learning Lab</a>.
+    Currently, I work in the <a href="https://pvl.cs.princeton.edu/">Princeton Vision and Learning Lab</a>, researching data generation and reinforcement learning for vision-based humanoid robot navigation.
   </p>
   <p>
-    Previously, I interned at <a href="https://scale.com/">Scale AI</a>, training/evaluating frontier LLMs and designing benchmarks like <a href="https://agi.safe.ai/">Humanity's Last Exam</a>.
+    Previously, I trained and evaluated frontier LLMs as an intern at <a href="https://scale.com/">Scale AI</a>.
   </p>
   <p>
-    I also compete as a Division I athlete on the Princeton Men's Swimming Team. This summer, I finished my first <a href="{{ site.baseurl }}/pdfs/im70.3.pdf">Ironman 70.3</a> in&nbsp;under&nbsp;5&nbsp;hours!
+    I also compete as a Division I athlete on the Princeton Men's Swim Team. This summer, I finished my first <a href="{{ site.baseurl }}/pdfs/im70.3.pdf">Ironman 70.3</a> in&nbsp;under&nbsp;5&nbsp;hours!
   </p>
   <p>
     You can find me on <a href="https://www.linkedin.com/in/conan-chen">LinkedIn</a> or reach me <a href="#" id="email-link" onclick="copyEmail(event)">by email</a>.
@@ -46,5 +46,23 @@ layout: default
   </section>
 
   <hr class="rule">
-  <p class="updated">Last updated September 2026</p>
+  <p class="updated" id="princeton-time"></p>
 </div>
+
+<script>
+  (function () {
+    var el = document.getElementById('princeton-time');
+    var format = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/New_York',
+      hour: 'numeric',
+      minute: '2-digit'
+    });
+
+    function tick() {
+      el.textContent = format.format(new Date()) + ' in Princeton, NJ';
+    }
+
+    tick();
+    setInterval(tick, 1000);
+  })();
+</script>
