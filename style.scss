@@ -73,29 +73,15 @@ a:focus {
   text-decoration-color: var(--text);
 }
 
-.type-cursor {
-  display: inline-block;
-  width: 1px;
-  height: 0.9em;
-  margin-left: 1px;
-  background: currentColor;
-  vertical-align: text-bottom;
-  animation: blink 0.9s steps(1) infinite;
-}
-
-@keyframes blink {
-  50% {
-    opacity: 0;
-  }
-}
-
-.anim-hide-type .type-target {
-  visibility: hidden;
+// Each direct child (paragraph, course row) fades in on its own; the
+// per-item timing is set from the layout's script
+.anim-hide-intro .fade-intro > * {
+  opacity: 0;
 }
 
 .fade-target {
   opacity: 1;
-  transition: opacity 2.4s ease;
+  transition: opacity 1s ease;
 }
 
 .anim-hide-fade .fade-target {

@@ -9,12 +9,12 @@
     (function () {
       document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'dark');
 
-      // Hides the page's typed content and fade-in content before first
-      // paint, so neither ever flashes fully rendered first. Skipped
-      // entirely under reduced motion, so that path never hides anything.
+      // Hides the page's fade-in content before first paint, so it never
+      // flashes fully rendered first. Skipped entirely under reduced motion,
+      // so that path never hides anything.
       var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (!reduceMotion) {
-        document.documentElement.classList.add('anim-hide-type', 'anim-hide-fade');
+        document.documentElement.classList.add('anim-hide-intro', 'anim-hide-fade');
       }
     })();
   </script>
@@ -204,8 +204,6 @@
 
     function copyEmail(event) {
       event.preventDefault();
-      // The link is typed out live; overwriting it mid-typing would garble it
-      if (document.querySelector('.type-cursor')) return;
       var address = 'conanc@princeton.edu';
       var link = document.getElementById('email-link');
       link.textContent = 'at ' + address;
@@ -225,97 +223,19 @@
       copyText(address).then(notify, notify);
     }
 
-    // Types out the page's ".type-target" content one character at a time,
-    // walking each item's real nodes (not raw HTML) so links stay clickable
-    // as they're typed. Which children count as "items" is set per page via
-    // data-type-items (defaults to "p"). Once typing finishes, ".fade-target"
-    // (if present) is revealed — either right away or after the visitor
-    // touches a key/mouse/trackpad, per data-fade-trigger ("auto"|"input").
-    // Pressing Space while typing skips ahead to the finished text.
+    // Fades in each child of the page's ".fade-intro" one after another, then
+    // reveals ".fade-target" (if present) — either right after, or once the
+    // visitor touches a key/mouse/trackpad, per data-fade-trigger
+    // ("auto"|"input").
     (function () {
-      var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      var container = document.querySelector('.type-target');
+      var ITEM_FADE_MS = 1000;  // how long each item takes to fade in
+      var ITEM_STEP_MS = 700;   // gap between one item starting and the next
+      var root = document.documentElement;
+      var intro = document.querySelector('.fade-intro');
+      var fadeTrigger = (intro && intro.getAttribute('data-fade-trigger')) || 'auto';
 
       function revealFade() {
-        document.documentElement.classList.remove('anim-hide-fade');
-      }
-
-      if (reduceMotion || !container) {
-        document.documentElement.classList.remove('anim-hide-type');
-        revealFade();
-        return;
-      }
-
-      var itemSelector = container.getAttribute('data-type-items') || 'p';
-      var fadeTrigger = container.getAttribute('data-fade-trigger') || 'auto';
-      var items = Array.prototype.filter.call(container.children, function (el) {
-        return el.matches(itemSelector);
-      });
-
-      if (!items.length) {
-        document.documentElement.classList.remove('anim-hide-type');
-        revealFade();
-        return;
-      }
-
-      var CHAR_DELAY = 10 / 1.15 / 1.15;
-      var ITEM_PAUSE = 75;
-
-      // setTimeout only honors whole milliseconds, so carry the fractional
-      // remainder forward to keep the average delay at CHAR_DELAY
-      var delayCarry = 0;
-      function nextCharDelay() {
-        var wanted = CHAR_DELAY + delayCarry;
-        var ms = Math.round(wanted);
-        delayCarry = wanted - ms;
-        return ms;
-      }
-
-      var originals = items.map(function (item) {
-        // Drop pure-whitespace text nodes (source indentation/newlines) —
-        // typing them either leaves a stray trailing space once the cursor
-        // moves past it, or just wastes time on invisible characters
-        var nodes = Array.prototype.slice.call(item.childNodes).filter(function (n) {
-          return !(n.nodeType === Node.TEXT_NODE && /^\s*$/.test(n.textContent));
-        });
-        item.innerHTML = '';
-        return nodes;
-      });
-
-      // The container was hidden pre-paint; now that it's empty, reveal it
-      // so typing fills already-visible (but blank) items
-      document.documentElement.classList.remove('anim-hide-type');
-
-      var cursor = document.createElement('span');
-      cursor.className = 'type-cursor';
-
-      // Only one typing timer is ever pending; tracking it lets Space cancel it
-      var typingTimer;
-      var typingDone = false;
-
-      function typeText(target, text, i, done) {
-        if (i >= text.length) return done();
-        target.appendChild(document.createTextNode(text[i]));
-        target.appendChild(cursor);
-        typingTimer = setTimeout(function () {
-          typeText(target, text, i + 1, done);
-        }, nextCharDelay());
-      }
-
-      function typeNodesInto(target, nodes, i, done) {
-        if (i >= nodes.length) return done();
-        var node = nodes[i];
-        var next = function () { typeNodesInto(target, nodes, i + 1, done); };
-        if (node.nodeType === Node.TEXT_NODE) {
-          typeText(target, node.textContent, 0, next);
-        } else {
-          var el = document.createElement(node.tagName);
-          Array.prototype.forEach.call(node.attributes, function (attr) {
-            el.setAttribute(attr.name, attr.value);
-          });
-          target.appendChild(el);
-          typeText(el, node.textContent, 0, next);
-        }
+        root.classList.remove('anim-hide-fade');
       }
 
       function waitForInputThenReveal() {
@@ -334,39 +254,24 @@
         });
       }
 
-      function finishTyping() {
-        typingDone = true;
-        window.removeEventListener('keydown', skipOnSpace);
-        cursor.remove();
+      var items = intro ? Array.prototype.slice.call(intro.children) : [];
+      items.forEach(function (item, i) {
+        item.style.transition = 'opacity ' + ITEM_FADE_MS + 'ms ease ' + (i * ITEM_STEP_MS) + 'ms';
+      });
+
+      // Flush styles first so the hidden state is applied before the class
+      // comes off; otherwise the browser would skip the transition
+      if (intro) void intro.offsetWidth;
+      root.classList.remove('anim-hide-intro');
+
+      var introMs = items.length ? (items.length - 1) * ITEM_STEP_MS + ITEM_FADE_MS : 0;
+      setTimeout(function () {
         if (fadeTrigger === 'input') {
           waitForInputThenReveal();
         } else {
           revealFade();
         }
-      }
-
-      // Space jumps straight to the fully typed page
-      function skipOnSpace(event) {
-        if (event.key !== ' ' || typingDone) return;
-        event.preventDefault();
-        clearTimeout(typingTimer);
-        items.forEach(function (item, i) {
-          item.innerHTML = '';
-          originals[i].forEach(function (node) { item.appendChild(node); });
-        });
-        finishTyping();
-      }
-
-      window.addEventListener('keydown', skipOnSpace);
-
-      function typeItem(index) {
-        if (index >= items.length) return finishTyping();
-        typeNodesInto(items[index], originals[index], 0, function () {
-          typingTimer = setTimeout(function () { typeItem(index + 1); }, ITEM_PAUSE);
-        });
-      }
-
-      typeItem(0);
+      }, introMs);
     })();
   </script>
 </body>
