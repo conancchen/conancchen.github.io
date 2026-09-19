@@ -258,8 +258,18 @@
         return;
       }
 
-      var CHAR_DELAY = 10;
-      var ITEM_PAUSE = 86;
+      var CHAR_DELAY = 10 / 1.15;
+      var ITEM_PAUSE = 75;
+
+      // setTimeout only honors whole milliseconds, so carry the fractional
+      // remainder forward to keep the average delay at CHAR_DELAY
+      var delayCarry = 0;
+      function nextCharDelay() {
+        var wanted = CHAR_DELAY + delayCarry;
+        var ms = Math.round(wanted);
+        delayCarry = wanted - ms;
+        return ms;
+      }
 
       var originals = items.map(function (item) {
         // Drop pure-whitespace text nodes (source indentation/newlines) —
@@ -289,7 +299,7 @@
         target.appendChild(cursor);
         typingTimer = setTimeout(function () {
           typeText(target, text, i + 1, done);
-        }, CHAR_DELAY);
+        }, nextCharDelay());
       }
 
       function typeNodesInto(target, nodes, i, done) {
