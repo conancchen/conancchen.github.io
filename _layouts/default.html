@@ -59,6 +59,105 @@
       </div>
     </header>
 
+    <!-- Runs as soon as the title is parsed, so the first paint is already scrambled -->
+    <script>
+      // Cycles the title through random, randomly colored glyphs, locking
+      // each one in (in the normal text color) from left to right until it
+      // spells the real name
+      (function () {
+        var link = document.querySelector('.home-link');
+        var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (!link || reduceMotion) return;
+
+        var finalText = link.textContent;
+
+        // Scramble glyphs come from many scripts and symbol blocks. Each block
+        // is picked with equal odds (so small ones like Greek show up as often
+        // as CJK), and only blocks that are fully assigned, left-to-right and
+        // not emoji are used, so nothing renders as a missing-glyph box, flips
+        // text direction, or turns into a color emoji.
+        var GLYPH_BLOCKS = [
+          [0x00C0, 0x024F],  // Latin-1 / Latin Extended
+          [0x0391, 0x03A1],  // Greek capitals
+          [0x03A3, 0x03C9],  // Greek capitals + lowercase
+          [0x0410, 0x044F],  // Cyrillic
+          [0x2190, 0x21FF],  // Arrows
+          [0x2200, 0x22FF],  // Math operators
+          [0x2500, 0x259F],  // Box drawing + block elements
+          [0x25A0, 0x25F7],  // Geometric shapes
+          [0x2800, 0x28FF],  // Braille
+          [0x3041, 0x3096],  // Hiragana
+          [0x30A1, 0x30FA],  // Katakana
+          [0xAC00, 0xD7A3],  // Hangul syllables
+          [0x4E00, 0x9FA5]   // CJK ideographs
+        ];
+
+        function randomGlyph() {
+          var block = GLYPH_BLOCKS[Math.floor(Math.random() * GLYPH_BLOCKS.length)];
+          return String.fromCharCode(block[0] + Math.floor(Math.random() * (block[1] - block[0] + 1)));
+        }
+
+        var TICK = 40;        // ms between scramble frames
+        var LOCK_START = 11.25;  // ticks of pure scramble before the first letter locks
+        var LOCK_STEP = 3.75;    // ticks between each following letter locking
+        // Any hue is fair game, but saturation and lightness are fixed so the
+        // colors read as one family (tweak these to change the feel)
+        var SATURATION = 75;       // %
+        var LIGHTNESS_DARK = 70;   // % on the dark theme
+        var LIGHTNESS_LIGHT = 45;  // % on the light theme
+        var lastTick = LOCK_START + finalText.length * LOCK_STEP;
+        var tick = 0;
+
+        // Screen readers should hear the name, not the gibberish
+        link.setAttribute('aria-label', finalText);
+
+        // Fallback fonts for exotic glyphs can have different line metrics and
+        // widths; pin the heading's height and keep the name on one line so
+        // the page below never jumps while it scrambles
+        var heading = link.parentNode;
+        heading.style.height = heading.offsetHeight + 'px';
+        link.style.whiteSpace = 'nowrap';
+
+        // One span per character so each can carry its own color
+        link.textContent = '';
+        var glyphs = finalText.split('').map(function (ch) {
+          var span = document.createElement('span');
+          link.appendChild(span);
+          return span;
+        });
+
+        function randomColor() {
+          var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+          var hue = Math.floor(Math.random() * 360);
+          return 'hsl(' + hue + ', ' + SATURATION + '%, ' + (dark ? LIGHTNESS_DARK : LIGHTNESS_LIGHT) + '%)';
+        }
+
+        function render() {
+          for (var i = 0; i < finalText.length; i++) {
+            var span = glyphs[i];
+            if (tick >= LOCK_START + i * LOCK_STEP || finalText[i] === ' ') {
+              span.textContent = finalText[i];
+              span.style.color = '';
+            } else {
+              span.textContent = randomGlyph();
+              span.style.color = randomColor();
+            }
+          }
+        }
+
+        render();
+        var timer = setInterval(function () {
+          tick++;
+          render();
+          if (tick >= lastTick) {
+            clearInterval(timer);
+            heading.style.height = '';
+            link.style.whiteSpace = '';
+          }
+        }, TICK);
+      })();
+    </script>
+
     {{ content }}
   </div>
 
@@ -124,6 +223,7 @@
     // data-type-items (defaults to "p"). Once typing finishes, ".fade-target"
     // (if present) is revealed — either right away or after the visitor
     // touches a key/mouse/trackpad, per data-fade-trigger ("auto"|"input").
+    // Pressing Space while typing skips ahead to the finished text.
     (function () {
       var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       var container = document.querySelector('.type-target');
@@ -150,8 +250,8 @@
         return;
       }
 
-      var CHAR_DELAY = 16;
-      var ITEM_PAUSE = 250;
+      var CHAR_DELAY = 14;
+      var ITEM_PAUSE = 120;
 
       var originals = items.map(function (item) {
         // Drop pure-whitespace text nodes (source indentation/newlines) —
@@ -171,11 +271,15 @@
       var cursor = document.createElement('span');
       cursor.className = 'type-cursor';
 
+      // Only one typing timer is ever pending; tracking it lets Space cancel it
+      var typingTimer;
+      var typingDone = false;
+
       function typeText(target, text, i, done) {
         if (i >= text.length) return done();
         target.appendChild(document.createTextNode(text[i]));
         target.appendChild(cursor);
-        setTimeout(function () {
+        typingTimer = setTimeout(function () {
           typeText(target, text, i + 1, done);
         }, CHAR_DELAY);
       }
@@ -212,18 +316,35 @@
         });
       }
 
-      function typeItem(index) {
-        if (index >= items.length) {
-          cursor.remove();
-          if (fadeTrigger === 'input') {
-            waitForInputThenReveal();
-          } else {
-            revealFade();
-          }
-          return;
+      function finishTyping() {
+        typingDone = true;
+        window.removeEventListener('keydown', skipOnSpace);
+        cursor.remove();
+        if (fadeTrigger === 'input') {
+          waitForInputThenReveal();
+        } else {
+          revealFade();
         }
+      }
+
+      // Space jumps straight to the fully typed page
+      function skipOnSpace(event) {
+        if (event.key !== ' ' || typingDone) return;
+        event.preventDefault();
+        clearTimeout(typingTimer);
+        items.forEach(function (item, i) {
+          item.innerHTML = '';
+          originals[i].forEach(function (node) { item.appendChild(node); });
+        });
+        finishTyping();
+      }
+
+      window.addEventListener('keydown', skipOnSpace);
+
+      function typeItem(index) {
+        if (index >= items.length) return finishTyping();
         typeNodesInto(items[index], originals[index], 0, function () {
-          setTimeout(function () { typeItem(index + 1); }, ITEM_PAUSE);
+          typingTimer = setTimeout(function () { typeItem(index + 1); }, ITEM_PAUSE);
         });
       }
 
