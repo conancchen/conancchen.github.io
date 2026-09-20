@@ -176,10 +176,6 @@ a:focus {
   font-weight: 400;
 }
 
-.block-label-current {
-  color: var(--text);
-}
-
 .row {
   display: flex;
   align-items: baseline;
@@ -332,22 +328,54 @@ a:focus {
 /**************/
 /* COURSEWORK */
 /**************/
-.course-row {
+.courses {
+  margin-top: 32px;
+}
+
+// Each term is a row: its name in a gutter on the left, its courses stacked
+// beside it. The rule above a term spans both columns; courses inside a term
+// are separated by space alone.
+.term {
+  display: grid;
+  grid-template-columns: 104px 1fr;
+  align-items: start;
+  border-top: 1px solid var(--rule);
+  padding: 16px 0;
+}
+
+.courses > .term:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.term-name {
+  color: var(--muted);
+}
+
+.term-name-current {
+  color: var(--text);
+}
+
+.course {
   display: flex;
   align-items: baseline;
-  gap: 14px;
+  justify-content: space-between;
+  gap: 16px;
   padding: 5px 0;
+}
+
+.course:first-child {
+  padding-top: 0;
+}
+
+.course:last-child {
+  padding-bottom: 0;
 }
 
 .course-code {
   color: var(--muted);
   font-size: 13px;
-  width: 52px;
-  flex-shrink: 0;
-}
-
-.course-title {
-  font-size: 14px;
+  white-space: nowrap;
 }
 
 #copy-toast {
@@ -369,6 +397,12 @@ a:focus {
 @media screen and (max-width: 480px) {
   .page {
     padding: 40px 20px 32px;
+  }
+
+  // No room for a gutter, so the term name sits above its courses
+  .term {
+    grid-template-columns: 1fr;
+    row-gap: 6px;
   }
 
   .row {

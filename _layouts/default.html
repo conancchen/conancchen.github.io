@@ -61,7 +61,8 @@
           </svg>
         </button>
       </div>
-      {% if page.show_updated %}<p class="subtitle">Updated {{ site.time | date: "%b %-d, %Y" }}</p>{% endif %}
+      {% if page.subtitle %}<p class="subtitle">{{ page.subtitle }}</p>
+      {% elsif page.show_updated %}<p class="subtitle">Updated {{ site.time | date: "%b %-d, %Y" }}</p>{% endif %}
     </header>
 
     <!-- Runs as soon as the title is parsed, so the first paint is already scrambled -->
@@ -261,9 +262,9 @@
       copyText(address).then(notify, notify);
     }
 
-    // Fades in each child of the page's ".fade-intro" one after another,
-    // spread so the last one finishes exactly when the title's glyph
-    // animation does, then reveals ".fade-target" (if present) — either right
+    // Fades in each child of the page's ".fade-intro" one after another (or
+    // all together, with data-fade-together), spread so the last one finishes
+    // exactly when the title's glyph animation does, then reveals ".fade-target" (if present) — either right
     // after, or once the visitor touches a key/mouse/trackpad, per
     // data-fade-trigger ("auto"|"input").
     (function () {
@@ -295,10 +296,12 @@
 
       var items = intro ? Array.prototype.slice.call(intro.children) : [];
       var totalMs = window.titleAnimationMs || FALLBACK_TOTAL_MS;
-      // A lone item fades over the whole span; otherwise items start evenly
-      // spaced so the last one ends at totalMs
-      var fadeMs = items.length > 1 ? Math.min(ITEM_FADE_MS, totalMs) : totalMs;
-      var stepMs = items.length > 1 ? (totalMs - fadeMs) / (items.length - 1) : 0;
+      // Items start evenly spaced so the last one ends at totalMs — unless
+      // there is only one, or the container asked for them all at once, in
+      // which case they fade together over the whole span
+      var stagger = items.length > 1 && !intro.hasAttribute('data-fade-together');
+      var fadeMs = stagger ? Math.min(ITEM_FADE_MS, totalMs) : totalMs;
+      var stepMs = stagger ? (totalMs - fadeMs) / (items.length - 1) : 0;
       items.forEach(function (item, i) {
         item.style.transition = 'opacity ' + fadeMs + 'ms ease ' + Math.round(i * stepMs) + 'ms';
       });
