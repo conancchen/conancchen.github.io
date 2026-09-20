@@ -112,6 +112,9 @@
         var lastTick = LOCK_START + finalText.length * LOCK_STEP;
         var tick = 0;
 
+        // The page's fade-in is timed to finish right as the last letter locks
+        window.titleAnimationMs = (LOCK_START + (finalText.length - 1) * LOCK_STEP) * TICK;
+
         // Screen readers should hear the name, not the gibberish
         link.setAttribute('aria-label', finalText);
 
@@ -223,13 +226,14 @@
       copyText(address).then(notify, notify);
     }
 
-    // Fades in each child of the page's ".fade-intro" one after another, then
-    // reveals ".fade-target" (if present) — either right after, or once the
-    // visitor touches a key/mouse/trackpad, per data-fade-trigger
-    // ("auto"|"input").
+    // Fades in each child of the page's ".fade-intro" one after another,
+    // spread so the last one finishes exactly when the title's glyph
+    // animation does, then reveals ".fade-target" (if present) — either right
+    // after, or once the visitor touches a key/mouse/trackpad, per
+    // data-fade-trigger ("auto"|"input").
     (function () {
-      var ITEM_FADE_MS = 1000;  // how long each item takes to fade in
-      var ITEM_STEP_MS = 700;   // gap between one item starting and the next
+      var ITEM_FADE_MS = 500;   // how long each item takes to fade in
+      var FALLBACK_TOTAL_MS = 2000;  // used if the title animation isn't running
       var root = document.documentElement;
       var intro = document.querySelector('.fade-intro');
       var fadeTrigger = (intro && intro.getAttribute('data-fade-trigger')) || 'auto';
@@ -255,8 +259,13 @@
       }
 
       var items = intro ? Array.prototype.slice.call(intro.children) : [];
+      var totalMs = window.titleAnimationMs || FALLBACK_TOTAL_MS;
+      // A lone item fades over the whole span; otherwise items start evenly
+      // spaced so the last one ends at totalMs
+      var fadeMs = items.length > 1 ? Math.min(ITEM_FADE_MS, totalMs) : totalMs;
+      var stepMs = items.length > 1 ? (totalMs - fadeMs) / (items.length - 1) : 0;
       items.forEach(function (item, i) {
-        item.style.transition = 'opacity ' + ITEM_FADE_MS + 'ms ease ' + (i * ITEM_STEP_MS) + 'ms';
+        item.style.transition = 'opacity ' + fadeMs + 'ms ease ' + Math.round(i * stepMs) + 'ms';
       });
 
       // Flush styles first so the hidden state is applied before the class
@@ -264,7 +273,7 @@
       if (intro) void intro.offsetWidth;
       root.classList.remove('anim-hide-intro');
 
-      var introMs = items.length ? (items.length - 1) * ITEM_STEP_MS + ITEM_FADE_MS : 0;
+      var introMs = items.length ? totalMs : 0;
       setTimeout(function () {
         if (fadeTrigger === 'input') {
           waitForInputThenReveal();
