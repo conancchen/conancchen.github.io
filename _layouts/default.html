@@ -20,6 +20,7 @@
   </script>
 
   <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+  <meta name="google" content="notranslate">
 
   <meta name="author" content="{{ site.name }}" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -43,7 +44,7 @@
   <div class="page">
     <header class="header">
       <div class="header-row">
-        <h1><a href="{{ site.baseurl }}/" class="home-link">{{ page.heading | default: site.name }}</a></h1>
+        <h1 translate="no"><a href="{{ site.baseurl }}/" class="home-link">{{ page.heading | default: site.name }}</a></h1>
         <button id="theme-toggle" onclick="toggleTheme()" aria-label="Switch to light mode" title="Switch to light mode">
           <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="4"></circle>
@@ -61,8 +62,8 @@
           </svg>
         </button>
       </div>
-      {% if page.subtitle %}<p class="subtitle">{{ page.subtitle }}</p>
-      {% elsif page.show_updated %}<p class="subtitle">Updated {{ site.time | date: "%b %-d, %Y" }}</p>{% endif %}
+      {% if page.subtitle %}<p class="subtitle" translate="no">{{ page.subtitle }}</p>
+      {% elsif page.show_updated %}<p class="subtitle" translate="no">Updated {{ site.time | date: "%b %-d, %Y" }}</p>{% endif %}
     </header>
 
     <!-- Runs as soon as the title is parsed, so the first paint is already scrambled -->
@@ -75,31 +76,13 @@
         var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         if (!link || reduceMotion) return;
 
-        // Scramble glyphs are English letters, Unicode math operators and
-        // Braille dots. Other scripts (CJK especially) trigger browser
-        // auto-translate prompts and change the punctuation spacing of the text
-        // around them, and arrows and boxes looked out of place, so the math
-        // operators skip the squared, square-cap/cup, triangle, diamond and
-        // multimap ones.
-        function charRange(from, to) {
-          var out = '';
-          for (var code = from; code <= to; code++) out += String.fromCharCode(code);
-          return out;
-        }
-
-        // A set is picked with equal odds, then a character from it
-        var GLYPH_SETS = [
-          charRange(0x41, 0x5A) + charRange(0x61, 0x7A),  // A-Z a-z
-          charRange(0x2200, 0x228E) + charRange(0x2295, 0x229D) +
-            charRange(0x22A2, 0x22B5) + charRange(0x22B9, 0x22BE) +
-            charRange(0x22C0, 0x22C3) + charRange(0x22C5, 0x22E1) +
-            charRange(0x22E6, 0x22FF),                    // Math operators
-          charRange(0x2801, 0x28FE)                       // Braille (not blank or full)
-        ];
+        // Scramble glyphs are simple (few-stroke) Chinese characters. They are
+        // why the page opts out of browser translation in the head — otherwise
+        // Chrome offers to translate the site while the title is scrambling.
+        var GLYPHS = '一乙二十丁七人入八九几儿了力乃刀又三干于亏士工土才下寸大丈与万上小口山巾千川个夕久么及广亡门义之尸弓己已子女飞刃习叉马乡王天夫元无云专不五支厅太犬区历友尤匹车巨牙屯戈比互切瓦止少日中贝内水见午牛手气毛长仁什片化币仍仅斤爪反介父从今凶分乏公仓月氏勿欠风丹匀乌凤勾文六方火为斗忆订计户认心打巧正扑扒功扔去甘世古节本术可丙左厉右石布龙平灭东卡北占业旧帅归且旦目叶甲申叮电号田由只史央兄叫另叹四生失禾丘付仗代';
 
         function randomGlyph() {
-          var set = GLYPH_SETS[Math.floor(Math.random() * GLYPH_SETS.length)];
-          return set.charAt(Math.floor(Math.random() * set.length));
+          return GLYPHS.charAt(Math.floor(Math.random() * GLYPHS.length));
         }
 
         var TICK = 40;          // ms between scramble frames
