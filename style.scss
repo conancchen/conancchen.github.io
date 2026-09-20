@@ -93,13 +93,13 @@ a:focus {
 /**************/
 .page {
   width: 100%;
-  max-width: 640px;
+  max-width: 680px;
   margin: 0 auto;
   padding: 64px 24px 48px;
 }
 
 .header {
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 
 .header-row {
@@ -149,7 +149,7 @@ a:focus {
 }
 
 .bio p {
-  margin: 0 0 16px;
+  margin: 0 0 12px;
   text-wrap: pretty;
 }
 
@@ -161,7 +161,7 @@ a:focus {
 /* SECTIONS   */
 /**************/
 .block {
-  margin-top: 40px;
+  margin-top: 32px;
 }
 
 .block-label {
@@ -184,7 +184,7 @@ a:focus {
   align-items: baseline;
   justify-content: space-between;
   gap: 16px;
-  padding: 7px 0;
+  padding: 5px 0;
 }
 
 .row-label {
@@ -205,7 +205,7 @@ a:focus {
 .rule {
   border: none;
   border-top: 1px solid var(--rule);
-  margin: 40px 0 14px;
+  margin: 32px 0 14px;
 }
 
 .updated {
@@ -213,6 +213,37 @@ a:focus {
   font-size: 12px;
   margin: 0;
   font-variant-numeric: tabular-nums;
+}
+
+.clock-place,
+.clock-input {
+  font: inherit;
+  color: inherit;
+  margin: 0;
+}
+
+.clock-place {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+
+.clock-place:hover {
+  color: var(--text);
+}
+
+.clock-input {
+  width: 18ch;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--muted);
+  border-radius: 0;
+  color: var(--text);
+  outline: none;
 }
 
 /**************/
@@ -259,5 +290,9 @@ a:focus {
 
   .row {
     flex-wrap: wrap;
+  }
+
+  .clock-input {
+    font-size: 16px;
   }
 }

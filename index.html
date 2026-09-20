@@ -3,13 +3,13 @@ layout: default
 ---
 <section class="bio fade-intro" data-fade-trigger="input">
   <p>
-    I’m a junior at Princeton studying ORFE with minors in Classics and Computer Science.
+    I’m a junior at Princeton studying ORFE with minors in Classics & Computer Science.
   </p>
   <p>
-    I research humanoid robot navigation in the <a href="https://pvl.cs.princeton.edu/">Princeton Vision and Learning Lab</a>.
+    I research RL & data generation for humanoid robots in the <a href="https://pvl.cs.princeton.edu/">Princeton Vision & Learning Lab</a>.
   </p>
   <p>
-    Previously, I trained and evaluated frontier LLMs as an intern at <a href="https://scale.com/">Scale AI</a>.
+    Previously, I trained & evaluated frontier LLMs as an intern at <a href="https://scale.com/">Scale AI</a>.
   </p>
   <p>
     I also compete as an NCAA Division I athlete for the Princeton Men's Swimming Team. This summer, I completed my first <a href="{{ site.baseurl }}/pdfs/im70.3.pdf">Ironman 70.3</a>.
@@ -24,16 +24,16 @@ layout: default
     <h2 class="block-label block-label-plain">Experiences</h2>
 
     <div class="row">
+      <span class="row-label">Citadel Securities</span>
+      <span class="row-year">Incoming Summer 2027</span>
+    </div>
+    <div class="row">
       <span class="row-label">Princeton Vision & Learning Lab</span>
       <span class="row-year">4/2026 – Present</span>
     </div>
     <div class="row">
       <span class="row-label">Scale AI</span>
       <span class="row-year">2/2025 – 12/2025</span>
-    </div>
-    <div class="row">
-      <span class="row-label">WOWS Global</span>
-      <span class="row-year">6/2025 – 8/2025</span>
     </div>
   </section>
 
@@ -49,23 +49,105 @@ layout: default
   </section>
 
   <hr class="rule">
-  <p class="updated" id="princeton-time"></p>
+  <p class="updated" id="clock"><span id="clock-time"></span> in <button type="button" class="clock-place" id="clock-place" title="Change location">Princeton, NJ</button></p>
 </div>
 
 <script>
   (function () {
-    var el = document.getElementById('princeton-time');
-    var format = new Intl.DateTimeFormat('en-US', {
-      timeZone: 'America/New_York',
-      hour: 'numeric',
-      minute: '2-digit'
-    });
+    var HOME = { label: 'Princeton, NJ', timeZone: 'America/New_York' };
+    var timeEl = document.getElementById('clock-time');
+    var placeEl = document.getElementById('clock-place');
+    var format;
 
-    function tick() {
-      el.textContent = format.format(new Date()) + ' in Princeton, NJ';
+    function setZone(place) {
+      var next;
+      try {
+        next = new Intl.DateTimeFormat('en-US', {
+          timeZone: place.timeZone,
+          hour: 'numeric',
+          minute: '2-digit'
+        });
+      } catch (e) {
+        return false;
+      }
+      format = next;
+      placeEl.textContent = place.label;
+      tick();
+      return true;
     }
 
-    tick();
+    function tick() {
+      timeEl.textContent = format.format(new Date());
+    }
+
+    function lookup(query) {
+      var url = 'https://geocoding-api.open-meteo.com/v1/search?count=1&language=en&format=json&name=' +
+        encodeURIComponent(query);
+      return fetch(url)
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          var hit = data.results && data.results[0];
+          if (!hit || !hit.timezone) return null;
+          var region = hit.country_code === 'US' ? hit.admin1 : hit.country;
+          return {
+            label: region && region !== hit.name ? hit.name + ', ' + region : hit.name,
+            timeZone: hit.timezone
+          };
+        });
+    }
+
+    function edit() {
+      var input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'clock-input';
+      input.setAttribute('aria-label', 'Location');
+      input.autocomplete = 'off';
+      input.spellcheck = false;
+      placeEl.replaceWith(input);
+      input.focus();
+
+      var done = false;
+      function close() {
+        if (done) return;
+        done = true;
+        input.replaceWith(placeEl);
+      }
+
+      function fail() {
+        input.disabled = false;
+        input.value = '';
+        input.placeholder = 'Location not found';
+        input.focus();
+      }
+
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          close();
+        } else if (e.key === 'Enter') {
+          var query = input.value.trim();
+          if (!query) {
+            setZone(HOME);
+            close();
+            return;
+          }
+          input.disabled = true;
+          lookup(query).then(function (place) {
+            if (done) return;
+            if (place && setZone(place)) close();
+            else fail();
+          }, function () {
+            if (!done) fail();
+          });
+        }
+      });
+      input.addEventListener('blur', function () {
+        if (!input.disabled) close();
+      });
+    }
+
+    placeEl.addEventListener('click', edit);
+
+    setZone(HOME);
     setInterval(tick, 1000);
   })();
 </script>
