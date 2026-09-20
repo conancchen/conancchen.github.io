@@ -99,7 +99,7 @@ a:focus {
 }
 
 .header {
-  padding-top: 8px;
+  padding-top: 38px;
   margin-bottom: 16px;
 }
 
@@ -206,7 +206,7 @@ a:focus {
 .rule {
   border: none;
   border-top: 1px solid var(--rule);
-  margin: 32px 0 14px;
+  margin: 0 0 14px;
 }
 
 .updated {
@@ -245,15 +245,88 @@ a:focus {
   color: var(--text);
 }
 
+// Typing a new location: no box, no focus ring — just the text and the
+// browser's own blinking caret
 .clock-input {
   width: 18ch;
   padding: 0;
-  background: transparent;
+  background: none;
   border: none;
-  border-bottom: 1px solid var(--muted);
   border-radius: 0;
   color: var(--text);
+  caret-color: currentColor;
   outline: none;
+  appearance: none;
+}
+
+// A pixel dinosaur running in place on the rule, hopping the cacti that scroll
+// past it, with sand below the line and clouds drifting above — the Chrome
+// offline game, driven by the script in index.html
+.dino-track {
+  position: relative;
+  height: 22px;
+  margin-top: 46px;
+  color: var(--muted);
+  // Clip left and right so sprites appear and vanish at the ends of the rule,
+  // while leaving room above for the jump and the clouds (overflow can't clip
+  // one axis on its own without turning into a scroll container)
+  clip-path: inset(-72px 0 -12px 0);
+}
+
+.dino-runner {
+  position: absolute;
+  bottom: 0;
+  left: 24px;
+}
+
+.dino,
+.cactus,
+.cloud {
+  display: block;
+  fill: currentColor;
+  shape-rendering: crispEdges;
+}
+
+.cactus,
+.cloud,
+.sand {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.sand {
+  background: currentColor;
+  opacity: 0.55;
+}
+
+// Clouds sit further off, so they are fainter as well as slower
+.cloud {
+  opacity: 0.4;
+}
+
+// The two leg poses alternate as the ground goes by, so the dino runs; the
+// script swaps the .step class on the runner
+.dino-legs-b {
+  opacity: 0;
+}
+
+.dino-runner.step .dino-legs-a {
+  opacity: 0;
+}
+
+.dino-runner.step .dino-legs-b {
+  opacity: 1;
+}
+
+// Mid-hop it keeps both feet tucked, like the real thing (this comes last, so
+// it wins over the stride above)
+.dino-runner.jumping .dino-legs-a {
+  opacity: 1;
+}
+
+.dino-runner.jumping .dino-legs-b {
+  opacity: 0;
 }
 
 /**************/

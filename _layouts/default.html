@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  <title>{{ page.title | default: site.name }}</title>
+  <title>{{ page.title | default: 'conan' }}</title>
 
   <!-- Runs before paint so the saved theme applies without a flash -->
   <script>
@@ -66,84 +66,107 @@
 
     <!-- Runs as soon as the title is parsed, so the first paint is already scrambled -->
     <script>
-      // Cycles the title (and the "Updated" line under it) through random,
-      // randomly colored glyphs, locking each one in (in the normal text
-      // color) from left to right until it spells the real text
+      // Cycles the name and the "Updated" line through random, randomly colored
+      // glyphs, locking each one in (in the normal text color) from left to
+      // right until it spells the real text, all finishing at TOTAL_MS
       (function () {
         var link = document.querySelector('.home-link');
         var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         if (!link || reduceMotion) return;
 
-        // Scramble glyphs come from many scripts and symbol blocks. Each block
-        // is picked with equal odds (so small ones like Greek show up as often
-        // as CJK), and only blocks that are fully assigned, left-to-right and
-        // not emoji are used, so nothing renders as a missing-glyph box, flips
-        // text direction, or turns into a color emoji.
-        var GLYPH_BLOCKS = [
-          [0x00C0, 0x024F],  // Latin-1 / Latin Extended
-          [0x0391, 0x03A1],  // Greek capitals
-          [0x03A3, 0x03C9],  // Greek capitals + lowercase
-          [0x0410, 0x044F],  // Cyrillic
-          [0x2190, 0x21FF],  // Arrows
-          [0x2200, 0x22FF],  // Math operators
-          [0x2500, 0x259F],  // Box drawing + block elements
-          [0x25A0, 0x25F7],  // Geometric shapes
-          [0x2800, 0x28FF],  // Braille
-          [0x3041, 0x3096],  // Hiragana
-          [0x30A1, 0x30FA],  // Katakana
-          [0xAC00, 0xD7A3],  // Hangul syllables
-          [0x4E00, 0x9FA5]   // CJK ideographs
+        // Scramble glyphs are English letters, Unicode math operators and
+        // Braille dots. Other scripts (CJK especially) trigger browser
+        // auto-translate prompts and change the punctuation spacing of the text
+        // around them, and arrows and boxes looked out of place, so the math
+        // operators skip the squared, square-cap/cup, triangle, diamond and
+        // multimap ones.
+        function charRange(from, to) {
+          var out = '';
+          for (var code = from; code <= to; code++) out += String.fromCharCode(code);
+          return out;
+        }
+
+        // A set is picked with equal odds, then a character from it
+        var GLYPH_SETS = [
+          charRange(0x41, 0x5A) + charRange(0x61, 0x7A),  // A-Z a-z
+          charRange(0x2200, 0x228E) + charRange(0x2295, 0x229D) +
+            charRange(0x22A2, 0x22B5) + charRange(0x22B9, 0x22BE) +
+            charRange(0x22C0, 0x22C3) + charRange(0x22C5, 0x22E1) +
+            charRange(0x22E6, 0x22FF),                    // Math operators
+          charRange(0x2801, 0x28FE)                       // Braille (not blank or full)
         ];
 
         function randomGlyph() {
-          var block = GLYPH_BLOCKS[Math.floor(Math.random() * GLYPH_BLOCKS.length)];
-          return String.fromCharCode(block[0] + Math.floor(Math.random() * (block[1] - block[0] + 1)));
+          var set = GLYPH_SETS[Math.floor(Math.random() * GLYPH_SETS.length)];
+          return set.charAt(Math.floor(Math.random() * set.length));
         }
 
-        var TICK = 40;        // ms between scramble frames
-        var LOCK_START = 11.25 * 1.15 * 1.1;  // ticks of pure scramble before the first letter locks
-        var LOCK_STEP = 3.75 * 1.15 * 1.1;    // ticks between each following letter locking
+        var TICK = 40;          // ms between scramble frames
+        var TOTAL_MS = 2200;    // when the last letter locks in
+        var TOTAL_TICKS = TOTAL_MS / TICK;
+        var LOCK_START = TOTAL_TICKS * 0.25;  // ticks of pure scramble before the first letter locks
+        var LAST_LOCK = TOTAL_TICKS - 1;      // tick on which the last letter locks
         // Any hue is fair game, but saturation and lightness are fixed so the
         // colors read as one family (tweak these to change the feel)
         var SATURATION = 75;       // %
         var LIGHTNESS_DARK = 70;   // % on the dark theme
         var LIGHTNESS_LIGHT = 45;  // % on the light theme
-        // The title and the "Updated" line scramble together and finish locking
-        // on the same tick, so the subtitle never stretches the animation
-        var subtitle = document.querySelector('.subtitle');
-        var targets = [link, subtitle].filter(Boolean).map(function (el) {
-          return { el: el, text: el.textContent };
-        });
-        var finalText = targets[0].text;
-        var lastLock = LOCK_START + (finalText.length - 1) * LOCK_STEP;
-        var lastTick = LOCK_START + finalText.length * LOCK_STEP;
+        var targets = [];
         var tick = 0;
 
-        // The page's fade-in is timed to finish right as the last letter locks.
-        // Locks only happen on whole ticks, so round up to the tick it lands on.
-        window.titleAnimationMs = Math.ceil(lastLock) * TICK;
-
-        // Screen readers should hear the name, not the gibberish
-        link.setAttribute('aria-label', finalText);
-
-        targets.forEach(function (t) {
-          t.step = t.text.length > 1 ? (lastLock - LOCK_START) / (t.text.length - 1) : 0;
+        // Wraps every character of every text node under el in its own span,
+        // remembering the original text nodes so they can be put back when the
+        // animation ends
+        function makeTarget(el, box) {
+          var t = { el: el, box: box || el, chars: [], nodes: [] };
 
           // Fallback fonts for exotic glyphs can have different line metrics and
           // widths; pin the height and keep the text on one line so the page
           // below never jumps while it scrambles
-          t.box = t.el === link ? link.parentNode : t.el;
           t.box.style.height = t.box.offsetHeight + 'px';
-          t.el.style.whiteSpace = 'nowrap';
+          el.style.whiteSpace = 'nowrap';
 
-          // One span per character so each can carry its own color
-          t.el.textContent = '';
-          t.glyphs = t.text.split('').map(function () {
-            var span = document.createElement('span');
-            t.el.appendChild(span);
-            return span;
+          var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+          var texts = [];
+          while (walker.nextNode()) texts.push(walker.currentNode);
+
+          texts.forEach(function (node) {
+            var frag = document.createDocumentFragment();
+            var spans = node.nodeValue.split('').map(function (ch) {
+              var span = document.createElement('span');
+              frag.appendChild(span);
+              t.chars.push({ span: span, ch: ch });
+              return span;
+            });
+            if (!spans.length) return;
+            node.parentNode.replaceChild(frag, node);
+            t.nodes.push({ orig: node, spans: spans });
           });
-        });
+
+          // Letters lock left to right, the last one on LAST_LOCK
+          t.step = t.chars.length > 1 ? (LAST_LOCK - LOCK_START) / (t.chars.length - 1) : 0;
+          targets.push(t);
+        }
+
+        function restore(t) {
+          t.box.style.height = '';
+          t.el.style.whiteSpace = '';
+          t.nodes.forEach(function (n) {
+            n.spans[0].parentNode.insertBefore(n.orig, n.spans[0]);
+            n.spans.forEach(function (span) { span.parentNode.removeChild(span); });
+          });
+        }
+
+        // The page's fade-in is timed to finish right as the last letter locks.
+        // Locks only happen on whole ticks, so round up to the tick it lands on.
+        window.titleAnimationMs = Math.ceil(LAST_LOCK) * TICK;
+
+        // Screen readers should hear the name, not the gibberish
+        link.setAttribute('aria-label', link.textContent);
+
+        makeTarget(link, link.parentNode);
+        var subtitle = document.querySelector('.subtitle');
+        if (subtitle) makeTarget(subtitle);
 
         function randomColor() {
           var dark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -153,16 +176,15 @@
 
         function render() {
           targets.forEach(function (t) {
-            for (var i = 0; i < t.text.length; i++) {
-              var span = t.glyphs[i];
-              if (tick >= LOCK_START + i * t.step || t.text[i] === ' ') {
-                span.textContent = t.text[i];
-                span.style.color = '';
+            t.chars.forEach(function (c, i) {
+              if (tick >= LOCK_START + i * t.step || /\s/.test(c.ch)) {
+                c.span.textContent = c.ch;
+                c.span.style.color = '';
               } else {
-                span.textContent = randomGlyph();
-                span.style.color = randomColor();
+                c.span.textContent = randomGlyph();
+                c.span.style.color = randomColor();
               }
-            }
+            });
           });
         }
 
@@ -170,12 +192,9 @@
         var timer = setInterval(function () {
           tick++;
           render();
-          if (tick >= lastTick) {
+          if (tick >= TOTAL_TICKS) {
             clearInterval(timer);
-            targets.forEach(function (t) {
-              t.box.style.height = '';
-              t.el.style.whiteSpace = '';
-            });
+            targets.forEach(restore);
           }
         }, TICK);
       })();

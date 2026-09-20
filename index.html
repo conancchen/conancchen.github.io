@@ -26,15 +26,15 @@ show_updated: true
 
     <div class="row">
       <span class="row-label">Citadel Securities</span>
-      <span class="row-year">Incoming Summer 2027</span>
+      <span class="row-year">2027</span>
     </div>
     <div class="row">
       <span class="row-label">Princeton Vision & Learning Lab</span>
-      <span class="row-year">4/2026 – Present</span>
+      <span class="row-year">2026</span>
     </div>
     <div class="row">
       <span class="row-label">Scale AI</span>
-      <span class="row-year">2/2025 – 12/2025</span>
+      <span class="row-year">2025</span>
     </div>
   </section>
 
@@ -49,6 +49,9 @@ show_updated: true
     </div>
   </section>
 
+  <div class="dino-track" aria-hidden="true">
+    <div class="dino-runner"><svg class="dino" viewBox="0 0 20 22" width="20" height="22" aria-hidden="true"><path d="M10 0h8v1h-8zM9 1h10v1h-10zM9 2h2v1h-2zM12 2h7v1h-7zM9 3h10v1h-10zM9 4h10v1h-10zM9 5h10v1h-10zM9 6h5v1h-5zM9 7h9v1h-9zM0 8h1v1h-1zM9 8h5v1h-5zM0 9h1v1h-1zM9 9h6v1h-6zM0 10h2v1h-2zM9 10h6v1h-6zM0 11h3v1h-3zM9 11h7v1h-7zM17 11h1v1h-1zM1 12h3v1h-3zM9 12h7v1h-7zM17 12h2v1h-2zM2 13h3v1h-3zM9 13h8v1h-8zM3 14h4v1h-4zM9 14h7v1h-7zM4 15h11v1h-11zM5 16h10v1h-10zM6 17h8v1h-8zM7 18h7v1h-7z"/><path class="dino-legs-a" d="M7 19h2v1h-2zM11 19h2v1h-2zM6 20h2v1h-2zM11 20h2v1h-2zM11 21h3v1h-3z"/><path class="dino-legs-b" d="M7 19h2v1h-2zM11 19h2v1h-2zM7 20h2v1h-2zM12 20h2v1h-2zM6 21h3v1h-3z"/></svg></div>
+  </div>
   <hr class="rule">
   <p class="updated" id="clock"><span id="clock-time"></span> in <button type="button" class="clock-place" id="clock-place" title="Change location">Princeton, NJ</button></p>
 </div>
@@ -66,7 +69,8 @@ show_updated: true
         next = new Intl.DateTimeFormat('en-US', {
           timeZone: place.timeZone,
           hour: 'numeric',
-          minute: '2-digit'
+          minute: '2-digit',
+          second: '2-digit'
         });
       } catch (e) {
         return false;
@@ -150,5 +154,152 @@ show_updated: true
 
     setZone(HOME);
     setInterval(tick, 1000);
+  })();
+</script>
+
+<script>
+  // The dinosaur runs in place on the rule while cacti, sand and clouds scroll
+  // past, and it hops over each cactus — the Chrome offline game as scenery.
+  // Everything moves at a constant speed; the jump is a parabola centred on the
+  // moment the dino and the cactus would overlap, so any of them gets cleared.
+  (function () {
+    var track = document.querySelector('.dino-track');
+    var runner = track && track.querySelector('.dino-runner');
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!runner || reduceMotion) return;
+
+    var SPEED = 165;     // px per second the ground goes by
+    var DINO_X = 24;     // px from the left edge the dino runs at
+    var DINO_W = 20;     // px, the dino sprite's width
+    var JUMP_MS = 550;   // how long a hop lasts, start to landing
+    var JUMP_H = 36;     // px, how high it peaks
+    var STRIDE = 17;     // px of ground per step, so the legs keep pace with the speed
+
+    var CACTI = [
+      { w: 9, h: 18, d: 'M3 3h3v1h-3zM3 4h3v1h-3zM3 5h3v1h-3zM0 6h1v1h-1zM3 6h3v1h-3zM0 7h1v1h-1zM3 7h3v1h-3zM8 7h1v1h-1zM0 8h1v1h-1zM3 8h3v1h-3zM8 8h1v1h-1zM0 9h2v1h-2zM3 9h3v1h-3zM8 9h1v1h-1zM1 10h6v1h-6zM8 10h1v1h-1zM2 11h6v1h-6zM3 12h3v1h-3zM3 13h3v1h-3zM3 14h3v1h-3zM3 15h3v1h-3zM3 16h3v1h-3zM3 17h3v1h-3z' },
+      { w: 9, h: 18, d: 'M3 0h3v1h-3zM3 1h3v1h-3zM3 2h3v1h-3zM3 3h3v1h-3zM0 4h1v1h-1zM3 4h3v1h-3zM0 5h1v1h-1zM3 5h3v1h-3zM8 5h1v1h-1zM0 6h1v1h-1zM3 6h3v1h-3zM8 6h1v1h-1zM0 7h1v1h-1zM3 7h3v1h-3zM8 7h1v1h-1zM0 8h2v1h-2zM3 8h3v1h-3zM7 8h2v1h-2zM1 9h7v1h-7zM2 10h5v1h-5zM3 11h3v1h-3zM3 12h3v1h-3zM3 13h3v1h-3zM3 14h3v1h-3zM3 15h3v1h-3zM3 16h3v1h-3zM3 17h3v1h-3z' },
+      { w: 19, h: 18, d: 'M3 0h3v1h-3zM3 1h3v1h-3zM3 2h3v1h-3zM3 3h3v1h-3zM13 3h3v1h-3zM0 4h1v1h-1zM3 4h3v1h-3zM13 4h3v1h-3zM0 5h1v1h-1zM3 5h3v1h-3zM8 5h1v1h-1zM13 5h3v1h-3zM0 6h1v1h-1zM3 6h3v1h-3zM8 6h1v1h-1zM10 6h1v1h-1zM13 6h3v1h-3zM0 7h1v1h-1zM3 7h3v1h-3zM8 7h1v1h-1zM10 7h1v1h-1zM13 7h3v1h-3zM18 7h1v1h-1zM0 8h2v1h-2zM3 8h3v1h-3zM7 8h2v1h-2zM10 8h1v1h-1zM13 8h3v1h-3zM18 8h1v1h-1zM1 9h7v1h-7zM10 9h2v1h-2zM13 9h3v1h-3zM18 9h1v1h-1zM2 10h5v1h-5zM11 10h6v1h-6zM18 10h1v1h-1zM3 11h3v1h-3zM12 11h6v1h-6zM3 12h3v1h-3zM13 12h3v1h-3zM3 13h3v1h-3zM13 13h3v1h-3zM3 14h3v1h-3zM13 14h3v1h-3zM3 15h3v1h-3zM13 15h3v1h-3zM3 16h3v1h-3zM13 16h3v1h-3zM3 17h3v1h-3zM13 17h3v1h-3z' }
+    ];
+
+    var CLOUDS = [
+      { w: 14, h: 5, d: 'M4 0h5v1h-5zM2 1h9v1h-9zM1 2h13v1h-13zM0 3h14v1h-14zM1 4h12v1h-12z' },
+      { w: 10, h: 4, d: 'M3 0h4v1h-4zM1 1h8v1h-8zM0 2h10v1h-10zM1 3h8v1h-8z' }
+    ];
+
+    // Each layer scrolls at its own speed: clouds drift, so they hang back
+    var layers = [
+      { cls: 'cloud', speed: SPEED * 0.18, gap: [120, 420], items: [],
+        shapes: CLOUDS, low: 38, high: 60 },
+      { cls: 'sand', speed: SPEED, gap: [14, 80], items: [] },
+      { cls: 'cactus', speed: SPEED, gap: [200, 520], items: [], shapes: CACTI, solid: true }
+    ];
+
+    var jumpStart = -Infinity;
+    var jumping = false;
+    var travelled = 0;
+    var stepped = false;
+    var last = null;
+
+    function sprite(cls, shape) {
+      var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('class', cls);
+      svg.setAttribute('viewBox', '0 0 ' + shape.w + ' ' + shape.h);
+      svg.setAttribute('width', shape.w);
+      svg.setAttribute('height', shape.h);
+      var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', shape.d);
+      svg.appendChild(path);
+      return svg;
+    }
+
+    // Sand is just a dash of ground, a pixel or two tall, below the rule
+    function grain() {
+      var el = document.createElement('i');
+      el.className = 'sand';
+      el.style.width = (1 + Math.floor(Math.random() * 4)) + 'px';
+      el.style.height = (Math.random() < 0.25 ? 2 : 1) + 'px';
+      el.style.bottom = -(2 + Math.floor(Math.random() * 5)) + 'px';
+      return el;
+    }
+
+    function spawn(layer, width) {
+      var w, el;
+      if (layer.cls === 'sand') {
+        el = grain();
+        w = 4;
+      } else {
+        var shape = layer.shapes[Math.floor(Math.random() * layer.shapes.length)];
+        el = sprite(layer.cls, shape);
+        w = shape.w;
+        if (layer.low != null) {
+          el.style.bottom = (layer.low + Math.random() * (layer.high - layer.low)) + 'px';
+        }
+      }
+      // Place it before it is attached, so it never flashes at the left edge
+      // on the frame it is created
+      el.style.transform = 'translateX(' + width + 'px)';
+      track.appendChild(el);
+      layer.items.push({ el: el, x: width, w: w, jumped: false });
+      layer.nextGap = layer.gap[0] + Math.random() * (layer.gap[1] - layer.gap[0]);
+    }
+
+    function frame(now) {
+      requestAnimationFrame(frame);
+      if (last === null) { last = now; return; }
+      var dt = Math.min((now - last) / 1000, 0.1);  // clamp, so a backgrounded tab doesn't teleport everything
+      last = now;
+
+      var width = track.offsetWidth;
+
+      // The legs swap pose every STRIDE px of ground, so the stride is tied to
+      // the speed rather than to a clock of its own
+      travelled += SPEED * dt;
+      var stepping = Math.floor(travelled / STRIDE) % 2 === 1;
+      if (stepping !== stepped) {
+        stepped = stepping;
+        runner.classList.toggle('step', stepping);
+      }
+
+      layers.forEach(function (layer) {
+        var rightmost = -Infinity;
+
+        for (var i = layer.items.length - 1; i >= 0; i--) {
+          var it = layer.items[i];
+          it.x -= layer.speed * dt;
+          if (it.x + it.w < 0) {
+            track.removeChild(it.el);
+            layer.items.splice(i, 1);
+            continue;
+          }
+          it.el.style.transform = 'translateX(' + Math.round(it.x) + 'px)';
+          if (it.x > rightmost) rightmost = it.x;
+
+          // Take off so the peak of the hop lands on the middle of the overlap
+          // — that way a wide cactus gets a longer hang time for free
+          if (layer.solid && !it.jumped) {
+            var entersIn = (it.x - (DINO_X + DINO_W)) / layer.speed;
+            var leavesIn = (it.x + it.w - DINO_X) / layer.speed;
+            if ((entersIn + leavesIn) / 2 <= JUMP_MS / 2000) {
+              it.jumped = true;
+              if (now - jumpStart > JUMP_MS) jumpStart = now;
+            }
+          }
+        }
+
+        if (rightmost <= width - (layer.nextGap || layer.gap[0])) spawn(layer, width);
+      });
+
+      var t = (now - jumpStart) / JUMP_MS;
+      var airborne = t >= 0 && t <= 1;
+      runner.style.transform = airborne
+        ? 'translateY(' + Math.round(-4 * JUMP_H * t * (1 - t)) + 'px)'
+        : '';
+      if (airborne !== jumping) {
+        jumping = airborne;
+        runner.classList.toggle('jumping', airborne);
+      }
+    }
+
+    requestAnimationFrame(frame);
   })();
 </script>
