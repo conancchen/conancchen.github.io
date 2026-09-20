@@ -102,8 +102,8 @@
         }
 
         var TICK = 40;        // ms between scramble frames
-        var LOCK_START = 11.25;  // ticks of pure scramble before the first letter locks
-        var LOCK_STEP = 3.75;    // ticks between each following letter locking
+        var LOCK_START = 11.25 * 1.15 * 1.1;  // ticks of pure scramble before the first letter locks
+        var LOCK_STEP = 3.75 * 1.15 * 1.1;    // ticks between each following letter locking
         // Any hue is fair game, but saturation and lightness are fixed so the
         // colors read as one family (tweak these to change the feel)
         var SATURATION = 75;       // %
@@ -112,8 +112,9 @@
         var lastTick = LOCK_START + finalText.length * LOCK_STEP;
         var tick = 0;
 
-        // The page's fade-in is timed to finish right as the last letter locks
-        window.titleAnimationMs = (LOCK_START + (finalText.length - 1) * LOCK_STEP) * TICK;
+        // The page's fade-in is timed to finish right as the last letter locks.
+        // Locks only happen on whole ticks, so round up to the tick it lands on.
+        window.titleAnimationMs = Math.ceil(LOCK_START + (finalText.length - 1) * LOCK_STEP) * TICK;
 
         // Screen readers should hear the name, not the gibberish
         link.setAttribute('aria-label', finalText);
