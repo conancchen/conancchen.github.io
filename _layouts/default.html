@@ -61,19 +61,18 @@
           </svg>
         </button>
       </div>
+      {% if page.show_updated %}<p class="subtitle">Updated {{ site.time | date: "%b %-d, %Y" }}</p>{% endif %}
     </header>
 
     <!-- Runs as soon as the title is parsed, so the first paint is already scrambled -->
     <script>
-      // Cycles the title through random, randomly colored glyphs, locking
-      // each one in (in the normal text color) from left to right until it
-      // spells the real name
+      // Cycles the title (and the "Updated" line under it) through random,
+      // randomly colored glyphs, locking each one in (in the normal text
+      // color) from left to right until it spells the real text
       (function () {
         var link = document.querySelector('.home-link');
         var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         if (!link || reduceMotion) return;
-
-        var finalText = link.textContent;
 
         // Scramble glyphs come from many scripts and symbol blocks. Each block
         // is picked with equal odds (so small ones like Greek show up as often
@@ -109,29 +108,41 @@
         var SATURATION = 75;       // %
         var LIGHTNESS_DARK = 70;   // % on the dark theme
         var LIGHTNESS_LIGHT = 45;  // % on the light theme
+        // The title and the "Updated" line scramble together and finish locking
+        // on the same tick, so the subtitle never stretches the animation
+        var subtitle = document.querySelector('.subtitle');
+        var targets = [link, subtitle].filter(Boolean).map(function (el) {
+          return { el: el, text: el.textContent };
+        });
+        var finalText = targets[0].text;
+        var lastLock = LOCK_START + (finalText.length - 1) * LOCK_STEP;
         var lastTick = LOCK_START + finalText.length * LOCK_STEP;
         var tick = 0;
 
         // The page's fade-in is timed to finish right as the last letter locks.
         // Locks only happen on whole ticks, so round up to the tick it lands on.
-        window.titleAnimationMs = Math.ceil(LOCK_START + (finalText.length - 1) * LOCK_STEP) * TICK;
+        window.titleAnimationMs = Math.ceil(lastLock) * TICK;
 
         // Screen readers should hear the name, not the gibberish
         link.setAttribute('aria-label', finalText);
 
-        // Fallback fonts for exotic glyphs can have different line metrics and
-        // widths; pin the heading's height and keep the name on one line so
-        // the page below never jumps while it scrambles
-        var heading = link.parentNode;
-        heading.style.height = heading.offsetHeight + 'px';
-        link.style.whiteSpace = 'nowrap';
+        targets.forEach(function (t) {
+          t.step = t.text.length > 1 ? (lastLock - LOCK_START) / (t.text.length - 1) : 0;
 
-        // One span per character so each can carry its own color
-        link.textContent = '';
-        var glyphs = finalText.split('').map(function (ch) {
-          var span = document.createElement('span');
-          link.appendChild(span);
-          return span;
+          // Fallback fonts for exotic glyphs can have different line metrics and
+          // widths; pin the height and keep the text on one line so the page
+          // below never jumps while it scrambles
+          t.box = t.el === link ? link.parentNode : t.el;
+          t.box.style.height = t.box.offsetHeight + 'px';
+          t.el.style.whiteSpace = 'nowrap';
+
+          // One span per character so each can carry its own color
+          t.el.textContent = '';
+          t.glyphs = t.text.split('').map(function () {
+            var span = document.createElement('span');
+            t.el.appendChild(span);
+            return span;
+          });
         });
 
         function randomColor() {
@@ -141,16 +152,18 @@
         }
 
         function render() {
-          for (var i = 0; i < finalText.length; i++) {
-            var span = glyphs[i];
-            if (tick >= LOCK_START + i * LOCK_STEP || finalText[i] === ' ') {
-              span.textContent = finalText[i];
-              span.style.color = '';
-            } else {
-              span.textContent = randomGlyph();
-              span.style.color = randomColor();
+          targets.forEach(function (t) {
+            for (var i = 0; i < t.text.length; i++) {
+              var span = t.glyphs[i];
+              if (tick >= LOCK_START + i * t.step || t.text[i] === ' ') {
+                span.textContent = t.text[i];
+                span.style.color = '';
+              } else {
+                span.textContent = randomGlyph();
+                span.style.color = randomColor();
+              }
             }
-          }
+          });
         }
 
         render();
@@ -159,8 +172,10 @@
           render();
           if (tick >= lastTick) {
             clearInterval(timer);
-            heading.style.height = '';
-            link.style.whiteSpace = '';
+            targets.forEach(function (t) {
+              t.box.style.height = '';
+              t.el.style.whiteSpace = '';
+            });
           }
         }, TICK);
       })();
@@ -169,7 +184,7 @@
     {{ content }}
   </div>
 
-  <div id="copy-toast">Copied to clipboard!</div>
+  <div id="copy-toast">Copied to clipboard</div>
 
   <script>
     function applyTheme(theme) {

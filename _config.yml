@@ -20,3 +20,6 @@ disqus:
 google_analytics:
 
 url: "https://conancchen.github.io"
+
+# Keeps the "Updated" date on Princeton time
+timezone: America/New_York
