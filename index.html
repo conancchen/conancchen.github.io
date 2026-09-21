@@ -635,6 +635,7 @@ show_updated: true
     var MAX_SPEED = 2600;   // px per second the head can travel, however far the cursor is
     var APPLE_R = 7;        // px, radius of an apple
     var CLEAR_OF_HEAD = 60; // px a new apple keeps from the head, so it isn't eaten as it lands
+    var TOUCH_LIFT = 38;    // px the snake rides above a fingertip, so it isn't hidden under it
     var MAX_SEG = 300;      // a ceiling on the body, so a long game can't drag the page down
     var MAX_DPR = 2;        // a phone's third pixel of density buys nothing here and costs a lot
     var POP_MS = 220;       // how long an apple takes to swell to full size
@@ -667,6 +668,7 @@ show_updated: true
     var apples = [];      // each { x, y, born }
     var score = 0;
     var pointer = null;   // where the cursor was last seen, once it has moved
+    var touching = false; // whether this game is being played with a finger
     var last = 0;
     var paper = '#202020';  // the page behind the snake, for its halo; read once a game
     var words = [];       // every word the snake can push, with where it rests
@@ -712,7 +714,25 @@ show_updated: true
     }
 
     function onMove(e) {
-      pointer = { x: e.clientX, y: e.clientY };
+      // A fingertip covers far more of the page than a cursor does, and what it
+      // covers is exactly the head. On touch the snake rides above the finger
+      // instead, which also leaves the apple it is closing on in view.
+      var lift = 0;
+      if (e.pointerType === 'touch') {
+        touching = true;
+        lift = TOUCH_LIFT;
+      }
+      pointer = { x: e.clientX, y: Math.max(4, e.clientY - lift) };
+    }
+
+    // Where an apple may land. Riding above the finger puts the foot of the
+    // window out of the snake's reach, so on touch nothing is dropped there.
+    function spawnBox() {
+      var foot = EDGE + (touching ? TOUCH_LIFT : 0);
+      return {
+        x0: EDGE, x1: Math.max(EDGE + 1, w - EDGE),
+        y0: EDGE, y1: Math.max(EDGE + 1, h - foot)
+      };
     }
 
     // Each word gets a span of its own so it can be moved on its own. The
@@ -852,10 +872,11 @@ show_updated: true
     // eaten cannot land under the snake and be swallowed on the spot
     function dropApple() {
       var head = seg[0];
+      var box = spawnBox();
       var x, y;
       for (var tries = 0; tries < 12; tries++) {
-        x = EDGE + Math.random() * Math.max(1, w - EDGE * 2);
-        y = EDGE + Math.random() * Math.max(1, h - EDGE * 2);
+        x = box.x0 + Math.random() * (box.x1 - box.x0);
+        y = box.y0 + Math.random() * (box.y1 - box.y0);
         var dx = x - head.x;
         var dy = y - head.y;
         if (dx * dx + dy * dy >= CLEAR_OF_HEAD * CLEAR_OF_HEAD) break;
@@ -1072,10 +1093,11 @@ show_updated: true
         for (var i = 0; i < START_LEN; i++) seg.push({ x: x, y: y });
       }
       // A window resized while the snake was away could have left an apple
-      // outside it
+      // outside it, or out of reach at the foot of it
+      var box = spawnBox();
       apples.forEach(function (a) {
-        a.x = Math.min(Math.max(a.x, EDGE), Math.max(EDGE, w - EDGE));
-        a.y = Math.min(Math.max(a.y, EDGE), Math.max(EDGE, h - EDGE));
+        a.x = Math.min(Math.max(a.x, box.x0), box.x1);
+        a.y = Math.min(Math.max(a.y, box.y0), box.y1);
       });
       showScore();
 

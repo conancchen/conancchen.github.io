@@ -483,6 +483,21 @@ a:focus {
   padding: 4px 1px;
 }
 
+// While the snake is out, a drag has to steer it rather than scroll the page.
+// Once a touch turns into a scroll the browser stops sending pointer moves
+// altogether, which left the snake frozen on a phone while the page slid about
+// under it. Taps are untouched, so the link that puts the snake away is still
+// there to press, and not being able to scroll costs nothing while a
+// full-window game is on. Not selecting text is the same bargain on a desktop:
+// dragging the cursor around would otherwise highlight half the page.
+.snaking,
+.snaking body {
+  touch-action: none;
+  overscroll-behavior: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 .snaking #theme-toggle {
   display: none;
 }
