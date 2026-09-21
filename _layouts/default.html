@@ -98,7 +98,7 @@
         }
 
         var TICK = 40;          // ms between scramble frames
-        var TOTAL_MS = 2200;    // when the last letter locks in
+        var TOTAL_MS = {{ page.scramble_ms | default: 2200 }};  // when the last letter locks in (a page can shorten it)
         var TOTAL_TICKS = TOTAL_MS / TICK;
         var LOCK_START = TOTAL_TICKS * 0.25;  // ticks of pure scramble before the first letter locks
         var LAST_LOCK = TOTAL_TICKS - 1;      // tick on which the last letter locks
