@@ -57,6 +57,9 @@ show_updated: true
     <div class="row">
       <a href="https://conancchen.github.io/strava/" class="row-link">Strava</a>
     </div>
+    <div class="row">
+      <a href="#" class="row-link" id="snake-link" role="button" aria-pressed="false" onclick="toggleSnake(event)" title="Chase the apples with your cursor">Snake</a>
+    </div>
   </section>
 
   <div class="dino-track" aria-hidden="true" title="Press space to jump">
@@ -599,5 +602,445 @@ show_updated: true
     prefill(layers[1]);
     paint();
     if (!reduceMotion) requestAnimationFrame(frame);
+  })();
+</script>
+
+<script>
+  // A snake that chases the cursor, woken by the Snake link under Misc. An
+  // apple drops somewhere on the page every APPLE_MS; steering the head onto
+  // one eats it, which lengthens the snake and ticks the score up in the
+  // header, where the theme toggle usually sits. Pressing the link again only
+  // puts the snake away — the game it was in the middle of is still there when
+  // it comes back, and nothing but a refresh starts it over.
+  //
+  // It all lives on one fixed canvas laid over the page. The canvas never takes
+  // the pointer, so everything underneath stays readable and clickable while a
+  // game is on.
+  (function () {
+    var link = document.getElementById('snake-link');
+    var scoreEl = document.getElementById('snake-score');
+    if (!link || !scoreEl) return;
+
+    var START_LEN = 12;     // segments the snake starts with
+    var GROW = 4;           // segments an apple is worth
+    var SPACING = 9;        // px the body keeps between one segment and the next
+    var HEAD_R = 8;         // px, radius of the head, a shade wider than the body
+    var BODY_R = 6;         // px, radius of the bead right behind the head
+    var TAIL_R = 2.5;       // px, radius of the last bead; the body tapers between the two
+    var EYE_R = 3.2;        // px, radius of an eye
+    var PUPIL_R = 1.6;      // px, radius of a pupil
+    var OUTLINE = 1.5;      // px of page color drawn around the snake, so it reads over text
+    var CHASE = 22;         // how hard the head is pulled toward the cursor, per second
+    var MAX_SPEED = 2600;   // px per second the head can travel, however far the cursor is
+    var APPLE_MS = 8000;    // how often an apple drops
+    var APPLE_R = 7;        // px, radius of an apple
+    var APPLE_MAX = 12;     // uneaten apples pile up only this far before the oldest goes
+    var POP_MS = 220;       // how long an apple takes to swell to full size
+    var EDGE = 20;          // px an apple keeps clear of the window's edges
+    var RIPPLE_R = 64;      // px, how close the head has to be for a word to feel it
+    var RIPPLE_PUSH = 1.5;  // px a word is shoved aside at most
+    var RIPPLE_EASE = 14;   // how quickly a word runs to where it ought to be, per second
+    // Text the snake can push around. The header is left out — the title
+    // animation owns those text nodes — and so is the clock, which rewrites
+    // itself every second.
+    var RIPPLE_SEL = '.bio p, .block-label, .row-label, .row-link, .row-year, .row-note';
+    var BITE = HEAD_R + APPLE_R;  // px between centres that counts as eaten
+
+    // The Chrome game's palette: a blue snake with wide eyes, and an apple with
+    // a sheen on it. All of it is fixed rather than themed, so the snake looks
+    // the same crossing a dark page as a light one.
+    var SNAKE = '#4a63d8';
+    var EYE = '#ffffff';
+    var PUPIL = '#2f2f33';
+    var APPLE = '#e5484d';
+    var APPLE_LIT = '#f07f82';
+    var STEM = '#7a4a2b';
+    var LEAF = '#5db85c';
+    var APPLE_ALPHA = 0.55;  // apples sit back, a wash of color rather than a blot
+
+    var canvas = null;
+    var ctx = null;
+    var raf = null;
+    var seg = [];         // the body, head first; each { x, y }
+    var apples = [];      // each { x, y, born }
+    var score = 0;
+    var pointer = null;   // where the cursor was last seen, once it has moved
+    var last = 0;
+    var nextApple = 0;
+    var appleLeft = 0;    // ms still owed on the apple clock when the snake was put away
+    var paper = '#202020';  // the page behind the snake, for its halo; read once a game
+    var words = [];       // every word the snake can push, with where it rests
+    var wrapped = [];     // the text nodes those words were cut from, to put back after
+    var w = 0;
+    var h = 0;
+
+    function remeasure() {
+      resize();
+      measureWords();
+    }
+
+    function resize() {
+      var dpr = window.devicePixelRatio || 1;
+      w = window.innerWidth;
+      h = window.innerHeight;
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      // Draw in CSS pixels and let the transform handle the display's density
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function onMove(e) {
+      pointer = { x: e.clientX, y: e.clientY };
+    }
+
+    // Each word gets a span of its own so it can be moved on its own. The
+    // spaces between them stay plain text, so lines still break where they did.
+    function wrapWords() {
+      var blocks = document.querySelectorAll(RIPPLE_SEL);
+      for (var b = 0; b < blocks.length; b++) {
+        var walker = document.createTreeWalker(blocks[b], NodeFilter.SHOW_TEXT);
+        var texts = [];
+        while (walker.nextNode()) texts.push(walker.currentNode);
+
+        for (var t = 0; t < texts.length; t++) {
+          var node = texts[t];
+          if (!/\S/.test(node.nodeValue)) continue;
+          var parts = node.nodeValue.split(/(\s+)/);
+          var frag = document.createDocumentFragment();
+          var made = [];
+          for (var i = 0; i < parts.length; i++) {
+            if (!parts[i]) continue;
+            var piece;
+            if (/^\s+$/.test(parts[i])) {
+              piece = document.createTextNode(parts[i]);
+            } else {
+              piece = document.createElement('span');
+              piece.className = 'ripple-word';
+              piece.textContent = parts[i];
+              words.push({ el: piece, x: 0, y: 0, moved: false, live: false });
+            }
+            frag.appendChild(piece);
+            made.push(piece);
+          }
+          if (!made.length) continue;
+          node.parentNode.replaceChild(frag, node);
+          wrapped.push({ node: node, parts: made });
+        }
+      }
+    }
+
+    function unwrapWords() {
+      for (var i = wrapped.length - 1; i >= 0; i--) {
+        var w = wrapped[i];
+        var parent = w.parts[0].parentNode;
+        if (!parent) continue;  // something else rewrote this text in the meantime
+        parent.insertBefore(w.node, w.parts[0]);
+        for (var j = 0; j < w.parts.length; j++) parent.removeChild(w.parts[j]);
+      }
+      wrapped = [];
+      words = [];
+    }
+
+    // Where every word sits when nothing is pushing it, in page coordinates so
+    // that scrolling needs no remeasuring. Clearing the transforms and reading
+    // the boxes are kept in separate passes, so the browser lays the page out
+    // once rather than once per word.
+    function measureWords() {
+      var i;
+      for (i = 0; i < words.length; i++) {
+        words[i].el.style.transform = '';
+        words[i].x = 0;
+        words[i].y = 0;
+        words[i].moved = false;
+      }
+      var sx = window.scrollX || window.pageXOffset || 0;
+      var sy = window.scrollY || window.pageYOffset || 0;
+      for (i = 0; i < words.length; i++) {
+        var r = words[i].el.getBoundingClientRect();
+        // A word inside a closed note has no box yet; it starts feeling the
+        // snake once the note is opened and everything is measured again
+        words[i].live = r.width > 0 && r.height > 0;
+        words[i].px = r.left + r.width / 2 + sx;
+        words[i].py = r.top + r.height / 2 + sy;
+      }
+    }
+
+    // Words near the head are shoved away from it and ease back once it has
+    // passed, so the text ripples where the snake crosses it
+    function ripple(dt) {
+      var head = seg[0];
+      var hx = head.x + (window.scrollX || window.pageXOffset || 0);
+      var hy = head.y + (window.scrollY || window.pageYOffset || 0);
+      var k = Math.min(1, RIPPLE_EASE * dt);
+
+      for (var i = 0; i < words.length; i++) {
+        var word = words[i];
+        if (!word.live) continue;
+        var tx = 0;
+        var ty = 0;
+        var dx = word.px - hx;
+        var dy = word.py - hy;
+        var d2 = dx * dx + dy * dy;
+        if (d2 < RIPPLE_R * RIPPLE_R) {
+          var d = Math.sqrt(d2) || 1;
+          var push = RIPPLE_PUSH * (1 - d / RIPPLE_R);
+          tx = (dx / d) * push;
+          ty = (dy / d) * push;
+        }
+        word.x += (tx - word.x) * k;
+        word.y += (ty - word.y) * k;
+
+        if (Math.abs(word.x) < 0.05 && Math.abs(word.y) < 0.05) {
+          // Settled: drop the transform rather than leave a dead one behind
+          if (word.moved) {
+            word.el.style.transform = '';
+            word.moved = false;
+            word.x = 0;
+            word.y = 0;
+          }
+        } else {
+          word.el.style.transform =
+            'translate(' + word.x.toFixed(2) + 'px, ' + word.y.toFixed(2) + 'px)';
+          word.moved = true;
+        }
+      }
+    }
+
+    // The link that starts a game is the one that puts it away again
+    function label(on) {
+      link.textContent = on ? 'Hide Snake' : 'Snake';
+      link.setAttribute('aria-pressed', on ? 'true' : 'false');
+      link.setAttribute('title', on ? 'Put the snake away' : 'Chase the apples with your cursor');
+    }
+
+    // Three digits until the hundreds run out, then however many it takes
+    function showScore() {
+      var s = String(score);
+      scoreEl.textContent = s.length < 3 ? ('00' + s).slice(-3) : s;
+    }
+
+    function dropApple() {
+      apples.push({
+        x: EDGE + Math.random() * Math.max(1, w - EDGE * 2),
+        y: EDGE + Math.random() * Math.max(1, h - EDGE * 2),
+        born: last
+      });
+      if (apples.length > APPLE_MAX) apples.shift();
+    }
+
+    // A segment is dragged along behind the one ahead of it, and only once it
+    // has fallen more than SPACING behind — which is what makes the body curve
+    // through the turns the head took rather than cutting the corner
+    function follow() {
+      for (var i = 1; i < seg.length; i++) {
+        var ahead = seg[i - 1];
+        var s = seg[i];
+        var dx = ahead.x - s.x;
+        var dy = ahead.y - s.y;
+        var d = Math.sqrt(dx * dx + dy * dy);
+        if (d > SPACING) {
+          var k = (d - SPACING) / d;
+          s.x += dx * k;
+          s.y += dy * k;
+        }
+      }
+    }
+
+    function eat() {
+      var head = seg[0];
+      for (var i = apples.length - 1; i >= 0; i--) {
+        var a = apples[i];
+        var dx = a.x - head.x;
+        var dy = a.y - head.y;
+        if (dx * dx + dy * dy > BITE * BITE) continue;
+        apples.splice(i, 1);
+        score++;
+        showScore();
+        // The new segments start stacked on the tail and unfurl behind it as
+        // the snake moves on
+        var tail = seg[seg.length - 1];
+        for (var g = 0; g < GROW; g++) seg.push({ x: tail.x, y: tail.y });
+      }
+    }
+
+    function dot(x, y, r, color) {
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
+
+    // The snake is a string of beads that overlap into a body, tapering from
+    // the head down to the tip of the tail
+    function radius(i) {
+      if (i === 0) return HEAD_R;
+      if (seg.length < 3) return BODY_R;
+      return BODY_R + (TAIL_R - BODY_R) * ((i - 1) / (seg.length - 2));
+    }
+
+    function drawFace() {
+      var head = seg[0];
+      // Read the heading a few segments back, so it comes from the line of the
+      // body rather than from one twitchy step
+      var neck = seg[Math.min(3, seg.length - 1)];
+      var dx = head.x - neck.x;
+      var dy = head.y - neck.y;
+      var d = Math.sqrt(dx * dx + dy * dy) || 1;
+      dx /= d;
+      dy /= d;
+      var px = -dy;  // across the head, for setting the eyes either side
+      var py = dx;
+
+      // The line of the mouth, drawn across the snout
+      ctx.beginPath();
+      ctx.moveTo(head.x + dx * HEAD_R * 0.78 + px * 2.6, head.y + dy * HEAD_R * 0.78 + py * 2.6);
+      ctx.lineTo(head.x + dx * HEAD_R * 0.78 - px * 2.6, head.y + dy * HEAD_R * 0.78 - py * 2.6);
+      ctx.strokeStyle = PUPIL;
+      ctx.lineWidth = 1.2;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+
+      // Two wide eyes, pupils pushed toward wherever it is headed
+      for (var side = -1; side <= 1; side += 2) {
+        var ex = head.x + dx * 1.4 + px * side * 3.4;
+        var ey = head.y + dy * 1.4 + py * side * 3.4;
+        dot(ex, ey, EYE_R, EYE);
+        dot(ex + dx * 1.1, ey + dy * 1.1, PUPIL_R, PUPIL);
+      }
+    }
+
+    function drawApple(a) {
+      // Swelling in on arrival, so an apple is noticed rather than just there
+      var t = Math.min(1, (last - a.born) / POP_MS);
+      var r = APPLE_R * (1 - (1 - t) * (1 - t));
+      ctx.globalAlpha = APPLE_ALPHA;
+
+      // Stem and leaf go down first, so the fruit laps over where they meet it
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y - r * 0.6);
+      ctx.lineTo(a.x + r * 0.18, a.y - r * 1.7);
+      ctx.strokeStyle = STEM;
+      ctx.lineWidth = Math.max(1, r * 0.22);
+      ctx.lineCap = 'round';
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.ellipse(a.x + r * 0.72, a.y - r * 1.6, r * 0.46, r * 0.24, -0.45, 0, Math.PI * 2);
+      ctx.fillStyle = LEAF;
+      ctx.fill();
+
+      dot(a.x, a.y, r, APPLE);
+      dot(a.x - r * 0.34, a.y - r * 0.36, r * 0.3, APPLE_LIT);
+      ctx.globalAlpha = 1;
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, w, h);
+      for (var a = 0; a < apples.length; a++) drawApple(apples[a]);
+
+      // Every bead's halo is laid down before any of the snake, so the outline
+      // traces the whole silhouette instead of ringing each bead in turn
+      var i;
+      for (i = seg.length - 1; i >= 0; i--) {
+        dot(seg[i].x, seg[i].y, radius(i) + OUTLINE, paper);
+      }
+      for (i = seg.length - 1; i >= 0; i--) {
+        dot(seg[i].x, seg[i].y, radius(i), SNAKE);
+      }
+      drawFace();
+    }
+
+    function frame(now) {
+      raf = requestAnimationFrame(frame);
+      // A tab left in the background piles up time it never drew; cap the step
+      // so coming back doesn't teleport the snake across the page
+      var dt = Math.min((now - last) / 1000, 0.05);
+      last = now;
+
+      if (now >= nextApple) {
+        dropApple();
+        nextApple = now + APPLE_MS;
+      }
+
+      if (pointer) {
+        var head = seg[0];
+        var dx = pointer.x - head.x;
+        var dy = pointer.y - head.y;
+        var d = Math.sqrt(dx * dx + dy * dy);
+        if (d > 0.5) {
+          // Eased, so the head sweeps in from across the page and then settles
+          // onto the cursor instead of shivering around it
+          var step = Math.min(d, d * CHASE * dt, MAX_SPEED * dt);
+          head.x += (dx / d) * step;
+          head.y += (dy / d) * step;
+        }
+      }
+
+      follow();
+      eat();
+      ripple(dt);
+      draw();
+    }
+
+    function start() {
+      canvas = document.createElement('canvas');
+      canvas.className = 'snake-canvas';
+      canvas.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(canvas);
+      ctx = canvas.getContext('2d');
+      resize();
+      paper = getComputedStyle(document.documentElement)
+        .getPropertyValue('--bg').trim() || paper;
+
+      // Hiding the snake only puts it away: a game already under way — its
+      // length, its apples and its score — is picked up where it left off
+      if (!seg.length) {
+        var x = pointer ? pointer.x : w / 2;
+        var y = pointer ? pointer.y : h / 2;
+        for (var i = 0; i < START_LEN; i++) seg.push({ x: x, y: y });
+      }
+      // A window resized while the snake was away could have left an apple
+      // outside it
+      apples.forEach(function (a) {
+        a.x = Math.min(Math.max(a.x, EDGE), Math.max(EDGE, w - EDGE));
+        a.y = Math.min(Math.max(a.y, EDGE), Math.max(EDGE, h - EDGE));
+      });
+      showScore();
+
+      document.documentElement.classList.add('snaking');
+      label(true);  // before the words are cut up, since it rewrites the link
+      wrapWords();
+      measureWords();
+      window.addEventListener('resize', remeasure);
+      window.addEventListener('pointermove', onMove);
+      // Opening a note pushes everything below it down, and `toggle` does not
+      // bubble, so it has to be caught on the way in
+      document.addEventListener('toggle', measureWords, true);
+
+      last = performance.now();
+      // A first game has an apple to chase from the first frame; a resumed one
+      // waits out whatever was left of the clock when it was put away
+      nextApple = last + appleLeft;
+      raf = requestAnimationFrame(frame);
+    }
+
+    function stop() {
+      cancelAnimationFrame(raf);
+      raf = null;
+      appleLeft = Math.max(0, nextApple - last);
+      window.removeEventListener('resize', remeasure);
+      window.removeEventListener('pointermove', onMove);
+      document.removeEventListener('toggle', measureWords, true);
+      unwrapWords();  // before the label is rewritten, which would strip the link's spans
+      canvas.parentNode.removeChild(canvas);
+      canvas = null;
+      ctx = null;
+      document.documentElement.classList.remove('snaking');
+      label(false);
+    }
+
+    window.toggleSnake = function (event) {
+      event.preventDefault();
+      if (raf) stop(); else start();
+    };
   })();
 </script>
