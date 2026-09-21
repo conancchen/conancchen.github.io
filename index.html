@@ -319,6 +319,7 @@ show_updated: true
     var REST_MS = 6000;     // how long a finished run stays up before it settles back
     var FORGIVE = 3;        // px shaved off the dino's box, so near misses are misses
     var REBASE_AT = 4000;   // px of travel before a layer's offsets are wound back to zero
+    var GROUND = 8;         // px from the bottom of the strip to the rule the dino runs on
 
     var WAITING = 0, PLAYING = 1, OVER = 2;
 
@@ -336,7 +337,7 @@ show_updated: true
     // Each layer scrolls at its own share of the speed: clouds drift, so they
     // hang back
     var layers = [
-      { cls: 'cloud', factor: 0.18, gap: [120, 420], shapes: CLOUDS, low: 38, high: 60 },
+      { cls: 'cloud', factor: 0.18, gap: [120, 420], shapes: CLOUDS, low: 46, high: 68 },
       { cls: 'sand', factor: 1, gap: [14, 80] },
       { cls: 'cactus', factor: 1, gap: [200, 520], shapes: CACTI, solid: true }
     ];
@@ -387,7 +388,7 @@ show_updated: true
       el.className = 'sand';
       el.style.width = (1 + Math.floor(Math.random() * 4)) + 'px';
       el.style.height = (Math.random() < 0.25 ? 2 : 1) + 'px';
-      el.style.bottom = -(2 + Math.floor(Math.random() * 5)) + 'px';
+      el.style.bottom = (GROUND - 2 - Math.floor(Math.random() * 5)) + 'px';
       return el;
     }
 

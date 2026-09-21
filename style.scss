@@ -295,23 +295,30 @@ a:focus {
 // A pixel dinosaur running in place on the rule, hopping the cacti that scroll
 // past it, with sand below the line and clouds drifting above — the Chrome
 // offline game, driven by the script in index.html
+// The box is taller than the space it takes up: it reaches up into the sky the
+// clouds drift through and 8px past the rule, where the sand lies, while
+// negative margin keeps the page around it where it was. That lets `overflow`
+// do the clipping — far cheaper per frame than a clip-path, which made the
+// browser re-mask the strip on every one — and `contain` keeps the animation
+// from ever invalidating the rest of the page. GROUND (8px) is where the rule
+// sits inside it; everything on the ground is positioned from there.
 .dino-track {
   position: relative;
-  height: 22px;
-  margin-top: 46px;
+  height: 74px;
+  margin-top: 2px;
+  margin-bottom: -8px;
+  overflow: hidden;
+  contain: layout paint;
   color: var(--muted);
   cursor: pointer;
   touch-action: manipulation;
-  // Clip left and right so sprites appear and vanish at the ends of the rule,
-  // while leaving room above for the jump and the clouds (overflow can't clip
-  // one axis on its own without turning into a scroll container)
-  clip-path: inset(-72px 0 -12px 0);
 }
 
 .dino-runner {
   position: absolute;
-  bottom: 0;
+  bottom: 8px;
   left: 24px;
+  will-change: transform;
 }
 
 .cactus,
@@ -341,7 +348,7 @@ a:focus {
 .cloud,
 .sand {
   position: absolute;
-  bottom: 0;
+  bottom: 8px;
 }
 
 .sand {
@@ -358,7 +365,7 @@ a:focus {
 .dino-score {
   position: absolute;
   right: 0;
-  bottom: 44px;
+  bottom: 52px;
   display: flex;
   gap: 10px;
   font-size: 11px;
