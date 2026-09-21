@@ -619,11 +619,14 @@ show_updated: true
   // game is on.
   (function () {
     var link = document.getElementById('snake-link');
-    var scoreEl = document.getElementById('snake-score');
-    if (!link || !scoreEl) return;
+    var scoreEl = document.getElementById('snake-points');
+    var hiEl = document.getElementById('snake-hi');
+    if (!link || !scoreEl || !hiEl) return;
 
     var START_LEN = 12;     // segments the snake starts with
-    var GROW = 4;           // segments an apple is worth
+    var GROW = 4;           // segments an apple is worth at the start of a game
+    var GROW_EVERY = 5;     // apples it takes for each apple to be worth one more
+    var GROW_MAX = 12;      // the most an apple is ever worth
     var SPACING = 9;        // px the body keeps between one segment and the next
     var HEAD_R = 8;         // px, radius of the head, a shade wider than the body
     var BODY_R = 6;         // px, radius of the bead right behind the head
@@ -671,7 +674,7 @@ show_updated: true
     var APPLE_LIT = '#f07f82';
     var STEM = '#7a4a2b';
     var LEAF = '#5db85c';
-    var APPLE_ALPHA = 0.55;  // apples sit back, a wash of color rather than a blot
+    var APPLE_ALPHA = 0.85;  // apples sit back a touch, but still read clearly
 
     var canvas = null;
     var ctx = null;
@@ -679,12 +682,16 @@ show_updated: true
     var seg = [];         // the body, head first; each { x, y }
     var apples = [];      // each { x, y, born }
     var score = 0;
+    var hi = 0;           // the best score on this browser, kept across visits
+    try { hi = parseInt(localStorage.getItem('snake-hi'), 10) || 0; } catch (e) {}
+    var beat = hi;        // the best as this game began: the number a record has to pass
     var pointer = null;   // where the cursor was last seen, once it has moved
     var touching = false; // whether this game is being played with a finger
     var LIVE = 0, DYING = 1, OVER = 2;
     var state = LIVE;
     var diedAt = 0;
     var travelled = 0;    // how far the head has gone, to know the body is strung out
+    var walled = false;   // whether the head has been clear of every edge, so hitting one counts
     var last = 0;
     var paper = '#202020';  // the page behind the snake, for its halo; read once a game
     var words = [];       // every word the snake can push, with where it rests
@@ -718,6 +725,8 @@ show_updated: true
       var ch = Math.round(window.innerHeight * dpr);
       w = window.innerWidth;
       h = window.innerHeight;
+      // A window that shrinks onto the head is not the player running into it
+      walled = false;
       // Mobile browsers fire resize every time the address bar slides away.
       // Assigning a canvas's width reallocates it even when the number is the
       // same, so the sizes are compared first.
@@ -876,7 +885,9 @@ show_updated: true
     // again once the snake has killed itself
     function label(kind) {
       link.textContent =
-        kind === 'on' ? 'Hide Snake' : kind === 'dead' ? 'Replay Snake' : 'Snake';
+        kind === 'on' ? 'Hide Snake'
+          : kind === 'dead' ? (record() ? 'Replay Snake · New best!' : 'Replay Snake')
+          : 'Snake';
       link.setAttribute('aria-pressed', kind === 'on' ? 'true' : 'false');
       link.setAttribute('title',
         kind === 'on' ? 'Put the snake away'
@@ -885,9 +896,29 @@ show_updated: true
     }
 
     // Three digits until the hundreds run out, then however many it takes
+    function pad(n) {
+      var s = String(n);
+      return s.length < 3 ? ('00' + s).slice(-3) : s;
+    }
+
+    // The best score sits dimmed beside this game's, as the dino's does. It is
+    // saved the moment it is beaten rather than at the end, so a record set in
+    // a game that is then put away, or lost to a refresh, still counts.
+    // A record needs something to break, so the very first game doesn't count
+    function record() {
+      return beat > 0 && score > beat;
+    }
+
     function showScore() {
-      var s = String(score);
-      scoreEl.textContent = s.length < 3 ? ('00' + s).slice(-3) : s;
+      // Lit from the apple that breaks the old best until the game ends, with a
+      // pop on that first apple so it is noticed mid-chase
+      scoreEl.parentNode.classList.toggle('record', record());
+      if (score > hi) {
+        hi = score;
+        try { localStorage.setItem('snake-hi', String(hi)); } catch (e) {}
+      }
+      scoreEl.textContent = pad(score);
+      hiEl.textContent = hi ? 'HI ' + pad(hi) + ' ' : '';
     }
 
     // Somewhere clear of the head, so the apple that replaces the one just
@@ -932,12 +963,15 @@ show_updated: true
         var dy = a.y - head.y;
         if (dx * dx + dy * dy > BITE * BITE) continue;
         apples.splice(i, 1);
+        // Worth more the longer the game goes on, so the body fills the window
+        // faster just as the player is getting comfortable
+        var grow = Math.min(GROW + Math.floor(score / GROW_EVERY), GROW_MAX);
         score++;
         showScore();
         // The new segments start stacked on the tail and unfurl behind it as
         // the snake moves on
         var tail = seg[seg.length - 1];
-        for (var g = 0; g < GROW && seg.length < MAX_SEG; g++) {
+        for (var g = 0; g < grow && seg.length < MAX_SEG; g++) {
           seg.push({ x: tail.x, y: tail.y });
         }
       }
@@ -956,6 +990,18 @@ show_updated: true
         if (dx * dx + dy * dy < r * r) return true;
       }
       return false;
+    }
+
+    // Has the head run into the edge of the window? Only once it has been
+    // clear of all four since the game began, was picked back up, or the
+    // window changed size — otherwise a snake that starts at the cursor, and
+    // the cursor is at an edge, would die before it had moved.
+    function hitWall() {
+      var head = seg[0];
+      var touches = head.x - HEAD_R <= 0 || head.x + HEAD_R >= w ||
+        head.y - HEAD_R <= 0 || head.y + HEAD_R >= h;
+      if (!touches) walled = true;
+      return walled && touches;
     }
 
     function die() {
@@ -1173,7 +1219,7 @@ show_updated: true
       }
 
       follow();
-      if (bitSelf()) {
+      if (bitSelf() || hitWall()) {
         die();
         draw();
         return;
@@ -1193,6 +1239,7 @@ show_updated: true
       seg = [];
       apples = [];
       score = 0;
+      beat = hi;
       travelled = 0;
       state = LIVE;
     }

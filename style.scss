@@ -473,7 +473,7 @@ a:focus {
 }
 
 // While a game is on, the score stands in for the theme toggle in the header.
-// The two are near enough the same width that nothing beside them shifts.
+// Once there is a best score it rides along in front, dimmed.
 .snake-score {
   display: none;
   color: var(--muted);
@@ -496,6 +496,26 @@ a:focus {
   overscroll-behavior: none;
   user-select: none;
   -webkit-user-select: none;
+}
+
+.snake-hi {
+  display: inline-block;
+  opacity: 0.55;
+  white-space: pre;
+}
+
+// Beating the old best lights the HI up in the snake's blue for the rest of
+// the game, with a pop as it happens
+.snake-score.record .snake-hi {
+  opacity: 1;
+  color: #4a63d8;
+  animation: snake-record 0.45s ease-out;
+}
+
+@keyframes snake-record {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.35); }
+  100% { transform: scale(1); }
 }
 
 .snaking #theme-toggle {
