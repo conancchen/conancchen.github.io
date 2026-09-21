@@ -70,8 +70,8 @@
         </button>
         </div>
       </div>
-      {% if page.subtitle %}<p class="subtitle" translate="no">{{ page.subtitle }}</p>
-      {% elsif page.show_updated %}<p class="subtitle" translate="no">Updated {{ site.time | date: "%b %-d, %Y" }}</p>{% endif %}
+      {% if page.subtitle %}<p class="subtitle" translate="no"><button type="button" class="replay" onclick="playTitleScramble()" title="Replay the animation">{{ page.subtitle }}</button></p>
+      {% elsif page.show_updated %}<p class="subtitle" translate="no"><button type="button" class="replay" onclick="playTitleScramble()" title="Replay the animation">Updated {{ site.time | date: "%b %-d, %Y" }}</button></p>{% endif %}
     </header>
 
     <!-- Runs as soon as the title is parsed, so the first paint is already scrambled -->

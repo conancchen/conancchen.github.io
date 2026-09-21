@@ -116,15 +116,29 @@ a:focus {
   margin: 0;
 }
 
-// The name is a button that replays the title animation, not a link
-.home-link {
+// The name and the line under it are buttons that replay the title animation,
+// not links
+.home-link,
+.replay {
   font: inherit;
-  color: var(--text);
+  color: inherit;
   background: none;
   border: none;
   padding: 0;
   margin: 0;
   cursor: pointer;
+}
+
+.home-link {
+  color: var(--text);
+}
+
+// A click shouldn't leave a focus ring behind; a keyboard tab still should
+.home-link:focus:not(:focus-visible),
+.replay:focus:not(:focus-visible),
+.icon-button:focus:not(:focus-visible),
+.entry > summary:focus:not(:focus-visible) {
+  outline: none;
 }
 
 .header-actions {
