@@ -606,10 +606,11 @@ show_updated: true
 </script>
 
 <script>
-  // A snake that chases the cursor, woken by the Snake link under Misc. An
-  // apple drops somewhere on the page every APPLE_MS; steering the head onto
-  // one eats it, which lengthens the snake and ticks the score up in the
-  // header, where the theme toggle usually sits. Pressing the link again only
+  // A snake that chases the cursor, woken by the Snake link under Misc. There
+  // is one apple on the page at a time; steering the head onto it eats it, the
+  // next appears somewhere else that same instant, and the snake lengthens as
+  // the score ticks up in the header, where the theme toggle usually sits.
+  // Pressing the link again only
   // puts the snake away — the game it was in the middle of is still there when
   // it comes back, and nothing but a refresh starts it over.
   //
@@ -632,9 +633,10 @@ show_updated: true
     var OUTLINE = 1.5;      // px of page color drawn around the snake, so it reads over text
     var CHASE = 22;         // how hard the head is pulled toward the cursor, per second
     var MAX_SPEED = 2600;   // px per second the head can travel, however far the cursor is
-    var APPLE_MS = 8000;    // how often an apple drops
     var APPLE_R = 7;        // px, radius of an apple
-    var APPLE_MAX = 12;     // uneaten apples pile up only this far before the oldest goes
+    var CLEAR_OF_HEAD = 60; // px a new apple keeps from the head, so it isn't eaten as it lands
+    var MAX_SEG = 300;      // a ceiling on the body, so a long game can't drag the page down
+    var MAX_DPR = 2;        // a phone's third pixel of density buys nothing here and costs a lot
     var POP_MS = 220;       // how long an apple takes to swell to full size
     var EDGE = 20;          // px an apple keeps clear of the window's edges
     var RIPPLE_R = 64;      // px, how close the head has to be for a word to feel it
@@ -666,27 +668,47 @@ show_updated: true
     var score = 0;
     var pointer = null;   // where the cursor was last seen, once it has moved
     var last = 0;
-    var nextApple = 0;
-    var appleLeft = 0;    // ms still owed on the apple clock when the snake was put away
     var paper = '#202020';  // the page behind the snake, for its halo; read once a game
     var words = [];       // every word the snake can push, with where it rests
     var wrapped = [];     // the text nodes those words were cut from, to put back after
+    var displaced = 0;    // how many of those words are currently off their mark
+    var rx = 0;           // where the head was when the ripple last had anything to do
+    var ry = 0;
+    var apple = null;     // one apple, drawn once and then stamped out for each of them
+    var appleDpr = 0;     // the density it was drawn at, so it is redrawn if that changes
+    var settle = null;    // pending remeasure, held off until the window stops changing
+    var TAU = Math.PI * 2;
     var w = 0;
     var h = 0;
 
+    // Measuring the words forces the browser to lay the page out, and a phone
+    // fires resize all the way through a scroll as its address bar slides away.
+    // The canvas is resized at once, since that is now cheap when nothing
+    // changed, but the measuring waits for the window to hold still.
     function remeasure() {
       resize();
-      measureWords();
+      clearTimeout(settle);
+      settle = setTimeout(measureWords, 150);
     }
 
     function resize() {
-      var dpr = window.devicePixelRatio || 1;
+      // Phones report a density of 3, which would have this clearing and
+      // refilling nine pixels for every one on the page. Two is past the point
+      // the difference shows.
+      var dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
+      var cw = Math.round(window.innerWidth * dpr);
+      var ch = Math.round(window.innerHeight * dpr);
       w = window.innerWidth;
       h = window.innerHeight;
-      canvas.width = Math.round(w * dpr);
-      canvas.height = Math.round(h * dpr);
+      // Mobile browsers fire resize every time the address bar slides away.
+      // Assigning a canvas's width reallocates it even when the number is the
+      // same, so the sizes are compared first.
+      if (canvas.width === cw && canvas.height === ch) return;
+      canvas.width = cw;
+      canvas.height = ch;
       // Draw in CSS pixels and let the transform handle the display's density
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (dpr !== appleDpr) makeApple(dpr);
     }
 
     function onMove(e) {
@@ -769,6 +791,12 @@ show_updated: true
     // passed, so the text ripples where the snake crosses it
     function ripple(dt) {
       var head = seg[0];
+      // A finger lifted or a cursor left alone: with every word already back on
+      // its mark there is nothing to work out, so the whole sweep is skipped
+      if (!displaced && Math.abs(head.x - rx) < 0.01 && Math.abs(head.y - ry) < 0.01) return;
+      rx = head.x;
+      ry = head.y;
+      displaced = 0;
       var hx = head.x + (window.scrollX || window.pageXOffset || 0);
       var hy = head.y + (window.scrollY || window.pageYOffset || 0);
       var k = Math.min(1, RIPPLE_EASE * dt);
@@ -802,6 +830,7 @@ show_updated: true
           word.el.style.transform =
             'translate(' + word.x.toFixed(2) + 'px, ' + word.y.toFixed(2) + 'px)';
           word.moved = true;
+          displaced++;
         }
       }
     }
@@ -819,13 +848,19 @@ show_updated: true
       scoreEl.textContent = s.length < 3 ? ('00' + s).slice(-3) : s;
     }
 
+    // Somewhere clear of the head, so the apple that replaces the one just
+    // eaten cannot land under the snake and be swallowed on the spot
     function dropApple() {
-      apples.push({
-        x: EDGE + Math.random() * Math.max(1, w - EDGE * 2),
-        y: EDGE + Math.random() * Math.max(1, h - EDGE * 2),
-        born: last
-      });
-      if (apples.length > APPLE_MAX) apples.shift();
+      var head = seg[0];
+      var x, y;
+      for (var tries = 0; tries < 12; tries++) {
+        x = EDGE + Math.random() * Math.max(1, w - EDGE * 2);
+        y = EDGE + Math.random() * Math.max(1, h - EDGE * 2);
+        var dx = x - head.x;
+        var dy = y - head.y;
+        if (dx * dx + dy * dy >= CLEAR_OF_HEAD * CLEAR_OF_HEAD) break;
+      }
+      apples.push({ x: x, y: y, born: last });
     }
 
     // A segment is dragged along behind the one ahead of it, and only once it
@@ -859,7 +894,9 @@ show_updated: true
         // The new segments start stacked on the tail and unfurl behind it as
         // the snake moves on
         var tail = seg[seg.length - 1];
-        for (var g = 0; g < GROW; g++) seg.push({ x: tail.x, y: tail.y });
+        for (var g = 0; g < GROW && seg.length < MAX_SEG; g++) {
+          seg.push({ x: tail.x, y: tail.y });
+        }
       }
     }
 
@@ -909,43 +946,80 @@ show_updated: true
       }
     }
 
+    // An apple is a dozen path operations, and there can be a dozen apples on
+    // the page. Drawing one into a small canvas at the start turns each of them
+    // into a single stamp per frame, which is what a phone can actually keep up
+    // with. The box is sized off APPLE_R so the leaf and stem always fit.
+    var SPR_CX = Math.ceil(APPLE_R * 1.6);
+    var SPR_CY = Math.ceil(APPLE_R * 2.4);
+    var SPR_W = SPR_CX + Math.ceil(APPLE_R * 1.6);
+    var SPR_H = SPR_CY + Math.ceil(APPLE_R * 1.4);
+
+    function makeApple(dpr) {
+      appleDpr = dpr;
+      apple = document.createElement('canvas');
+      apple.width = Math.round(SPR_W * dpr);
+      apple.height = Math.round(SPR_H * dpr);
+      var c = apple.getContext('2d');
+      c.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      var r = APPLE_R;
+      // Stem and leaf go down first, so the fruit laps over where they meet it
+      c.beginPath();
+      c.moveTo(SPR_CX, SPR_CY - r * 0.6);
+      c.lineTo(SPR_CX + r * 0.18, SPR_CY - r * 1.7);
+      c.strokeStyle = STEM;
+      c.lineWidth = Math.max(1, r * 0.22);
+      c.lineCap = 'round';
+      c.stroke();
+      c.beginPath();
+      c.ellipse(SPR_CX + r * 0.72, SPR_CY - r * 1.6, r * 0.46, r * 0.24, -0.45, 0, TAU);
+      c.fillStyle = LEAF;
+      c.fill();
+
+      c.beginPath();
+      c.arc(SPR_CX, SPR_CY, r, 0, TAU);
+      c.fillStyle = APPLE;
+      c.fill();
+      c.beginPath();
+      c.arc(SPR_CX - r * 0.34, SPR_CY - r * 0.36, r * 0.3, 0, TAU);
+      c.fillStyle = APPLE_LIT;
+      c.fill();
+    }
+
     function drawApple(a) {
       // Swelling in on arrival, so an apple is noticed rather than just there
       var t = Math.min(1, (last - a.born) / POP_MS);
-      var r = APPLE_R * (1 - (1 - t) * (1 - t));
+      var k = 1 - (1 - t) * (1 - t);
       ctx.globalAlpha = APPLE_ALPHA;
-
-      // Stem and leaf go down first, so the fruit laps over where they meet it
-      ctx.beginPath();
-      ctx.moveTo(a.x, a.y - r * 0.6);
-      ctx.lineTo(a.x + r * 0.18, a.y - r * 1.7);
-      ctx.strokeStyle = STEM;
-      ctx.lineWidth = Math.max(1, r * 0.22);
-      ctx.lineCap = 'round';
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.ellipse(a.x + r * 0.72, a.y - r * 1.6, r * 0.46, r * 0.24, -0.45, 0, Math.PI * 2);
-      ctx.fillStyle = LEAF;
-      ctx.fill();
-
-      dot(a.x, a.y, r, APPLE);
-      dot(a.x - r * 0.34, a.y - r * 0.36, r * 0.3, APPLE_LIT);
+      ctx.drawImage(apple, a.x - SPR_CX * k, a.y - SPR_CY * k, SPR_W * k, SPR_H * k);
       ctx.globalAlpha = 1;
+    }
+
+    // Every bead of a pass goes into one path and is filled in one go. Filling
+    // them one at a time meant a draw call per bead per pass, which on a long
+    // snake was hundreds of them a frame; the picture is identical, since the
+    // beads all wind the same way and so fill as their union.
+    function beads(grow, color) {
+      ctx.beginPath();
+      for (var i = seg.length - 1; i >= 0; i--) {
+        var r = radius(i) + grow;
+        // Without this the arc would be joined to the last one by a straight line
+        ctx.moveTo(seg[i].x + r, seg[i].y);
+        ctx.arc(seg[i].x, seg[i].y, r, 0, TAU);
+      }
+      ctx.fillStyle = color;
+      ctx.fill();
     }
 
     function draw() {
       ctx.clearRect(0, 0, w, h);
       for (var a = 0; a < apples.length; a++) drawApple(apples[a]);
 
-      // Every bead's halo is laid down before any of the snake, so the outline
+      // The whole halo is laid down before any of the snake, so the outline
       // traces the whole silhouette instead of ringing each bead in turn
-      var i;
-      for (i = seg.length - 1; i >= 0; i--) {
-        dot(seg[i].x, seg[i].y, radius(i) + OUTLINE, paper);
-      }
-      for (i = seg.length - 1; i >= 0; i--) {
-        dot(seg[i].x, seg[i].y, radius(i), SNAKE);
-      }
+      beads(OUTLINE, paper);
+      beads(0, SNAKE);
       drawFace();
     }
 
@@ -955,11 +1029,6 @@ show_updated: true
       // so coming back doesn't teleport the snake across the page
       var dt = Math.min((now - last) / 1000, 0.05);
       last = now;
-
-      if (now >= nextApple) {
-        dropApple();
-        nextApple = now + APPLE_MS;
-      }
 
       if (pointer) {
         var head = seg[0];
@@ -977,6 +1046,9 @@ show_updated: true
 
       follow();
       eat();
+      // The board is never empty: this covers the first frame of a game and
+      // puts the next apple out the same frame the last one is eaten
+      if (!apples.length) dropApple();
       ripple(dt);
       draw();
     }
@@ -987,6 +1059,7 @@ show_updated: true
       canvas.setAttribute('aria-hidden', 'true');
       document.body.appendChild(canvas);
       ctx = canvas.getContext('2d');
+      appleDpr = 0;  // force the sprite to be drawn for this game's density
       resize();
       paper = getComputedStyle(document.documentElement)
         .getPropertyValue('--bg').trim() || paper;
@@ -1017,19 +1090,16 @@ show_updated: true
       document.addEventListener('toggle', measureWords, true);
 
       last = performance.now();
-      // A first game has an apple to chase from the first frame; a resumed one
-      // waits out whatever was left of the clock when it was put away
-      nextApple = last + appleLeft;
       raf = requestAnimationFrame(frame);
     }
 
     function stop() {
       cancelAnimationFrame(raf);
       raf = null;
-      appleLeft = Math.max(0, nextApple - last);
       window.removeEventListener('resize', remeasure);
       window.removeEventListener('pointermove', onMove);
       document.removeEventListener('toggle', measureWords, true);
+      clearTimeout(settle);
       unwrapWords();  // before the label is rewritten, which would strip the link's spans
       canvas.parentNode.removeChild(canvas);
       canvas = null;
