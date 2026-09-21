@@ -5,7 +5,7 @@ show_updated: true
 ---
 <section class="bio fade-intro">
   <p>
-    I’m a junior at Princeton studying Operations Research & Financial Engineering with minors in Classics & Computer Science.
+    I’m a junior at Princeton studying Operations Research & Financial Engineering with minors in Classics, Computer Science & Machine Learning.
   </p>
   <p>
     I research reinforcement learning & data generation for humanoid robot navigation in the <a href="https://pvl.cs.princeton.edu/">Princeton Vision & Learning Lab</a>.
@@ -57,10 +57,10 @@ show_updated: true
       <a href="{{ site.baseurl }}/coursework/" class="row-link">Coursework</a>
     </div>
     <div class="row">
-      <a href="https://conancchen.github.io/strava/" class="row-link">Strava</a>
+      <a href="https://conancchen.github.io/strava/" class="row-link">Custom Strava</a>
     </div>
     <div class="row">
-      <a href="#" class="row-link" id="snake-link" role="button" aria-pressed="false" onclick="toggleSnake(event)" title="Chase the apples with your cursor">Snake</a>
+      <a href="#" class="row-link" id="snake-link" role="button" aria-pressed="false" onclick="toggleSnake(event)" title="Chase the apples with your cursor">Snake Mode</a>
     </div>
   </section>
 
@@ -889,7 +889,7 @@ show_updated: true
       link.textContent =
         kind === 'on' ? 'Hide Snake'
           : kind === 'dead' ? (record() ? 'Replay Snake · New best!' : 'Replay Snake')
-          : 'Snake';
+          : 'Snake Mode';
       link.setAttribute('aria-pressed', kind === 'on' ? 'true' : 'false');
       link.setAttribute('title',
         kind === 'on' ? 'Put the snake away'
