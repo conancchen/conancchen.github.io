@@ -636,6 +636,17 @@ show_updated: true
     var APPLE_R = 7;        // px, radius of an apple
     var CLEAR_OF_HEAD = 60; // px a new apple keeps from the head, so it isn't eaten as it lands
     var TOUCH_LIFT = 38;    // px the snake rides above a fingertip, so it isn't hidden under it
+    // Doubling back is fatal, but a hard turn is not: the beads just behind the
+    // head are always close to it, and a tight corner brings the next few
+    // within reach too, so the first NECK of them cannot be bitten. Past that,
+    // touching itself means the head has genuinely crossed its own body.
+    var NECK = 8;
+    var SELF_GIVE = 2;      // px shaved off the bite, so a near miss stays a miss
+    var FLASH_MS = 220;     // how long the snake flashes where it hit itself
+    var BLINK_MS = 55;      // how fast it flashes
+    var UNRAVEL_MS = 620;   // how long it then takes to come apart
+    var STAGGER = 0.55;     // the share of that spent waiting its turn, head first
+    var DEATH_MS = FLASH_MS + UNRAVEL_MS;
     var MAX_SEG = 300;      // a ceiling on the body, so a long game can't drag the page down
     var MAX_DPR = 2;        // a phone's third pixel of density buys nothing here and costs a lot
     var POP_MS = 220;       // how long an apple takes to swell to full size
@@ -653,6 +664,7 @@ show_updated: true
     // a sheen on it. All of it is fixed rather than themed, so the snake looks
     // the same crossing a dark page as a light one.
     var SNAKE = '#4a63d8';
+    var HURT = '#e5484d';   // what it flashes as it dies, the color of the apple
     var EYE = '#ffffff';
     var PUPIL = '#2f2f33';
     var APPLE = '#e5484d';
@@ -669,6 +681,10 @@ show_updated: true
     var score = 0;
     var pointer = null;   // where the cursor was last seen, once it has moved
     var touching = false; // whether this game is being played with a finger
+    var LIVE = 0, DYING = 1, OVER = 2;
+    var state = LIVE;
+    var diedAt = 0;
+    var travelled = 0;    // how far the head has gone, to know the body is strung out
     var last = 0;
     var paper = '#202020';  // the page behind the snake, for its halo; read once a game
     var words = [];       // every word the snake can push, with where it rests
@@ -856,10 +872,16 @@ show_updated: true
     }
 
     // The link that starts a game is the one that puts it away again
-    function label(on) {
-      link.textContent = on ? 'Hide Snake' : 'Snake';
-      link.setAttribute('aria-pressed', on ? 'true' : 'false');
-      link.setAttribute('title', on ? 'Put the snake away' : 'Chase the apples with your cursor');
+    // Three things the link can be: the way in, the way out, and the way round
+    // again once the snake has killed itself
+    function label(kind) {
+      link.textContent =
+        kind === 'on' ? 'Hide Snake' : kind === 'dead' ? 'Replay Snake' : 'Snake';
+      link.setAttribute('aria-pressed', kind === 'on' ? 'true' : 'false');
+      link.setAttribute('title',
+        kind === 'on' ? 'Put the snake away'
+          : kind === 'dead' ? 'Start another game'
+          : 'Chase the apples with your cursor');
     }
 
     // Three digits until the hundreds run out, then however many it takes
@@ -921,6 +943,36 @@ show_updated: true
       }
     }
 
+    // Has the head run into its own body? Only once the snake has pulled itself
+    // out into a line at least once — at the start of a game every bead sits on
+    // top of every other, which would otherwise be a death on the first frame.
+    function bitSelf() {
+      if (travelled < START_LEN * SPACING) return false;
+      var head = seg[0];
+      for (var i = NECK; i < seg.length; i++) {
+        var dx = seg[i].x - head.x;
+        var dy = seg[i].y - head.y;
+        var r = HEAD_R + radius(i) - SELF_GIVE;
+        if (dx * dx + dy * dy < r * r) return true;
+      }
+      return false;
+    }
+
+    function die() {
+      state = DYING;
+      diedAt = last;
+    }
+
+    // How much of a bead is left. Dying, they go one after another from the
+    // head down, so the snake comes apart from the end that hit something.
+    function beadScale(i) {
+      if (state !== DYING) return 1;
+      var p = (last - diedAt - FLASH_MS) / UNRAVEL_MS;
+      if (p <= 0) return 1;
+      var q = (p - (i / seg.length) * STAGGER) / (1 - STAGGER);
+      return q <= 0 ? 1 : q >= 1 ? 0 : 1 - q;
+    }
+
     function dot(x, y, r, color) {
       ctx.beginPath();
       ctx.arc(x, y, r, 0, Math.PI * 2);
@@ -934,6 +986,14 @@ show_updated: true
       if (i === 0) return HEAD_R;
       if (seg.length < 3) return BODY_R;
       return BODY_R + (TAIL_R - BODY_R) * ((i - 1) / (seg.length - 2));
+    }
+
+    // It flashes where it hit, then stays that colour while it comes apart
+    function bodyColor() {
+      if (state !== DYING) return SNAKE;
+      var t = last - diedAt;
+      if (t >= FLASH_MS) return HURT;
+      return Math.floor(t / BLINK_MS) % 2 ? HURT : SNAKE;
     }
 
     function drawFace() {
@@ -958,12 +1018,32 @@ show_updated: true
       ctx.lineCap = 'round';
       ctx.stroke();
 
-      // Two wide eyes, pupils pushed toward wherever it is headed
+      // Two wide eyes, pupils pushed toward wherever it is headed — or, once it
+      // has hit itself, the old cartoon shorthand for the opposite
+      var dead = state !== LIVE;
+      if (dead) {
+        ctx.strokeStyle = EYE;
+        ctx.lineWidth = 1.6;
+      }
       for (var side = -1; side <= 1; side += 2) {
         var ex = head.x + dx * 1.4 + px * side * 3.4;
         var ey = head.y + dy * 1.4 + py * side * 3.4;
-        dot(ex, ey, EYE_R, EYE);
-        dot(ex + dx * 1.1, ey + dy * 1.1, PUPIL_R, PUPIL);
+        if (!dead) {
+          dot(ex, ey, EYE_R, EYE);
+          dot(ex + dx * 1.1, ey + dy * 1.1, PUPIL_R, PUPIL);
+          continue;
+        }
+        // An X, drawn on the head's own axes so it turns with it
+        var ux = (dx + px) * 2.4;
+        var uy = (dy + py) * 2.4;
+        var vx = (dx - px) * 2.4;
+        var vy = (dy - py) * 2.4;
+        ctx.beginPath();
+        ctx.moveTo(ex - ux, ey - uy);
+        ctx.lineTo(ex + ux, ey + uy);
+        ctx.moveTo(ex - vx, ey - vy);
+        ctx.lineTo(ex + vx, ey + vy);
+        ctx.stroke();
       }
     }
 
@@ -1023,12 +1103,17 @@ show_updated: true
     // beads all wind the same way and so fill as their union.
     function beads(grow, color) {
       ctx.beginPath();
+      var any = false;
       for (var i = seg.length - 1; i >= 0; i--) {
-        var r = radius(i) + grow;
+        var r = radius(i) * beadScale(i);
+        if (r <= 0.2) continue;  // this one has finished coming apart
+        r += grow;
         // Without this the arc would be joined to the last one by a straight line
         ctx.moveTo(seg[i].x + r, seg[i].y);
         ctx.arc(seg[i].x, seg[i].y, r, 0, TAU);
+        any = true;
       }
+      if (!any) return;
       ctx.fillStyle = color;
       ctx.fill();
     }
@@ -1040,8 +1125,10 @@ show_updated: true
       // The whole halo is laid down before any of the snake, so the outline
       // traces the whole silhouette instead of ringing each bead in turn
       beads(OUTLINE, paper);
-      beads(0, SNAKE);
-      drawFace();
+      beads(0, bodyColor());
+      // Once the head has started coming apart there is nothing left to put a
+      // face on
+      if (beadScale(0) > 0.55) drawFace();
     }
 
     function frame(now) {
@@ -1050,6 +1137,25 @@ show_updated: true
       // so coming back doesn't teleport the snake across the page
       var dt = Math.min((now - last) / 1000, 0.05);
       last = now;
+
+      // A dying snake takes no more steering: it holds where it hit itself
+      // while it comes apart, and then the board is cleared for the replay
+      if (state === DYING) {
+        if (now - diedAt >= DEATH_MS) {
+          state = OVER;
+          apples = [];
+          ctx.clearRect(0, 0, w, h);
+          // The game is over, so the page is free to scroll again
+          document.documentElement.classList.remove('snake-live');
+          label('dead');
+          cancelAnimationFrame(raf);
+          raf = null;
+          return;
+        }
+        ripple(dt);
+        draw();
+        return;
+      }
 
       if (pointer) {
         var head = seg[0];
@@ -1062,16 +1168,33 @@ show_updated: true
           var step = Math.min(d, d * CHASE * dt, MAX_SPEED * dt);
           head.x += (dx / d) * step;
           head.y += (dy / d) * step;
+          travelled += step;
         }
       }
 
       follow();
+      if (bitSelf()) {
+        die();
+        draw();
+        return;
+      }
       eat();
       // The board is never empty: this covers the first frame of a game and
       // puts the next apple out the same frame the last one is eaten
       if (!apples.length) dropApple();
       ripple(dt);
       draw();
+    }
+
+    // Everything a new game starts over from. Putting the snake away leaves all
+    // of this alone, which is why a hidden game comes back as it was; only a
+    // death, or a refresh, clears it.
+    function reset() {
+      seg = [];
+      apples = [];
+      score = 0;
+      travelled = 0;
+      state = LIVE;
     }
 
     function start() {
@@ -1101,8 +1224,8 @@ show_updated: true
       });
       showScore();
 
-      document.documentElement.classList.add('snaking');
-      label(true);  // before the words are cut up, since it rewrites the link
+      document.documentElement.classList.add('snaking', 'snake-live');
+      label('on');  // before the words are cut up, since it rewrites the link
       wrapWords();
       measureWords();
       window.addEventListener('resize', remeasure);
@@ -1118,6 +1241,9 @@ show_updated: true
     function stop() {
       cancelAnimationFrame(raf);
       raf = null;
+      // Put away mid-death, it counts as dead: there is nothing left to come
+      // back to, so the next press starts a new game
+      if (state === DYING) state = OVER;
       window.removeEventListener('resize', remeasure);
       window.removeEventListener('pointermove', onMove);
       document.removeEventListener('toggle', measureWords, true);
@@ -1126,13 +1252,23 @@ show_updated: true
       canvas.parentNode.removeChild(canvas);
       canvas = null;
       ctx = null;
-      document.documentElement.classList.remove('snaking');
-      label(false);
+      document.documentElement.classList.remove('snaking', 'snake-live');
+      label('off');
     }
 
     window.toggleSnake = function (event) {
       event.preventDefault();
-      if (raf) stop(); else start();
+      if (canvas) {
+        // Out on the page. A dead snake replays; a live one is put away with
+        // its game intact.
+        var again = state === OVER;
+        stop();
+        if (!again) return;
+        reset();
+      } else if (state === OVER) {
+        reset();  // it died and was then put away, so start it afresh
+      }
+      start();
     };
   })();
 </script>

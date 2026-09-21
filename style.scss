@@ -490,8 +490,8 @@ a:focus {
 // there to press, and not being able to scroll costs nothing while a
 // full-window game is on. Not selecting text is the same bargain on a desktop:
 // dragging the cursor around would otherwise highlight half the page.
-.snaking,
-.snaking body {
+.snake-live,
+.snake-live body {
   touch-action: none;
   overscroll-behavior: none;
   user-select: none;
