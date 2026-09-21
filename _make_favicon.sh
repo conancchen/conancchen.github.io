@@ -6,8 +6,8 @@ from PIL import Image, ImageDraw, ImageOps
 
 RADIUS = 0.44  # radius of the whole yin-yang circle, as a share of the canvas size
 EYE = 0.2      # dot radius, as a share of RADIUS
-ROTATE = 270   # degrees clockwise
-FLIP = True    # then mirror top to bottom
+FLIP = True    # mirror the drawing top to bottom, then...
+ROTATE = 135   # ...turn it this many degrees clockwise
 SUPERSAMPLE = 16
 
 def disc(draw, cx, cy, r, fill):
@@ -26,9 +26,9 @@ def fish(size):
     disc(draw, c, c + r / 2, r / 2, clear)
     # The black dot sits in the middle of the top bulb
     disc(draw, c, c - r / 2, EYE * r, black)
-    img = img.rotate(-ROTATE, resample=Image.BICUBIC)
     if FLIP:
         img = ImageOps.flip(img)
+    img = img.rotate(-ROTATE, resample=Image.BICUBIC)
     return img.resize((size, size), Image.LANCZOS)
 
 for name, size in [("favicon-16", 16), ("favicon-32", 32), ("favicon-192", 192),

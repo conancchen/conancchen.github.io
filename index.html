@@ -1,8 +1,9 @@
 ---
 layout: default
+home: true
 show_updated: true
 ---
-<section class="bio fade-intro" data-fade-trigger="input">
+<section class="bio fade-intro">
   <p>
     I’m a junior at Princeton studying Operations Research & Financial Engineering with minors in Classics & Computer Science.
   </p>
@@ -24,18 +25,27 @@ show_updated: true
   <section class="block">
     <h2 class="block-label block-label-plain">Experiences</h2>
 
-    <div class="row">
-      <span class="row-label">Citadel Securities</span>
-      <span class="row-year">2027</span>
-    </div>
-    <div class="row">
-      <span class="row-label">Princeton Vision & Learning Lab</span>
-      <span class="row-year">2026</span>
-    </div>
-    <div class="row">
-      <span class="row-label">Scale AI</span>
-      <span class="row-year">2025</span>
-    </div>
+    <details class="entry">
+      <summary class="row">
+        <span class="row-label">Citadel Securities</span>
+        <span class="row-year">2027</span>
+      </summary>
+      <p class="row-note">Incoming QT Intern</p>
+    </details>
+    <details class="entry">
+      <summary class="row">
+        <span class="row-label">Princeton Vision &amp; Learning Lab</span>
+        <span class="row-year">2026</span>
+      </summary>
+      <p class="row-note">Fall 2026 IW, <a href="https://orfe.princeton.edu/undergraduate/eric-fs-pai-83-fund">Eric Pai Summer Research Grant</a></p>
+    </details>
+    <details class="entry">
+      <summary class="row">
+        <span class="row-label">Scale AI</span>
+        <span class="row-year">2025</span>
+      </summary>
+      <p class="row-note">Technical Advisor Intern (GenAI)</p>
+    </details>
   </section>
 
   <section class="block">
@@ -49,34 +59,209 @@ show_updated: true
     </div>
   </section>
 
-  <div class="dino-track" aria-hidden="true">
-    <div class="dino-runner"><svg class="dino" viewBox="0 0 20 22" width="20" height="22" aria-hidden="true"><path d="M10 0h8v1h-8zM9 1h10v1h-10zM9 2h2v1h-2zM12 2h7v1h-7zM9 3h10v1h-10zM9 4h10v1h-10zM9 5h10v1h-10zM9 6h5v1h-5zM9 7h9v1h-9zM0 8h1v1h-1zM9 8h5v1h-5zM0 9h1v1h-1zM9 9h6v1h-6zM0 10h2v1h-2zM9 10h6v1h-6zM0 11h3v1h-3zM9 11h7v1h-7zM17 11h1v1h-1zM1 12h3v1h-3zM9 12h7v1h-7zM17 12h2v1h-2zM2 13h3v1h-3zM9 13h8v1h-8zM3 14h4v1h-4zM9 14h7v1h-7zM4 15h11v1h-11zM5 16h10v1h-10zM6 17h8v1h-8zM7 18h7v1h-7z"/><path class="dino-legs-a" d="M7 19h2v1h-2zM11 19h2v1h-2zM6 20h2v1h-2zM11 20h2v1h-2zM11 21h3v1h-3z"/><path class="dino-legs-b" d="M7 19h2v1h-2zM11 19h2v1h-2zM7 20h2v1h-2zM12 20h2v1h-2zM6 21h3v1h-3z"/></svg></div>
+  <div class="dino-track" aria-hidden="true" title="Press space to jump">
+    <div class="dino-score"><span class="dino-hi"></span><span class="dino-points"></span></div>
+    <div class="dino-runner"><svg class="dino" viewBox="0 0 20 22" width="20" height="22" aria-hidden="true"><path d="M10 0h8v1h-8zM9 1h10v1h-10zM9 2h2v1h-2zM12 2h7v1h-7zM9 3h10v1h-10zM9 4h10v1h-10zM9 5h10v1h-10zM9 6h5v1h-5zM9 7h9v1h-9zM0 8h1v1h-1zM9 8h5v1h-5zM0 9h1v1h-1zM9 9h6v1h-6zM0 10h2v1h-2zM9 10h6v1h-6zM0 11h3v1h-3zM9 11h7v1h-7zM17 11h1v1h-1zM1 12h3v1h-3zM9 12h7v1h-7zM17 12h2v1h-2zM2 13h3v1h-3zM9 13h8v1h-8zM3 14h4v1h-4zM9 14h7v1h-7zM4 15h11v1h-11zM5 16h10v1h-10zM6 17h8v1h-8zM7 18h7v1h-7z"/><path class="dino-legs-a" d="M7 19h2v1h-2zM11 19h2v1h-2zM6 20h2v1h-2zM11 20h2v1h-2zM11 21h3v1h-3z"/><path class="dino-legs-b" d="M7 19h2v1h-2zM11 19h2v1h-2zM7 20h2v1h-2zM12 20h2v1h-2zM6 21h3v1h-3z"/><path class="dino-legs-idle" d="M7 19h2v1h-2zM11 19h2v1h-2zM7 20h2v1h-2zM11 20h2v1h-2zM6 21h3v1h-3zM11 21h3v1h-3z"/></svg></div>
   </div>
   <hr class="rule">
-  <p class="updated" id="clock"><span id="clock-time"></span> in <button type="button" class="clock-place" id="clock-place" title="Change location">Princeton, NJ</button></p>
+  <p class="updated" id="clock"><span id="clock-time"></span> in <button type="button" class="clock-place" id="clock-place" title="Somewhere else">Princeton, NJ</button></p>
 </div>
 
 <script>
+  // The clock starts in Princeton; clicking the place name scrambles it to
+  // another spot on the map and retunes the time to match. The list is baked in
+  // so the page never has to ask anyone where a city is — 161 of them,
+  // between them covering every hour the world keeps.
   (function () {
-    var HOME = { label: 'Princeton, NJ', timeZone: 'America/New_York' };
+    var PLACES = [
+      // Home first; the rest are a spin of the globe
+      { label: 'Princeton, NJ', timeZone: 'America/New_York' },
+      // North America
+      { label: 'New York', timeZone: 'America/New_York' },
+      { label: 'Boston', timeZone: 'America/New_York' },
+      { label: 'Toronto', timeZone: 'America/Toronto' },
+      { label: 'Montréal', timeZone: 'America/Toronto' },
+      { label: 'Chicago', timeZone: 'America/Chicago' },
+      { label: 'Austin', timeZone: 'America/Chicago' },
+      { label: 'Denver', timeZone: 'America/Denver' },
+      { label: 'Santa Fe', timeZone: 'America/Denver' },
+      { label: 'Phoenix', timeZone: 'America/Phoenix' },
+      { label: 'Los Angeles', timeZone: 'America/Los_Angeles' },
+      { label: 'San Francisco', timeZone: 'America/Los_Angeles' },
+      { label: 'Seattle', timeZone: 'America/Los_Angeles' },
+      { label: 'Vancouver', timeZone: 'America/Vancouver' },
+      { label: 'Anchorage', timeZone: 'America/Anchorage' },
+      { label: 'Nome', timeZone: 'America/Nome' },
+      { label: 'Honolulu', timeZone: 'Pacific/Honolulu' },
+      { label: 'Whitehorse', timeZone: 'America/Whitehorse' },
+      { label: 'Iqaluit', timeZone: 'America/Iqaluit' },
+      { label: 'Halifax', timeZone: 'America/Halifax' },
+      { label: 'St. John\'s', timeZone: 'America/St_Johns' },
+      { label: 'Mexico City', timeZone: 'America/Mexico_City' },
+      { label: 'Tijuana', timeZone: 'America/Tijuana' },
+      { label: 'Havana', timeZone: 'America/Havana' },
+      { label: 'Kingston', timeZone: 'America/Jamaica' },
+      { label: 'San Juan', timeZone: 'America/Puerto_Rico' },
+      { label: 'Guatemala City', timeZone: 'America/Guatemala' },
+      { label: 'Panama City', timeZone: 'America/Panama' },
+      { label: 'Nuuk', timeZone: 'America/Nuuk' },
+      // South America
+      { label: 'Bogotá', timeZone: 'America/Bogota' },
+      { label: 'Quito', timeZone: 'America/Guayaquil' },
+      { label: 'Lima', timeZone: 'America/Lima' },
+      { label: 'La Paz', timeZone: 'America/La_Paz' },
+      { label: 'Santiago', timeZone: 'America/Santiago' },
+      { label: 'Buenos Aires', timeZone: 'America/Argentina/Buenos_Aires' },
+      { label: 'Montevideo', timeZone: 'America/Montevideo' },
+      { label: 'Asunción', timeZone: 'America/Asuncion' },
+      { label: 'São Paulo', timeZone: 'America/Sao_Paulo' },
+      { label: 'Rio de Janeiro', timeZone: 'America/Sao_Paulo' },
+      { label: 'Manaus', timeZone: 'America/Manaus' },
+      { label: 'Caracas', timeZone: 'America/Caracas' },
+      { label: 'Galápagos', timeZone: 'Pacific/Galapagos' },
+      { label: 'Ushuaia', timeZone: 'America/Argentina/Ushuaia' },
+      // Europe
+      { label: 'Reykjavík', timeZone: 'Atlantic/Reykjavik' },
+      { label: 'Dublin', timeZone: 'Europe/Dublin' },
+      { label: 'London', timeZone: 'Europe/London' },
+      { label: 'Lisbon', timeZone: 'Europe/Lisbon' },
+      { label: 'Madrid', timeZone: 'Europe/Madrid' },
+      { label: 'Barcelona', timeZone: 'Europe/Madrid' },
+      { label: 'Paris', timeZone: 'Europe/Paris' },
+      { label: 'Brussels', timeZone: 'Europe/Brussels' },
+      { label: 'Amsterdam', timeZone: 'Europe/Amsterdam' },
+      { label: 'Berlin', timeZone: 'Europe/Berlin' },
+      { label: 'Zürich', timeZone: 'Europe/Zurich' },
+      { label: 'Milan', timeZone: 'Europe/Rome' },
+      { label: 'Rome', timeZone: 'Europe/Rome' },
+      { label: 'Vienna', timeZone: 'Europe/Vienna' },
+      { label: 'Prague', timeZone: 'Europe/Prague' },
+      { label: 'Warsaw', timeZone: 'Europe/Warsaw' },
+      { label: 'Copenhagen', timeZone: 'Europe/Copenhagen' },
+      { label: 'Oslo', timeZone: 'Europe/Oslo' },
+      { label: 'Stockholm', timeZone: 'Europe/Stockholm' },
+      { label: 'Helsinki', timeZone: 'Europe/Helsinki' },
+      { label: 'Tallinn', timeZone: 'Europe/Tallinn' },
+      { label: 'Riga', timeZone: 'Europe/Riga' },
+      { label: 'Vilnius', timeZone: 'Europe/Vilnius' },
+      { label: 'Kyiv', timeZone: 'Europe/Kyiv' },
+      { label: 'Bucharest', timeZone: 'Europe/Bucharest' },
+      { label: 'Sofia', timeZone: 'Europe/Sofia' },
+      { label: 'Athens', timeZone: 'Europe/Athens' },
+      { label: 'Istanbul', timeZone: 'Europe/Istanbul' },
+      { label: 'Belgrade', timeZone: 'Europe/Belgrade' },
+      { label: 'Budapest', timeZone: 'Europe/Budapest' },
+      { label: 'Moscow', timeZone: 'Europe/Moscow' },
+      { label: 'Tórshavn', timeZone: 'Atlantic/Faroe' },
+      { label: 'Azores', timeZone: 'Atlantic/Azores' },
+      { label: 'Longyearbyen', timeZone: 'Arctic/Longyearbyen' },
+      // Africa and the Middle East
+      { label: 'Casablanca', timeZone: 'Africa/Casablanca' },
+      { label: 'Marrakesh', timeZone: 'Africa/Casablanca' },
+      { label: 'Dakar', timeZone: 'Africa/Dakar' },
+      { label: 'Accra', timeZone: 'Africa/Accra' },
+      { label: 'Lagos', timeZone: 'Africa/Lagos' },
+      { label: 'Kinshasa', timeZone: 'Africa/Kinshasa' },
+      { label: 'Cairo', timeZone: 'Africa/Cairo' },
+      { label: 'Khartoum', timeZone: 'Africa/Khartoum' },
+      { label: 'Addis Ababa', timeZone: 'Africa/Addis_Ababa' },
+      { label: 'Nairobi', timeZone: 'Africa/Nairobi' },
+      { label: 'Dar es Salaam', timeZone: 'Africa/Dar_es_Salaam' },
+      { label: 'Kampala', timeZone: 'Africa/Kampala' },
+      { label: 'Luanda', timeZone: 'Africa/Luanda' },
+      { label: 'Windhoek', timeZone: 'Africa/Windhoek' },
+      { label: 'Johannesburg', timeZone: 'Africa/Johannesburg' },
+      { label: 'Cape Town', timeZone: 'Africa/Johannesburg' },
+      { label: 'Antananarivo', timeZone: 'Indian/Antananarivo' },
+      { label: 'Mauritius', timeZone: 'Indian/Mauritius' },
+      { label: 'Tel Aviv', timeZone: 'Asia/Jerusalem' },
+      { label: 'Beirut', timeZone: 'Asia/Beirut' },
+      { label: 'Amman', timeZone: 'Asia/Amman' },
+      { label: 'Riyadh', timeZone: 'Asia/Riyadh' },
+      { label: 'Dubai', timeZone: 'Asia/Dubai' },
+      { label: 'Doha', timeZone: 'Asia/Qatar' },
+      { label: 'Tehran', timeZone: 'Asia/Tehran' },
+      { label: 'Baku', timeZone: 'Asia/Baku' },
+      { label: 'Tbilisi', timeZone: 'Asia/Tbilisi' },
+      { label: 'Yerevan', timeZone: 'Asia/Yerevan' },
+      // Asia
+      { label: 'Karachi', timeZone: 'Asia/Karachi' },
+      { label: 'Lahore', timeZone: 'Asia/Karachi' },
+      { label: 'Kabul', timeZone: 'Asia/Kabul' },
+      { label: 'Tashkent', timeZone: 'Asia/Tashkent' },
+      { label: 'Almaty', timeZone: 'Asia/Almaty' },
+      { label: 'Delhi', timeZone: 'Asia/Kolkata' },
+      { label: 'Mumbai', timeZone: 'Asia/Kolkata' },
+      { label: 'Bengaluru', timeZone: 'Asia/Kolkata' },
+      { label: 'Colombo', timeZone: 'Asia/Colombo' },
+      { label: 'Kathmandu', timeZone: 'Asia/Kathmandu' },
+      { label: 'Dhaka', timeZone: 'Asia/Dhaka' },
+      { label: 'Yangon', timeZone: 'Asia/Yangon' },
+      { label: 'Bangkok', timeZone: 'Asia/Bangkok' },
+      { label: 'Hanoi', timeZone: 'Asia/Ho_Chi_Minh' },
+      { label: 'Phnom Penh', timeZone: 'Asia/Phnom_Penh' },
+      { label: 'Kuala Lumpur', timeZone: 'Asia/Kuala_Lumpur' },
+      { label: 'Singapore', timeZone: 'Asia/Singapore' },
+      { label: 'Jakarta', timeZone: 'Asia/Jakarta' },
+      { label: 'Bali', timeZone: 'Asia/Makassar' },
+      { label: 'Manila', timeZone: 'Asia/Manila' },
+      { label: 'Hong Kong', timeZone: 'Asia/Hong_Kong' },
+      { label: 'Taipei', timeZone: 'Asia/Taipei' },
+      { label: 'Shanghai', timeZone: 'Asia/Shanghai' },
+      { label: 'Beijing', timeZone: 'Asia/Shanghai' },
+      { label: 'Chengdu', timeZone: 'Asia/Shanghai' },
+      { label: 'Ulaanbaatar', timeZone: 'Asia/Ulaanbaatar' },
+      { label: 'Seoul', timeZone: 'Asia/Seoul' },
+      { label: 'Tokyo', timeZone: 'Asia/Tokyo' },
+      { label: 'Kyoto', timeZone: 'Asia/Tokyo' },
+      { label: 'Sapporo', timeZone: 'Asia/Tokyo' },
+      { label: 'Vladivostok', timeZone: 'Asia/Vladivostok' },
+      { label: 'Novosibirsk', timeZone: 'Asia/Novosibirsk' },
+      { label: 'Yekaterinburg', timeZone: 'Asia/Yekaterinburg' },
+      { label: 'Kamchatka', timeZone: 'Asia/Kamchatka' },
+      // Oceania and the far south
+      { label: 'Perth', timeZone: 'Australia/Perth' },
+      { label: 'Adelaide', timeZone: 'Australia/Adelaide' },
+      { label: 'Darwin', timeZone: 'Australia/Darwin' },
+      { label: 'Brisbane', timeZone: 'Australia/Brisbane' },
+      { label: 'Melbourne', timeZone: 'Australia/Melbourne' },
+      { label: 'Sydney', timeZone: 'Australia/Sydney' },
+      { label: 'Hobart', timeZone: 'Australia/Hobart' },
+      { label: 'Auckland', timeZone: 'Pacific/Auckland' },
+      { label: 'Wellington', timeZone: 'Pacific/Auckland' },
+      { label: 'Chatham Islands', timeZone: 'Pacific/Chatham' },
+      { label: 'Suva', timeZone: 'Pacific/Fiji' },
+      { label: 'Nouméa', timeZone: 'Pacific/Noumea' },
+      { label: 'Port Moresby', timeZone: 'Pacific/Port_Moresby' },
+      { label: 'Apia', timeZone: 'Pacific/Apia' },
+      { label: 'Tongatapu', timeZone: 'Pacific/Tongatapu' },
+      { label: 'Tahiti', timeZone: 'Pacific/Tahiti' },
+      { label: 'Easter Island', timeZone: 'Pacific/Easter' },
+      { label: 'Guam', timeZone: 'Pacific/Guam' },
+      { label: 'Midway', timeZone: 'Pacific/Midway' },
+      { label: 'McMurdo Station', timeZone: 'Antarctica/McMurdo' },
+      { label: 'Rothera Station', timeZone: 'Antarctica/Rothera' },
+      { label: 'Casey Station', timeZone: 'Antarctica/Casey' }
+    ];
+
     var timeEl = document.getElementById('clock-time');
     var placeEl = document.getElementById('clock-place');
     var format;
+    var current = -1;
 
-    function setZone(place) {
-      var next;
+    function setZone(i) {
+      var place = PLACES[i];
       try {
-        next = new Intl.DateTimeFormat('en-US', {
+        format = new Intl.DateTimeFormat('en-US', {
           timeZone: place.timeZone,
           hour: 'numeric',
           minute: '2-digit',
           second: '2-digit'
         });
       } catch (e) {
-        return false;
+        return false;  // a zone this browser has never heard of
       }
-      format = next;
-      placeEl.textContent = place.label;
+      current = i;
       tick();
       return true;
     }
@@ -85,95 +270,57 @@ show_updated: true
       timeEl.textContent = format.format(new Date());
     }
 
-    function lookup(query) {
-      var url = 'https://geocoding-api.open-meteo.com/v1/search?count=1&language=en&format=json&name=' +
-        encodeURIComponent(query);
-      return fetch(url)
-        .then(function (res) { return res.json(); })
-        .then(function (data) {
-          var hit = data.results && data.results[0];
-          if (!hit || !hit.timezone) return null;
-          var region = hit.country_code === 'US' ? hit.admin1 : hit.country;
-          return {
-            label: region && region !== hit.name ? hit.name + ', ' + region : hit.name,
-            timeZone: hit.timezone
-          };
-        });
-    }
-
-    function edit() {
-      var input = document.createElement('input');
-      input.type = 'text';
-      input.className = 'clock-input';
-      input.setAttribute('aria-label', 'Location');
-      input.autocomplete = 'off';
-      input.spellcheck = false;
-      placeEl.replaceWith(input);
-      input.focus();
-
-      var done = false;
-      function close() {
-        if (done) return;
-        done = true;
-        input.replaceWith(placeEl);
-      }
-
-      function fail() {
-        input.disabled = false;
-        input.value = '';
-        input.placeholder = 'Location not found';
-        input.focus();
-      }
-
-      input.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') {
-          close();
-        } else if (e.key === 'Enter') {
-          var query = input.value.trim();
-          if (!query) {
-            setZone(HOME);
-            close();
-            return;
-          }
-          input.disabled = true;
-          lookup(query).then(function (place) {
-            if (done) return;
-            if (place && setZone(place)) close();
-            else fail();
-          }, function () {
-            if (!done) fail();
-          });
+    function elsewhere() {
+      for (var tries = 0; tries < 20; tries++) {
+        var i = Math.floor(Math.random() * PLACES.length);
+        if (i !== current && setZone(i)) {
+          window.scrambleSwap(placeEl, PLACES[i].label, 600);
+          return;
         }
-      });
-      input.addEventListener('blur', function () {
-        if (!input.disabled) close();
-      });
+      }
     }
 
-    placeEl.addEventListener('click', edit);
+    placeEl.addEventListener('click', elsewhere);
 
-    setZone(HOME);
+    setZone(0);
+    placeEl.textContent = PLACES[0].label;
     setInterval(tick, 1000);
   })();
 </script>
 
 <script>
-  // The dinosaur runs in place on the rule while cacti, sand and clouds scroll
-  // past, and it hops over each cactus — the Chrome offline game as scenery.
-  // Everything moves at a constant speed; the jump is a parabola centred on the
-  // moment the dino and the cactus would overlap, so any of them gets cleared.
+  // The Chrome offline game, sitting on the rule at the foot of the page. It
+  // waits, still, until someone presses space or taps it; then the ground rolls,
+  // the dino runs, the score counts up, and hitting a cactus ends the run. A
+  // finished run stays up for a moment and then settles back to waiting.
+  //
+  // Each layer of scenery is one element that slides as a whole, with its
+  // sprites parked at fixed offsets inside it. That way a frame writes four
+  // transforms instead of one per sprite, and the browser can hand the whole
+  // thing to the compositor.
   (function () {
     var track = document.querySelector('.dino-track');
     var runner = track && track.querySelector('.dino-runner');
     var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!runner || reduceMotion) return;
+    if (!runner) return;
 
-    var SPEED = 165;     // px per second the ground goes by
-    var DINO_X = 24;     // px from the left edge the dino runs at
-    var DINO_W = 20;     // px, the dino sprite's width
-    var JUMP_MS = 550;   // how long a hop lasts, start to landing
-    var JUMP_H = 36;     // px, how high it peaks
-    var STRIDE = 17;     // px of ground per step, so the legs keep pace with the speed
+    var pointsEl = track.querySelector('.dino-points');
+    var hiEl = track.querySelector('.dino-hi');
+
+    var BASE_SPEED = 165;   // px per second the ground goes by
+    var MAX_SPEED = 360;    // it winds up to here over a long run
+    var ACCEL = 7;          // px per second of speed gained each second
+    var DINO_X = 24;        // px from the left edge the dino runs at
+    var DINO_W = 20;        // px, the dino sprite's width
+    var JUMP_MS = 550;      // how long a hop lasts, start to landing
+    var JUMP_H = 36;        // px, how high it peaks
+    var STRIDE = 17;        // px of ground per step, so the legs keep pace with the speed
+    var PER_POINT = 20;     // px of ground per point of score
+    var REST_MS = 6000;     // how long a finished run stays up before it settles back
+    var FORGIVE = 3;        // px shaved off the dino's box, so near misses are misses
+    var REBASE_AT = 4000;   // px of travel before a layer's offsets are wound back to zero
+
+    var WAITING = 0, PLAYING = 1, OVER = 2;
 
     var CACTI = [
       { w: 9, h: 18, d: 'M3 3h3v1h-3zM3 4h3v1h-3zM3 5h3v1h-3zM0 6h1v1h-1zM3 6h3v1h-3zM0 7h1v1h-1zM3 7h3v1h-3zM8 7h1v1h-1zM0 8h1v1h-1zM3 8h3v1h-3zM8 8h1v1h-1zM0 9h2v1h-2zM3 9h3v1h-3zM8 9h1v1h-1zM1 10h6v1h-6zM8 10h1v1h-1zM2 11h6v1h-6zM3 12h3v1h-3zM3 13h3v1h-3zM3 14h3v1h-3zM3 15h3v1h-3zM3 16h3v1h-3zM3 17h3v1h-3z' },
@@ -186,19 +333,41 @@ show_updated: true
       { w: 10, h: 4, d: 'M3 0h4v1h-4zM1 1h8v1h-8zM0 2h10v1h-10zM1 3h8v1h-8z' }
     ];
 
-    // Each layer scrolls at its own speed: clouds drift, so they hang back
+    // Each layer scrolls at its own share of the speed: clouds drift, so they
+    // hang back
     var layers = [
-      { cls: 'cloud', speed: SPEED * 0.18, gap: [120, 420], items: [],
-        shapes: CLOUDS, low: 38, high: 60 },
-      { cls: 'sand', speed: SPEED, gap: [14, 80], items: [] },
-      { cls: 'cactus', speed: SPEED, gap: [200, 520], items: [], shapes: CACTI, solid: true }
+      { cls: 'cloud', factor: 0.18, gap: [120, 420], shapes: CLOUDS, low: 38, high: 60 },
+      { cls: 'sand', factor: 1, gap: [14, 80] },
+      { cls: 'cactus', factor: 1, gap: [200, 520], shapes: CACTI, solid: true }
     ];
+
+    layers.forEach(function (layer) {
+      layer.items = [];
+      layer.offset = 0;
+      layer.el = document.createElement('div');
+      layer.el.className = 'layer';
+      track.appendChild(layer.el);
+    });
+    var CACTUS = layers[2];
+
+    var state = WAITING;
+    var speed = BASE_SPEED;
+    var score = 0;
+    var shown = -1;
+    var hi = 0;
+    try { hi = parseInt(localStorage.getItem('dino-hi'), 10) || 0; } catch (e) {}
 
     var jumpStart = -Infinity;
     var jumping = false;
     var travelled = 0;
     var stepped = false;
+    var overAt = 0;
     var last = null;
+
+    // Reading the width mid-frame would make the browser lay the page out again
+    // every frame, so it is measured once and on resize
+    var width = track.offsetWidth;
+    window.addEventListener('resize', function () { width = track.offsetWidth; });
 
     function sprite(cls, shape) {
       var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -222,8 +391,10 @@ show_updated: true
       return el;
     }
 
-    function spawn(layer, width) {
-      var w, el;
+    // `left` is where the sprite sits inside its layer, which never changes;
+    // the layer slides underneath it
+    function spawn(layer, left) {
+      var w, h = 0, el;
       if (layer.cls === 'sand') {
         el = grain();
         w = 4;
@@ -231,17 +402,132 @@ show_updated: true
         var shape = layer.shapes[Math.floor(Math.random() * layer.shapes.length)];
         el = sprite(layer.cls, shape);
         w = shape.w;
+        h = shape.h;
         if (layer.low != null) {
           el.style.bottom = (layer.low + Math.random() * (layer.high - layer.low)) + 'px';
         }
       }
-      // Place it before it is attached, so it never flashes at the left edge
-      // on the frame it is created
-      el.style.transform = 'translateX(' + width + 'px)';
-      track.appendChild(el);
-      layer.items.push({ el: el, x: width, w: w, jumped: false });
+      el.style.left = Math.round(left) + 'px';
+      layer.el.appendChild(el);
+      layer.items.push({ el: el, left: left, w: w, h: h });
       layer.nextGap = layer.gap[0] + Math.random() * (layer.gap[1] - layer.gap[0]);
     }
+
+    function clear(layer) {
+      layer.items.forEach(function (it) { layer.el.removeChild(it.el); });
+      layer.items = [];
+      layer.nextGap = layer.gap[1];
+    }
+
+    // Sand and clouds are laid out across the whole strip up front, so the
+    // scene looks like somewhere even while it is standing still
+    function prefill(layer) {
+      for (var x = -30; x < width; x += layer.gap[0] + Math.random() * (layer.gap[1] - layer.gap[0])) {
+        spawn(layer, x);
+      }
+    }
+
+    // Offsets would otherwise climb without limit, which grows the layer's
+    // painted area; every so often everything is wound back to the start
+    function rebase(layer) {
+      layer.items.forEach(function (it) {
+        it.left -= layer.offset;
+        it.el.style.left = Math.round(it.left) + 'px';
+      });
+      layer.offset = 0;
+    }
+
+    function pad(n) {
+      var s = String(Math.floor(n));
+      while (s.length < 5) s = '0' + s;
+      return s;
+    }
+
+    function paint() {
+      track.classList.toggle('still', state !== PLAYING);
+      track.classList.toggle('over', state === OVER);
+      track.classList.toggle('scored', state !== WAITING);
+    }
+
+    function tally() {
+      if (state === WAITING || Math.floor(score) === shown) return;
+      shown = Math.floor(score);
+      pointsEl.textContent = pad(score);
+      hiEl.textContent = hi ? 'HI ' + pad(hi) : '';
+    }
+
+    function start() {
+      state = PLAYING;
+      speed = BASE_SPEED;
+      score = 0;
+      shown = -1;
+      clear(CACTUS);  // nobody should begin already stood under one
+      paint();
+      tally();
+    }
+
+    function gameOver() {
+      state = OVER;
+      overAt = performance.now();
+      if (score > hi) {
+        hi = Math.floor(score);
+        try { localStorage.setItem('dino-hi', String(hi)); } catch (e) {}
+      }
+      shown = -1;
+      paint();
+      tally();
+    }
+
+    function wait() {
+      state = WAITING;
+      speed = BASE_SPEED;
+      clear(CACTUS);
+      runner.style.transform = '';
+      runner.classList.remove('jumping', 'step');
+      jumping = false;
+      jumpStart = -Infinity;
+      paint();
+    }
+
+    function jump() {
+      if (performance.now() - jumpStart > JUMP_MS) jumpStart = performance.now();
+    }
+
+    // Space, the up arrow, a click or a tap: start a run, hop, or try again
+    function press() {
+      if (state === PLAYING) {
+        jump();
+      } else if (state === WAITING) {
+        start();
+        jump();
+      } else if (performance.now() - overAt > 400) {  // ignore the press that ended the run
+        start();
+      }
+    }
+
+    // Only claim the keyboard while the strip is actually on screen, so the
+    // space bar still scrolls the page everywhere else
+    var onScreen = true;
+    if (window.IntersectionObserver) {
+      onScreen = false;
+      new IntersectionObserver(function (entries) {
+        onScreen = entries[entries.length - 1].isIntersecting;
+      }).observe(track);
+    }
+
+    window.addEventListener('keydown', function (e) {
+      if (!onScreen || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key !== ' ' && e.key !== 'Spacebar' && e.key !== 'ArrowUp') return;
+      var tag = (e.target.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable) return;
+      e.preventDefault();
+      press();
+    });
+
+    track.addEventListener('pointerdown', function (e) {
+      e.preventDefault();
+      press();
+    });
 
     function frame(now) {
       requestAnimationFrame(frame);
@@ -249,57 +535,68 @@ show_updated: true
       var dt = Math.min((now - last) / 1000, 0.1);  // clamp, so a backgrounded tab doesn't teleport everything
       last = now;
 
-      var width = track.offsetWidth;
+      if (state === OVER && now - overAt > REST_MS) wait();
+      if (state !== PLAYING) return;  // waiting and finished: the scene holds still
+
+      speed = Math.min(MAX_SPEED, speed + ACCEL * dt);
+      score += speed * dt / PER_POINT;
+      tally();
+
+      var moved = speed * dt;
 
       // The legs swap pose every STRIDE px of ground, so the stride is tied to
       // the speed rather than to a clock of its own
-      travelled += SPEED * dt;
+      travelled += moved;
       var stepping = Math.floor(travelled / STRIDE) % 2 === 1;
       if (stepping !== stepped) {
         stepped = stepping;
         runner.classList.toggle('step', stepping);
       }
 
-      layers.forEach(function (layer) {
-        var rightmost = -Infinity;
-
-        for (var i = layer.items.length - 1; i >= 0; i--) {
-          var it = layer.items[i];
-          it.x -= layer.speed * dt;
-          if (it.x + it.w < 0) {
-            track.removeChild(it.el);
-            layer.items.splice(i, 1);
-            continue;
-          }
-          it.el.style.transform = 'translateX(' + Math.round(it.x) + 'px)';
-          if (it.x > rightmost) rightmost = it.x;
-
-          // Take off so the peak of the hop lands on the middle of the overlap
-          // — that way a wide cactus gets a longer hang time for free
-          if (layer.solid && !it.jumped) {
-            var entersIn = (it.x - (DINO_X + DINO_W)) / layer.speed;
-            var leavesIn = (it.x + it.w - DINO_X) / layer.speed;
-            if ((entersIn + leavesIn) / 2 <= JUMP_MS / 2000) {
-              it.jumped = true;
-              if (now - jumpStart > JUMP_MS) jumpStart = now;
-            }
-          }
-        }
-
-        if (rightmost <= width - (layer.nextGap || layer.gap[0])) spawn(layer, width);
-      });
-
       var t = (now - jumpStart) / JUMP_MS;
       var airborne = t >= 0 && t <= 1;
-      runner.style.transform = airborne
-        ? 'translateY(' + Math.round(-4 * JUMP_H * t * (1 - t)) + 'px)'
-        : '';
+      var height = airborne ? -4 * JUMP_H * t * (1 - t) : 0;
+      runner.style.transform = airborne ? 'translateY(' + Math.round(height) + 'px)' : '';
       if (airborne !== jumping) {
         jumping = airborne;
         runner.classList.toggle('jumping', airborne);
       }
+
+      for (var l = 0; l < layers.length; l++) {
+        var layer = layers[l];
+        layer.offset += moved * layer.factor;
+        if (layer.offset > REBASE_AT) rebase(layer);
+        layer.el.style.transform = 'translateX(' + -Math.round(layer.offset) + 'px)';
+
+        var rightmost = -Infinity;
+
+        for (var i = layer.items.length - 1; i >= 0; i--) {
+          var it = layer.items[i];
+          var x = it.left - layer.offset;  // where it is on screen
+          if (x + it.w < 0) {
+            layer.el.removeChild(it.el);
+            layer.items.splice(i, 1);
+            continue;
+          }
+          if (x > rightmost) rightmost = x;
+
+          if (layer.solid &&
+              x < DINO_X + DINO_W - FORGIVE && x + it.w > DINO_X + FORGIVE &&
+              height > -it.h + 1) {
+            gameOver();
+            return;
+          }
+        }
+
+        if (rightmost <= width - (layer.nextGap || layer.gap[0])) {
+          spawn(layer, layer.offset + width);
+        }
+      }
     }
 
-    requestAnimationFrame(frame);
+    prefill(layers[0]);
+    prefill(layers[1]);
+    paint();
+    if (!reduceMotion) requestAnimationFrame(frame);
   })();
 </script>

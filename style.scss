@@ -99,7 +99,7 @@ a:focus {
 }
 
 .header {
-  padding-top: 38px;
+  padding-top: 13px;
   margin-bottom: 16px;
 }
 
@@ -116,12 +116,26 @@ a:focus {
   margin: 0;
 }
 
+// The name is a button that replays the title animation, not a link
 .home-link {
+  font: inherit;
   color: var(--text);
-  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
 }
 
-#theme-toggle {
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.icon-button {
+  display: inline-flex;
   background: transparent;
   border: none;
   padding: 4px;
@@ -132,7 +146,7 @@ a:focus {
   flex-shrink: 0;
 }
 
-#theme-toggle:hover {
+.icon-button:hover {
   color: var(--text);
 }
 
@@ -188,6 +202,47 @@ a:focus {
   font-weight: 400;
 }
 
+// An experience opens a note about itself when pressed
+.entry > summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.entry > summary::-webkit-details-marker {
+  display: none;
+}
+
+// A link inside a note is invisible until you hover it
+.row-note a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.row-note a:hover,
+.row-note a:focus {
+  opacity: 1;
+  color: var(--text);
+}
+
+.row-note {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0;
+  padding: 0 0 8px;
+  max-width: 44ch;
+}
+
+.entry[open] .row-note {
+  animation: note-in 0.18s ease both;
+}
+
+@keyframes note-in {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+}
+
 .row-link {
   color: var(--text);
   font-weight: 400;
@@ -221,14 +276,10 @@ a:focus {
   font-variant-numeric: tabular-nums;
 }
 
-.clock-place,
-.clock-input {
+.clock-place {
   font: inherit;
   color: inherit;
   margin: 0;
-}
-
-.clock-place {
   background: none;
   border: none;
   padding: 0;
@@ -241,20 +292,6 @@ a:focus {
   color: var(--text);
 }
 
-// Typing a new location: no box, no focus ring — just the text and the
-// browser's own blinking caret
-.clock-input {
-  width: 18ch;
-  padding: 0;
-  background: none;
-  border: none;
-  border-radius: 0;
-  color: var(--text);
-  caret-color: currentColor;
-  outline: none;
-  appearance: none;
-}
-
 // A pixel dinosaur running in place on the rule, hopping the cacti that scroll
 // past it, with sand below the line and clouds drifting above — the Chrome
 // offline game, driven by the script in index.html
@@ -263,6 +300,8 @@ a:focus {
   height: 22px;
   margin-top: 46px;
   color: var(--muted);
+  cursor: pointer;
+  touch-action: manipulation;
   // Clip left and right so sprites appear and vanish at the ends of the rule,
   // while leaving room above for the jump and the clouds (overflow can't clip
   // one axis on its own without turning into a scroll container)
@@ -275,7 +314,6 @@ a:focus {
   left: 24px;
 }
 
-.dino,
 .cactus,
 .cloud {
   display: block;
@@ -283,12 +321,27 @@ a:focus {
   shape-rendering: crispEdges;
 }
 
+// The dino reads brighter than the scenery it runs through
+.dino {
+  display: block;
+  fill: var(--text);
+  opacity: 0.8;
+  shape-rendering: crispEdges;
+}
+
+// One element per layer of scenery slides as a whole, so a frame moves four
+// things instead of thirty and the compositor can own them
+.layer {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
 .cactus,
 .cloud,
 .sand {
   position: absolute;
   bottom: 0;
-  left: 0;
 }
 
 .sand {
@@ -301,9 +354,38 @@ a:focus {
   opacity: 0.4;
 }
 
+// Score sits in the top right of the strip, and only while a run is going on
+.dino-score {
+  position: absolute;
+  right: 0;
+  bottom: 44px;
+  display: flex;
+  gap: 10px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.dino-track.scored .dino-score {
+  opacity: 1;
+}
+
+.dino-hi {
+  opacity: 0.55;
+}
+
+// A finished run dims until the strip settles back to waiting
+.dino-track.over .dino-runner,
+.dino-track.over .cactus {
+  opacity: 0.45;
+}
+
 // The two leg poses alternate as the ground goes by, so the dino runs; the
 // script swaps the .step class on the runner
-.dino-legs-b {
+.dino-legs-b,
+.dino-legs-idle {
   opacity: 0;
 }
 
@@ -315,14 +397,24 @@ a:focus {
   opacity: 1;
 }
 
-// Mid-hop it keeps both feet tucked, like the real thing (this comes last, so
-// it wins over the stride above)
+// Mid-hop it keeps both feet tucked, like the real thing (this comes after the
+// stride above, so it wins)
 .dino-runner.jumping .dino-legs-a {
   opacity: 1;
 }
 
 .dino-runner.jumping .dino-legs-b {
   opacity: 0;
+}
+
+// Waiting to be played, or just finished: it stands on both feet, still
+.dino-track.still .dino-legs-a,
+.dino-track.still .dino-legs-b {
+  opacity: 0;
+}
+
+.dino-track.still .dino-legs-idle {
+  opacity: 1;
 }
 
 /**************/
@@ -409,7 +501,4 @@ a:focus {
     flex-wrap: wrap;
   }
 
-  .clock-input {
-    font-size: 16px;
-  }
 }
