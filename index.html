@@ -8,13 +8,10 @@ show_updated: true
     I’m a junior at Princeton studying Operations Research & Financial Engineering with minors in Classics, Computer Science & Machine Learning.
   </p>
   <p>
-    I research reinforcement learning & data generation for humanoid robot navigation in the <a href="https://pvl.cs.princeton.edu/">Princeton Vision & Learning Lab</a>.
+    I work with humanoid robots in the <a href="https://pvl.cs.princeton.edu/">Princeton Vision & Learning Lab</a>. Previously, I trained & evaluated frontier LLMs at <a href="https://scale.com/">Scale AI</a>.
   </p>
   <p>
-    Previously, I trained & evaluated frontier LLMs as an intern at <a href="https://scale.com/">Scale AI</a>.
-  </p>
-  <p>
-    I also compete as an NCAA Division I athlete for the Princeton Men's Swimming Team. This summer, I completed my first <a href="{{ site.baseurl }}/pdfs/im70.3.pdf">Ironman 70.3</a>.
+    I also compete as a Division I athlete for Princeton Men's Swimming. This summer, I completed my first <a href="{{ site.baseurl }}/pdfs/im70.3.pdf">Ironman 70.3</a>.
   </p>
   <p>
     Find me on <a href="https://www.linkedin.com/in/conan-chen">LinkedIn</a> or reach me <a href="#" id="email-link" onclick="copyEmail(event)">by email</a>.
@@ -60,7 +57,11 @@ show_updated: true
       <a href="https://conancchen.github.io/strava/" class="row-link">Custom Strava</a>
     </div>
     <div class="row">
-      <a href="#" class="row-link" id="snake-link" role="button" aria-pressed="false" onclick="toggleSnake(event)" title="Chase the apples with your cursor">Snake Mode</a>
+      <span class="snake-row">
+        <a href="#" class="row-link" id="snake-link" role="button" aria-pressed="false" onclick="toggleSnake(event)" title="Chase the apples with your cursor">Snake</a>
+        <span class="snake-sep" aria-hidden="true">·</span>
+        <a href="#" class="row-link snake-hard-link" id="snake-hard" role="button" aria-pressed="false" onclick="toggleHardSnake(event)" title="Two apples at once, bouncing across the page">Hard Mode</a>
+      </span>
     </div>
   </section>
 
@@ -609,9 +610,12 @@ show_updated: true
 
 <script>
   // A snake that chases the cursor, woken by the Snake link under Misc. There
-  // is one apple on the page at a time; steering the head onto it eats it, the
+  // is an apple on the page at all times; steering the head onto it eats it, the
   // next appears somewhere else that same instant, and the snake lengthens as
   // the score ticks up in the header, where the theme toggle usually sits.
+  // Hard mode, beside the link, puts two apples out at once and sets them
+  // bounding across the page in arcs rather than sitting still to be taken,
+  // and keeps a best score of its own.
   // Pressing the link again only
   // puts the snake away — the game it was in the middle of is still there when
   // it comes back, and nothing but a refresh starts it over.
@@ -621,9 +625,10 @@ show_updated: true
   // game is on.
   (function () {
     var link = document.getElementById('snake-link');
+    var hardLink = document.getElementById('snake-hard');
     var scoreEl = document.getElementById('snake-points');
     var hiEl = document.getElementById('snake-hi');
-    if (!link || !scoreEl || !hiEl) return;
+    if (!link || !hardLink || !scoreEl || !hiEl) return;
 
     var START_LEN = 12;     // segments the snake starts with
     var GROW = 4;           // segments an apple is worth at the start of a game
@@ -640,6 +645,13 @@ show_updated: true
     var MAX_SPEED = 2600;   // px per second the head can travel, however far the cursor is
     var APPLE_R = 7;        // px, radius of an apple
     var CLEAR_OF_HEAD = 60; // px a new apple keeps from the head, so it isn't eaten as it lands
+    var CLEAR_OF_APPLE = 40; // px hard mode's two apples keep apart, so they read as two
+    var HARD_APPLES = 2;    // apples out at once in hard mode
+    var DRIFT_MIN = 72;     // px per second, the slowest a hard apple wanders
+    var DRIFT_MAX = 176;    // px per second, the fastest
+    var GRAVITY = 2000;     // px per second², the pull on a hard mode apple
+    var HOP_MIN = 230;      // px, the lowest a bounce carries one
+    var HOP_MAX = 430;      // px, the highest
     var TOUCH_LIFT = 38;    // px the snake rides above a fingertip, so it isn't hidden under it
     // Doubling back is fatal, but a hard turn is not: the beads just behind the
     // head are always close to it, and a tight corner brings the next few
@@ -682,10 +694,13 @@ show_updated: true
     var ctx = null;
     var raf = null;
     var seg = [];         // the body, head first; each { x, y }
-    var apples = [];      // each { x, y, born }
+    var apples = [];      // each { x, y, born, vx, vy }; still unless hard mode is on
     var score = 0;
-    var hi = 0;           // the best score on this browser, kept across visits
-    try { hi = parseInt(localStorage.getItem('snake-hi'), 10) || 0; } catch (e) {}
+    // Hard mode is a game of its own, so it carries its own best score, and the
+    // choice is remembered between visits like the theme is
+    var hard = false;
+    try { hard = localStorage.getItem('snake-hard') === '1'; } catch (e) {}
+    var hi = loadHi();    // the best score on this browser, kept across visits
     var beat = hi;        // the best as this game began: the number a record has to pass
     var pointer = null;   // where the cursor was last seen, once it has moved
     var touching = false; // whether this game is being played with a finger
@@ -889,12 +904,21 @@ show_updated: true
       link.textContent =
         kind === 'on' ? 'Hide Snake'
           : kind === 'dead' ? (record() ? 'Replay Snake · New best!' : 'Replay Snake')
-          : 'Snake Mode';
+          : 'Snake';
       link.setAttribute('aria-pressed', kind === 'on' ? 'true' : 'false');
       link.setAttribute('title',
         kind === 'on' ? 'Put the snake away'
           : kind === 'dead' ? 'Start another game'
           : 'Chase the apples with your cursor');
+    }
+
+    // The Hard link is a switch rather than a second way in: it says which game
+    // the next apple belongs to, lit while it is on
+    function hardLabel() {
+      hardLink.setAttribute('aria-pressed', hard ? 'true' : 'false');
+      hardLink.setAttribute('title', hard
+        ? 'Back to one apple, sitting still'
+        : 'Two apples at once, bouncing across the page');
     }
 
     // Three digits until the hundreds run out, then however many it takes
@@ -911,32 +935,88 @@ show_updated: true
       return beat > 0 && score > beat;
     }
 
+    // Each difficulty keeps its own best, so a hard game is never measured
+    // against a score set with one apple standing still
+    function hiKey() {
+      return hard ? 'snake-hi-hard' : 'snake-hi';
+    }
+
+    function loadHi() {
+      try { return parseInt(localStorage.getItem(hiKey()), 10) || 0; } catch (e) { return 0; }
+    }
+
     function showScore() {
       // Lit from the apple that breaks the old best until the game ends, with a
       // pop on that first apple so it is noticed mid-chase
       scoreEl.parentNode.classList.toggle('record', record());
       if (score > hi) {
         hi = score;
-        try { localStorage.setItem('snake-hi', String(hi)); } catch (e) {}
+        try { localStorage.setItem(hiKey(), String(hi)); } catch (e) {}
       }
       scoreEl.textContent = pad(score);
       hiEl.textContent = hi ? 'HI ' + pad(hi) + ' ' : '';
     }
 
+    function clearOf(x, y, ox, oy, r) {
+      var dx = x - ox;
+      var dy = y - oy;
+      return dx * dx + dy * dy >= r * r;
+    }
+
     // Somewhere clear of the head, so the apple that replaces the one just
-    // eaten cannot land under the snake and be swallowed on the spot
+    // eaten cannot land under the snake and be swallowed on the spot — and,
+    // in hard mode, clear of the apple still out, so the pair read as two
     function dropApple() {
       var head = seg[0];
       var box = spawnBox();
-      var x, y;
+      var x, y, i;
       for (var tries = 0; tries < 12; tries++) {
         x = box.x0 + Math.random() * (box.x1 - box.x0);
         y = box.y0 + Math.random() * (box.y1 - box.y0);
-        var dx = x - head.x;
-        var dy = y - head.y;
-        if (dx * dx + dy * dy >= CLEAR_OF_HEAD * CLEAR_OF_HEAD) break;
+        if (!clearOf(x, y, head.x, head.y, CLEAR_OF_HEAD)) continue;
+        var alone = true;
+        for (i = 0; i < apples.length; i++) {
+          if (!clearOf(x, y, apples[i].x, apples[i].y, CLEAR_OF_APPLE)) alone = false;
+        }
+        if (alone) break;
       }
-      apples.push({ x: x, y: y, born: last });
+      var a = { x: x, y: y, born: last, vx: 0, vy: 0, hop: 0, bouncy: hard };
+      if (hard) {
+        // Thrown one way or the other and left to fall: the sideways speed
+        // holds, so the bounces draw a row of parabolas across the window.
+        // Each apple is given a hop of its own, high or low, so the two of
+        // them never fall into step — but it is the same hop every time it
+        // lands, for as long as that apple is out.
+        var speed = DRIFT_MIN + Math.random() * (DRIFT_MAX - DRIFT_MIN);
+        a.vx = Math.random() < 0.5 ? -speed : speed;
+        a.hop = Math.sqrt(2 * GRAVITY * (HOP_MIN + Math.random() * (HOP_MAX - HOP_MIN)));
+        a.vy = -a.hop;
+      }
+      apples.push(a);
+    }
+
+    // Hard mode's apples bound around the window, each pulled down as it goes
+    // and thrown back up off the floor, so both draw parabolas across the page
+    // and one can drop out from under the head as it closes in. Nothing is ever
+    // taken out of them: a bounce leaves the floor at the speed that apple was
+    // launched at rather than at whatever it happened to land with, so it goes
+    // on reaching the same height however long it has been out — no slow
+    // settling, and no rounding to lose height to. They are turned around at
+    // the sides and the ceiling rather than reflected off where they ended up,
+    // so an apple left outside the box by a resize walks back in.
+    function driftApples(dt) {
+      var box = spawnBox();
+      for (var i = 0; i < apples.length; i++) {
+        var a = apples[i];
+        if (!a.bouncy) continue;
+        a.vy += GRAVITY * dt;
+        a.x += a.vx * dt;
+        a.y += a.vy * dt;
+        if (a.x < box.x0) { a.x = box.x0; a.vx = Math.abs(a.vx); }
+        else if (a.x > box.x1) { a.x = box.x1; a.vx = -Math.abs(a.vx); }
+        if (a.y < box.y0) { a.y = box.y0; a.vy = Math.abs(a.vy); }
+        else if (a.y > box.y1) { a.y = box.y1; a.vy = -a.hop; }
+      }
     }
 
     // A segment is dragged along behind the one ahead of it, and only once it
@@ -1226,10 +1306,11 @@ show_updated: true
         draw();
         return;
       }
+      driftApples(dt);
       eat();
-      // The board is never empty: this covers the first frame of a game and
+      // The board is never short: this covers the first frame of a game and
       // puts the next apple out the same frame the last one is eaten
-      if (!apples.length) dropApple();
+      while (apples.length < (hard ? HARD_APPLES : 1)) dropApple();
       ripple(dt);
       draw();
     }
@@ -1304,6 +1385,24 @@ show_updated: true
       document.documentElement.classList.remove('snaking', 'snake-live');
       label('off');
     }
+
+    // Switching difficulty is switching games — a different board and a
+    // different best — so whatever was under way is dropped for a fresh one,
+    // and if the snake is away the change is simply waiting for the next game
+    window.toggleHardSnake = function (event) {
+      event.preventDefault();
+      hard = !hard;
+      try { localStorage.setItem('snake-hard', hard ? '1' : '0'); } catch (e) {}
+      hi = loadHi();
+      hardLabel();
+      var out = !!canvas;
+      if (out) stop();
+      reset();
+      if (out) start();
+      else showScore();
+    };
+
+    hardLabel();  // the choice this browser was last left on
 
     window.toggleSnake = function (event) {
       event.preventDefault();

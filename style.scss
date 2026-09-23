@@ -518,6 +518,28 @@ a:focus {
   100% { transform: scale(1); }
 }
 
+// The two switches sit side by side at the left of their row, with a dot
+// between them, rather than pushed to either end of the line. They are wrapped
+// in one inline box so the row's own spacing has a single thing to place.
+.snake-row {
+  display: inline;
+}
+
+.snake-sep {
+  color: var(--muted);
+  padding: 0 2px;
+}
+
+// Hard mode sits beside the way in: dim while it is off, and the red of the
+// apples once it is on
+.snake-hard-link {
+  color: var(--muted);
+}
+
+.snake-hard-link[aria-pressed='true'] {
+  color: #e5484d;
+}
+
 .snaking #theme-toggle {
   display: none;
 }
