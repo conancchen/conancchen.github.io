@@ -216,6 +216,20 @@ a:focus {
   font-weight: 400;
 }
 
+// A small logo ahead of each experience, sat on the text's baseline
+.row-icon {
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  vertical-align: -2px;
+  border-radius: 3px;
+}
+
+// Logos drawn in plain black are flipped to white on the dark page
+:root:not([data-theme="light"]) .row-icon-mono {
+  filter: invert(1);
+}
+
 // An experience opens a note about itself when pressed
 .entry > summary {
   cursor: pointer;
@@ -340,6 +354,20 @@ a:focus {
   display: block;
   fill: currentColor;
   shape-rendering: crispEdges;
+}
+
+// Folded away from the Dino link under Games: the strip closes up to nothing
+// and the rule it ran on stays, with room kept above it. It only animates when
+// the link is pressed, so a page that loads folded doesn't close on arrival.
+.dino-track.folded {
+  height: 0;
+  margin-top: 14px;
+  margin-bottom: 0;
+  visibility: hidden;
+}
+
+.dino-track.folding {
+  transition: height 220ms ease, margin 220ms ease, visibility 220ms;
 }
 
 // The dino reads brighter than the scenery it runs through
@@ -538,6 +566,11 @@ a:focus {
 
 .snake-hard-link[aria-pressed='true'] {
   color: #e5484d;
+}
+
+// The Dino link dims while the strip is folded away
+.dino-link[aria-pressed='false'] {
+  color: var(--muted);
 }
 
 .snaking #theme-toggle {
