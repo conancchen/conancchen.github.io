@@ -71,13 +71,12 @@
         <span class="snake-score" id="snake-score" translate="no"><span class="snake-hi" id="snake-hi"></span><span id="snake-points" aria-live="polite">000</span></span>
         </div>
       </div>
-      {% if page.subtitle %}<p class="subtitle" translate="no"><button type="button" class="replay" onclick="playTitleScramble()" title="Replay the animation">{{ page.subtitle }}</button></p>
-      {% elsif page.show_updated %}<p class="subtitle" translate="no"><button type="button" class="replay" onclick="playTitleScramble()" title="Replay the animation">Updated {{ site.time | date: "%b %-d, %Y" }}</button></p>{% endif %}
+      {% if page.subtitle %}<p class="subtitle" translate="no"><button type="button" class="replay" onclick="playTitleScramble()" title="Replay the animation">{{ page.subtitle }}</button></p>{% endif %}
     </header>
 
     <!-- Runs as soon as the title is parsed, so the first paint is already scrambled -->
     <script>
-      // Cycles the name and the "Updated" line through random, randomly colored
+      // Cycles the name and the subtitle through random, randomly colored
       // glyphs, locking each one in (in the normal text color) from left to
       // right until it spells the real text, all finishing at TOTAL_MS
       window.playTitleScramble = function () {};

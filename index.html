@@ -1,7 +1,6 @@
 ---
 layout: default
 home: true
-show_updated: true
 ---
 <section class="bio fade-intro">
   <p>
@@ -65,7 +64,7 @@ show_updated: true
       <span class="snake-row">
         <a href="#" class="row-link" id="snake-link" role="button" aria-pressed="false" onclick="toggleSnake(event)" title="Chase the apples with your cursor">Snake</a>
         <span class="snake-sep" aria-hidden="true">·</span>
-        <a href="#" class="row-link snake-hard-link" id="snake-hard" role="button" aria-pressed="false" onclick="toggleHardSnake(event)" title="Eight apples at once, bouncing across the page">Hard</a>
+        <a href="#" class="row-link snake-hard-link" id="snake-hard" role="button" aria-pressed="false" onclick="toggleHardSnake(event)" title="Two apples at once, bouncing across the page">Hard</a>
       </span>
     </div>
     <div class="row">
@@ -688,7 +687,7 @@ show_updated: true
   // glancing off the window's edges; steering the head onto it eats it, the
   // next appears somewhere else that same instant, and the snake lengthens as
   // the score ticks up in the header, where the theme toggle usually sits.
-  // Hard mode, beside the link, puts eight apples out at once and sets them
+  // Hard mode, beside the link, puts two apples out at once and sets them
   // bounding across the page in arcs instead, with the ground moving to
   // another edge of the window every two points, and keeps a best score of its own.
   // Pressing the link again only
@@ -722,7 +721,7 @@ show_updated: true
     var APPLE_R = 8.5;      // px, radius of an apple
     var CLEAR_OF_HEAD = 60; // px a new apple keeps from the head, so it isn't eaten as it lands
     var CLEAR_OF_APPLE = 40; // px Hard mode's apples keep apart, so they read as separate
-    var HARD_APPLES = 8;    // apples out at once in Hard mode
+    var HARD_APPLES = 2;    // apples out at once in Hard mode
     var GLIDE_MIN = 60;     // px per second, the slowest an easy apple glides
     var GLIDE_MAX = 120;    // px per second, the fastest
     var DRIFT_MIN = 72;     // px per second, the slowest a Hard apple wanders
@@ -1001,7 +1000,7 @@ show_updated: true
       hardLink.setAttribute('aria-pressed', hard ? 'true' : 'false');
       hardLink.setAttribute('title', hard
         ? 'Back to one apple, gliding in a straight line'
-        : 'Eight apples at once, bouncing across the page');
+        : 'Two apples at once, bouncing across the page');
     }
 
     // Three digits until the hundreds run out, then however many it takes
