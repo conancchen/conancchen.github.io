@@ -15,6 +15,8 @@
   --underline: #d3d2ce;
   --toast-bg: #3a3a38;
   --toast-text: #f7f6f3;
+  --chip-bg: #f0efec;
+  --chip-bg-hover: #e6e5e1;
 }
 
 :root[data-theme="dark"] {
@@ -27,6 +29,8 @@
   --underline: #55554f;
   --toast-bg: #f2f2f0;
   --toast-text: #000000;
+  --chip-bg: #1c1c1b;
+  --chip-bg-hover: #2a2a28;
 }
 
 /**************/
@@ -71,6 +75,33 @@ a:focus {
 .bio a:focus {
   opacity: 1;
   text-decoration-color: var(--text);
+}
+
+// Some bio names are pills with a logo in front, like a mention
+.bio .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 6px;
+  border-radius: 6px;
+  background-color: var(--chip-bg);
+  font-size: 13px;
+  line-height: 1.5;
+  vertical-align: -1px;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+.bio a.chip:hover,
+.bio a.chip:focus {
+  background-color: var(--chip-bg-hover);
+}
+
+.chip-icon {
+  width: 12px;
+  height: 12px;
+  flex: none;
 }
 
 // The whole page fades in together; the layout's script takes the class off
@@ -576,10 +607,6 @@ a:focus {
 /**************/
 /* COURSEWORK */
 /**************/
-.courses {
-  margin-top: 32px;
-}
-
 // Each term is a row: its name in a gutter on the left, its courses stacked
 // beside it. The rule above a term spans both columns; courses inside a term
 // are separated by space alone.

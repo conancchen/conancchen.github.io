@@ -167,13 +167,13 @@
     function copyEmail(event) {
       event.preventDefault();
       var address = 'conanc@princeton.edu';
-      var link = document.getElementById('email-link');
-      link.textContent = 'at ' + address;
+      var label = document.getElementById('email-text');
+      label.textContent = 'at ' + address;
 
       // Rapid clicks restart the countdown instead of stacking timers
       clearTimeout(emailResetTimer);
       emailResetTimer = setTimeout(function () {
-        link.textContent = 'by email';
+        label.textContent = 'by email';
       }, 3000);
 
       var toast = document.getElementById('copy-toast');
