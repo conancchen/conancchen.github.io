@@ -4,7 +4,7 @@
 python3 - <<'PY'
 from PIL import Image, ImageDraw
 
-RADIUS = 0.44  # radius of the whole yin-yang circle, as a share of the canvas size
+RADIUS = 0.308 # radius of the whole yin-yang circle, as a share of the canvas size
 EYE = 0.2      # dot radius, as a share of RADIUS
 RING = 0.05    # black outline width, as a share of RADIUS, so the white half
                # still reads on a light tab bar
