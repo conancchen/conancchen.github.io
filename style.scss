@@ -36,19 +36,12 @@
   box-sizing: border-box;
 }
 
-// Text grows with the window: 14px on phones and small laptops, easing up to
-// 15px on a 1920px-wide screen. Every font size below is written as its size
-// at 14px (e.g. 13rem / 14), so the whole page scales together.
-html {
-  font-size: clamp(14px, 13.55px + 0.076vw, 15px);
-}
-
 body {
   margin: 0;
   background-color: var(--bg);
   color: var(--text);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-  font-size: calc(14rem / 14);
+  font-size: 14px;
   line-height: 1.6;
 }
 
@@ -94,7 +87,7 @@ a:focus {
 /**************/
 .page {
   width: 100%;
-  max-width: calc(520rem / 14 + 48px);  // a 520px text column (at 14px text) plus the 24px gutters
+  max-width: 568px;  // a 520px text column plus the 24px gutters
   margin: 0 auto;
   padding: 64px 24px 48px;
 }
@@ -112,7 +105,7 @@ a:focus {
 }
 
 .header h1 {
-  font-size: calc(14rem / 14);
+  font-size: 14px;
   font-weight: 400;
   margin: 0;
 }
@@ -193,7 +186,7 @@ a:focus {
 }
 
 .block-label {
-  font-size: calc(12.5rem / 14);
+  font-size: 12.5px;
   font-weight: 700;
   color: var(--muted);
   margin: 0 0 12px;
@@ -253,7 +246,7 @@ a:focus {
 
 .row-note {
   color: var(--muted);
-  font-size: calc(13rem / 14);
+  font-size: 13px;
   margin: 0;
   padding: 0 0 8px;
   max-width: 44ch;
@@ -277,7 +270,7 @@ a:focus {
 
 .row-year {
   color: var(--muted);
-  font-size: calc(13rem / 14);
+  font-size: 13px;
   white-space: nowrap;
 }
 
@@ -289,7 +282,7 @@ a:focus {
 
 .updated {
   color: var(--muted);
-  font-size: calc(12rem / 14);
+  font-size: 12px;
   margin: 0;
   font-variant-numeric: tabular-nums;
 }
@@ -297,7 +290,7 @@ a:focus {
 // Sits under the title at the same size (body size), in muted gray
 .subtitle {
   color: var(--muted);
-  font-size: calc(14rem / 14);
+  font-size: 14px;
   font-weight: 400;
   margin: 0;
   font-variant-numeric: tabular-nums;
@@ -592,7 +585,7 @@ a:focus {
 // are separated by space alone.
 .term {
   display: grid;
-  grid-template-columns: calc(104rem / 14) 1fr;
+  grid-template-columns: 104px 1fr;
   align-items: start;
   border-top: 1px solid var(--rule);
   padding: 16px 0;
@@ -630,7 +623,7 @@ a:focus {
 
 .course-code {
   color: var(--muted);
-  font-size: calc(13rem / 14);
+  font-size: 13px;
   white-space: nowrap;
 }
 
@@ -641,7 +634,7 @@ a:focus {
   transform: translateX(-50%);
   background: var(--toast-bg);
   color: var(--toast-text);
-  font-size: calc(13rem / 14);
+  font-size: 13px;
   padding: 6px 12px;
   border-radius: 5px;
   opacity: 0;
