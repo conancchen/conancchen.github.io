@@ -4,20 +4,8 @@
 /**************/
 /* THEME      */
 /**************/
-// Dark is the default; the toggle opts into light and remembers the choice
+// Light is the default; the toggle opts into dark and remembers the choice
 :root {
-  color-scheme: dark;
-  --bg: #202020;
-  --text: #f2f2f0;
-  --muted: #8a8a8a;
-  --rule: #3a3a3a;
-  --link: #9a9a98;
-  --underline: #55554f;
-  --toast-bg: #f2f2f0;
-  --toast-text: #202020;
-}
-
-:root[data-theme="light"] {
   color-scheme: light;
   --bg: #ffffff;
   --text: #16150f;
@@ -29,6 +17,18 @@
   --toast-text: #f7f6f3;
 }
 
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #000000;
+  --text: #f2f2f0;
+  --muted: #8a8a8a;
+  --rule: #3a3a3a;
+  --link: #9a9a98;
+  --underline: #55554f;
+  --toast-bg: #f2f2f0;
+  --toast-text: #000000;
+}
+
 /**************/
 /* BASE       */
 /**************/
@@ -36,12 +36,19 @@
   box-sizing: border-box;
 }
 
+// Text grows with the window: 14px on phones and small laptops, easing up to
+// 15px on a 1920px-wide screen. Every font size below is written as its size
+// at 14px (e.g. 13rem / 14), so the whole page scales together.
+html {
+  font-size: clamp(14px, 13.55px + 0.076vw, 15px);
+}
+
 body {
   margin: 0;
   background-color: var(--bg);
   color: var(--text);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-  font-size: 13px;
+  font-size: calc(14rem / 14);
   line-height: 1.6;
 }
 
@@ -87,7 +94,7 @@ a:focus {
 /**************/
 .page {
   width: 100%;
-  max-width: 508px;  // a 460px text column plus the 24px gutters
+  max-width: calc(520rem / 14 + 48px);  // a 520px text column (at 14px text) plus the 24px gutters
   margin: 0 auto;
   padding: 64px 24px 48px;
 }
@@ -105,7 +112,7 @@ a:focus {
 }
 
 .header h1 {
-  font-size: 13px;
+  font-size: calc(14rem / 14);
   font-weight: 400;
   margin: 0;
 }
@@ -139,17 +146,34 @@ a:focus {
   color: var(--text);
 }
 
-.icon-sun,
-.icon-moon {
-  display: none;
+// The theme toggle is a yin-yang that spins each time it is pressed, slowing
+// as it settles; the script picks how far it turns and how long that takes
+.icon-yinyang {
+  --angle: 0deg;
+  --yin: currentColor;
+  --yang: var(--bg);
+  transform: rotate(var(--angle));
+  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-:root:not([data-theme="light"]) #theme-toggle .icon-sun {
-  display: block;
+// Yin is always the darker half, so it trades colors with yang in dark mode
+:root[data-theme="dark"] .icon-yinyang {
+  --yin: var(--bg);
+  --yang: currentColor;
 }
 
-:root[data-theme="light"] #theme-toggle .icon-moon {
-  display: block;
+.icon-yinyang .yin {
+  fill: var(--yin);
+}
+
+.icon-yinyang .yang {
+  fill: var(--yang);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .icon-yinyang {
+    transition: none;
+  }
 }
 
 .bio p {
@@ -169,7 +193,7 @@ a:focus {
 }
 
 .block-label {
-  font-size: 11.5px;
+  font-size: calc(12.5rem / 14);
   font-weight: 700;
   color: var(--muted);
   margin: 0 0 12px;
@@ -201,7 +225,7 @@ a:focus {
 }
 
 // Logos drawn in plain black are flipped to white on the dark page
-:root:not([data-theme="light"]) .row-icon-mono {
+:root[data-theme="dark"] .row-icon-mono {
   filter: invert(1);
 }
 
@@ -229,7 +253,7 @@ a:focus {
 
 .row-note {
   color: var(--muted);
-  font-size: 12px;
+  font-size: calc(13rem / 14);
   margin: 0;
   padding: 0 0 8px;
   max-width: 44ch;
@@ -253,7 +277,7 @@ a:focus {
 
 .row-year {
   color: var(--muted);
-  font-size: 12px;
+  font-size: calc(13rem / 14);
   white-space: nowrap;
 }
 
@@ -265,7 +289,7 @@ a:focus {
 
 .updated {
   color: var(--muted);
-  font-size: 11px;
+  font-size: calc(12rem / 14);
   margin: 0;
   font-variant-numeric: tabular-nums;
 }
@@ -273,7 +297,7 @@ a:focus {
 // Sits under the title at the same size (body size), in muted gray
 .subtitle {
   color: var(--muted);
-  font-size: 13px;
+  font-size: calc(14rem / 14);
   font-weight: 400;
   margin: 0;
   font-variant-numeric: tabular-nums;
@@ -568,7 +592,7 @@ a:focus {
 // are separated by space alone.
 .term {
   display: grid;
-  grid-template-columns: 104px 1fr;
+  grid-template-columns: calc(104rem / 14) 1fr;
   align-items: start;
   border-top: 1px solid var(--rule);
   padding: 16px 0;
@@ -581,55 +605,6 @@ a:focus {
 
 .term-name {
   color: var(--muted);
-}
-
-// Only the current term shows at first; the rest wait behind one toggle
-// under it
-.past-terms {
-  border-top: 1px solid var(--rule);
-  padding-top: 16px;
-}
-
-.past-terms > summary {
-  cursor: pointer;
-  list-style: none;
-  width: max-content;
-  color: var(--muted);
-}
-
-.past-terms > summary::-webkit-details-marker {
-  display: none;
-}
-
-.past-terms > summary::after {
-  content: ' +';
-}
-
-.past-terms[open] > summary::after {
-  content: ' \2212';
-}
-
-.past-terms > summary:hover {
-  color: var(--text);
-}
-
-.past-terms > summary:focus:not(:focus-visible) {
-  outline: none;
-}
-
-.past-terms[open] > summary {
-  margin-bottom: 12px;
-}
-
-.past-terms[open] > .term {
-  animation: note-in 0.18s ease both;
-}
-
-// Under the label, the first past term needs no rule of its own, just like
-// the current one
-.past-terms > .term:first-of-type {
-  border-top: none;
-  padding-top: 0;
 }
 
 .course {
@@ -655,7 +630,7 @@ a:focus {
 
 .course-code {
   color: var(--muted);
-  font-size: 12px;
+  font-size: calc(13rem / 14);
   white-space: nowrap;
 }
 
@@ -666,7 +641,7 @@ a:focus {
   transform: translateX(-50%);
   background: var(--toast-bg);
   color: var(--toast-text);
-  font-size: 12px;
+  font-size: calc(13rem / 14);
   padding: 6px 12px;
   border-radius: 5px;
   opacity: 0;

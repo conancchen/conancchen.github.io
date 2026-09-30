@@ -5,13 +5,12 @@ subtitle: Updated Sep 2026
 ---
 <section class="bio">
   <p>
-    I study applied math &amp; computer science at Princeton.
+    I'm a junior at Princeton studying applied math.  </p>
+  <p>
+    I work with humanoid robots in the <a href="https://pvl.cs.princeton.edu/">Princeton Vision &amp; Learning Lab</a>. Previously, I interned at <a href="https://scale.com/">Scale AI</a>.
   </p>
   <p>
-    I train humanoid robots in the <a href="https://pvl.cs.princeton.edu/">Princeton Vision & Learning Lab</a>. Previously, I trained frontier LLMs &amp; agents at <a href="https://scale.com/">Scale AI</a>.
-  </p>
-  <p>
-    Outside of school, I compete as a Division I athlete for Princeton Men's Swimming. This summer, I finished my first <a href="{{ site.baseurl }}/pdfs/im70.3.pdf">Ironman 70.3</a>.
+    Outside of school, I compete as a Division I swimmer. This summer, I finished my first <a href="{{ site.baseurl }}/pdfs/im70.3.pdf">Ironman 70.3</a>.
   </p>
   <p>
     Find me on <a href="https://www.linkedin.com/in/conan-chen">LinkedIn</a> or reach me <a href="#" id="email-link" onclick="copyEmail(event)">by email</a>.
@@ -22,15 +21,13 @@ subtitle: Updated Sep 2026
   <section class="block">
     <h2 class="block-label block-label-plain">Experiences</h2>
 
-    {% comment %}
     <details class="entry">
       <summary class="row">
-        <span class="row-label">Citadel Securities</span>
+        <span class="row-label"><img class="row-icon" src="{{ site.baseurl }}/images/logos/citadel.png" alt="" width="14" height="14">Citadel Securities</span>
         <span class="row-year">2027</span>
       </summary>
-      <p class="row-note">Incoming QT Intern</p>
+      <p class="row-note">Incoming Quant Trading Intern</p>
     </details>
-    {% endcomment %}
     <details class="entry">
       <summary class="row">
         <span class="row-label"><img class="row-icon" src="{{ site.baseurl }}/images/logos/pvl.png" alt="" width="14" height="14">Princeton Vision &amp; Learning Lab</span>
@@ -84,7 +81,7 @@ subtitle: Updated Sep 2026
   </div>
   {% endcomment %}
   <hr class="rule">
-  <p class="updated" id="clock"><span id="clock-time"></span> in <button type="button" class="clock-place" id="clock-place" title="Somewhere else">Princeton, NJ</button></p>
+  <p class="updated" id="clock"><span id="clock-time"></span><span id="clock-in"> in </span><button type="button" class="clock-place" id="clock-place" title="Somewhere else">Princeton</button></p>
 </div>
 
 <script>
@@ -95,7 +92,7 @@ subtitle: Updated Sep 2026
   (function () {
     var PLACES = [
       // Home first; the rest are a spin of the globe
-      { label: 'Princeton, NJ', timeZone: 'America/New_York' },
+      { label: 'Princeton', timeZone: 'America/New_York' },
       // North America
       { label: 'New York', timeZone: 'America/New_York' },
       { label: 'Boston', timeZone: 'America/New_York' },
@@ -265,9 +262,11 @@ subtitle: Updated Sep 2026
     ];
 
     var timeEl = document.getElementById('clock-time');
+    var inEl = document.getElementById('clock-in');
     var placeEl = document.getElementById('clock-place');
     var format;
     var current = -1;
+    var scrambling = false;  // the scramble owns the time while it runs
 
     function setZone(i) {
       var place = PLACES[i];
@@ -286,17 +285,28 @@ subtitle: Updated Sep 2026
       return true;
     }
 
+    function now() {
+      return format.format(new Date());
+    }
+
     function tick() {
-      timeEl.textContent = format.format(new Date());
+      if (!scrambling) timeEl.textContent = now();
     }
 
     function elsewhere() {
+      if (scrambling) return;  // let one scramble finish before the next
       for (var tries = 0; tries < 20; tries++) {
         var i = Math.floor(Math.random() * PLACES.length);
-        if (i !== current && setZone(i)) {
-          window.scrambleSwap(placeEl, PLACES[i].label, 600);
-          return;
-        }
+        if (i === current) continue;
+        // Claim the time first, so the new zone's time doesn't flash up
+        // before the scramble starts
+        scrambling = true;
+        if (!setZone(i)) { scrambling = false; continue; }
+        // The whole line scrambles, time and all, into the new place
+        window.scrambleSwap([[timeEl, now], [inEl, ' in '], [placeEl, PLACES[i].label]], 700, function () {
+          scrambling = false;
+        });
+        return;
       }
     }
 
