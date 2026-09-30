@@ -23,6 +23,8 @@
   <meta name="google" content="notranslate">
 
   <meta name="author" content="{{ site.name }}" />
+  <!-- Keeps search engines from listing the site; it is only for people who have the link -->
+  <meta name="robots" content="noindex, nofollow">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -128,7 +130,7 @@
       toggle.setAttribute('title', label);
     }
 
-    // Each switch spins the yin-yang anywhere from one to three full turns,
+    // Each switch spins the yin-yang anywhere from three to five full turns,
     // picked at random: clockwise into dark, counterclockwise into light. The
     // longer spins get a little more time.
     var yinyangAngle = 0;
@@ -137,7 +139,7 @@
       var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
       localStorage.setItem('theme', next);
       applyTheme(next);
-      var spin = 360 + Math.random() * 720;  // degrees
+      var spin = 1080 + Math.random() * 720;  // degrees
       yinyangAngle += next === 'dark' ? spin : -spin;
       var icon = document.querySelector('#theme-toggle .icon-yinyang');
       icon.style.transitionDuration = (0.5 + 0.2 * spin / 360) + 's';
@@ -185,11 +187,14 @@
       copyText(address).then(notify, notify);
     }
 
-    // Fades the whole page in at once. Flush styles first so the hidden
-    // state is applied before the class comes off; otherwise the browser
-    // would skip the transition.
-    void document.body.offsetWidth;
-    document.documentElement.classList.remove('anim-hide');
+    // Staggers the fade-in: numbers each piece in page order so the CSS can
+    // delay it, then starts them all at once.
+    if (document.documentElement.classList.contains('anim-hide')) {
+      var pieces = document.querySelectorAll('.header, .bio > p, .block, .rule, .updated, .term');
+      for (var i = 0; i < pieces.length; i++) pieces[i].style.setProperty('--i', Math.min(i, 12));
+      document.documentElement.classList.add('anim-play');
+      document.documentElement.classList.remove('anim-hide');
+    }
   </script>
 </body>
 

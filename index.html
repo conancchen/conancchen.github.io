@@ -14,7 +14,7 @@ subtitle: Updated Sep 2026
     I also compete as a Division I swimmer and recreational triathlete. Recently, I completed my first <a href="{{ site.baseurl }}/pdfs/im70.3.pdf">Ironman 70.3</a>.
   </p>
   <p>
-    Find me on <a class="chip" href="https://www.linkedin.com/in/conan-chen"><svg class="chip-icon" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="3" fill="#0a66c2"/><path fill="#fff" d="M5.3 9.2h3v9.6h-3zM6.8 4.4a1.7 1.7 0 1 1 0 3.5 1.7 1.7 0 0 1 0-3.5zM10.2 9.2h2.9v1.3c.4-.8 1.4-1.6 2.9-1.6 3.1 0 3.6 2 3.6 4.6v5.3h-3v-4.7c0-1.1 0-2.6-1.6-2.6s-1.8 1.2-1.8 2.5v4.8h-3z"/></svg>LinkedIn</a> or reach me <a class="chip" href="#" id="email-link" onclick="copyEmail(event)"><svg class="chip-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285f4" d="M1.6 20h3.8v-9.2L0 6.8v11.6c0 .9.7 1.6 1.6 1.6z"/><path fill="#34a853" d="M18.6 20h3.8c.9 0 1.6-.7 1.6-1.6V6.8l-5.4 4z"/><path fill="#fbbc04" d="M18.6 4.1v6.7L24 6.8V4.6c0-2-2.3-3.1-3.9-1.9z"/><path fill="#ea4335" d="M5.4 10.8V4.1L12 9l6.6-4.9v6.7L12 15.7z"/><path fill="#c5221f" d="M0 4.6v2.2l5.4 4V4.1L3.9 2.7C2.3 1.5 0 2.6 0 4.6z"/></svg><span id="email-text">by email</span></a>
+    Find me on <a class="chip" href="https://www.linkedin.com/in/conan-chen"><svg class="chip-icon" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="3" fill="#0a66c2"/><path fill="#fff" d="M5.3 9.2h3v9.6h-3zM6.8 4.4a1.7 1.7 0 1 1 0 3.5 1.7 1.7 0 0 1 0-3.5zM10.2 9.2h2.9v1.3c.4-.8 1.4-1.6 2.9-1.6 3.1 0 3.6 2 3.6 4.6v5.3h-3v-4.7c0-1.1 0-2.6-1.6-2.6s-1.8 1.2-1.8 2.5v4.8h-3z"/></svg>LinkedIn</a> or reach me <a class="chip" href="#" id="email-link" onclick="copyEmail(event)"><svg class="chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span id="email-text">by email</span></a>
   </p>
 </section>
 
@@ -34,7 +34,7 @@ subtitle: Updated Sep 2026
         <span class="row-label"><img class="row-icon" src="{{ site.baseurl }}/images/logos/pvl.png" alt="" width="14" height="14">Princeton Vision &amp; Learning Lab</span>
         <span class="row-year">2026</span>
       </summary>
-      <p class="row-note">Fall 2026 IW, <a href="https://orfe.princeton.edu/undergraduate/eric-fs-pai-83-fund">ORFE Eric Pai Summer Research Grant</a></p>
+      <p class="row-note">Fall 2026 IW, <a href="https://orfe.princeton.edu/undergraduate/eric-fs-pai-83-fund">ORFE Eric Pai Summer Research Grant</a><br>Mentor: Erich Liang, Advisor: Jia Deng</p>
     </details>
     <details class="entry">
       <summary class="row">
@@ -82,13 +82,13 @@ subtitle: Updated Sep 2026
   </div>
   {% endcomment %}
   <hr class="rule">
-  <p class="updated" id="clock"><span id="clock-time"></span><span id="clock-in"> in </span><button type="button" class="clock-place" id="clock-place" title="Somewhere else">Princeton</button></p>
+  <p class="updated" id="clock"><span id="clock-time"></span><span id="clock-in"> in </span><button type="button" class="clock-place" id="clock-place" title="Somewhere else">Princeton</button><span id="clock-diff"></span></p>
 </div>
 
 <script>
   // The clock starts in Princeton; clicking the place name scrambles it to
   // another spot on the map and retunes the time to match. The list is baked in
-  // so the page never has to ask anyone where a city is — 161 of them,
+  // so the page never has to ask anyone where a city is — 500 of them,
   // between them covering every hour the world keeps.
   (function () {
     var PLACES = [
@@ -123,6 +123,83 @@ subtitle: Updated Sep 2026
       { label: 'Guatemala City', timeZone: 'America/Guatemala' },
       { label: 'Panama City', timeZone: 'America/Panama' },
       { label: 'Nuuk', timeZone: 'America/Nuuk' },
+      { label: 'Philadelphia', timeZone: 'America/New_York' },
+      { label: 'Washington, D.C.', timeZone: 'America/New_York' },
+      { label: 'Baltimore', timeZone: 'America/New_York' },
+      { label: 'Pittsburgh', timeZone: 'America/New_York' },
+      { label: 'Atlanta', timeZone: 'America/New_York' },
+      { label: 'Miami', timeZone: 'America/New_York' },
+      { label: 'Orlando', timeZone: 'America/New_York' },
+      { label: 'Charlotte', timeZone: 'America/New_York' },
+      { label: 'Raleigh', timeZone: 'America/New_York' },
+      { label: 'Nashville', timeZone: 'America/Chicago' },
+      { label: 'Detroit', timeZone: 'America/Detroit' },
+      { label: 'Cleveland', timeZone: 'America/New_York' },
+      { label: 'Columbus', timeZone: 'America/New_York' },
+      { label: 'Indianapolis', timeZone: 'America/Indiana/Indianapolis' },
+      { label: 'Louisville', timeZone: 'America/Kentucky/Louisville' },
+      { label: 'Buffalo', timeZone: 'America/New_York' },
+      { label: 'Providence', timeZone: 'America/New_York' },
+      { label: 'New Haven', timeZone: 'America/New_York' },
+      { label: 'Hartford', timeZone: 'America/New_York' },
+      { label: 'Portland, Maine', timeZone: 'America/New_York' },
+      { label: 'Burlington', timeZone: 'America/New_York' },
+      { label: 'Richmond', timeZone: 'America/New_York' },
+      { label: 'Savannah', timeZone: 'America/New_York' },
+      { label: 'Charleston', timeZone: 'America/New_York' },
+      { label: 'Tampa', timeZone: 'America/New_York' },
+      { label: 'Key West', timeZone: 'America/New_York' },
+      { label: 'New Orleans', timeZone: 'America/Chicago' },
+      { label: 'Houston', timeZone: 'America/Chicago' },
+      { label: 'Dallas', timeZone: 'America/Chicago' },
+      { label: 'San Antonio', timeZone: 'America/Chicago' },
+      { label: 'Memphis', timeZone: 'America/Chicago' },
+      { label: 'St. Louis', timeZone: 'America/Chicago' },
+      { label: 'Kansas City', timeZone: 'America/Chicago' },
+      { label: 'Minneapolis', timeZone: 'America/Chicago' },
+      { label: 'Milwaukee', timeZone: 'America/Chicago' },
+      { label: 'Madison', timeZone: 'America/Chicago' },
+      { label: 'Omaha', timeZone: 'America/Chicago' },
+      { label: 'Oklahoma City', timeZone: 'America/Chicago' },
+      { label: 'Winnipeg', timeZone: 'America/Winnipeg' },
+      { label: 'Regina', timeZone: 'America/Regina' },
+      { label: 'Saskatoon', timeZone: 'America/Regina' },
+      { label: 'Calgary', timeZone: 'America/Edmonton' },
+      { label: 'Edmonton', timeZone: 'America/Edmonton' },
+      { label: 'Yellowknife', timeZone: 'America/Edmonton' },
+      { label: 'Salt Lake City', timeZone: 'America/Denver' },
+      { label: 'Boise', timeZone: 'America/Boise' },
+      { label: 'Albuquerque', timeZone: 'America/Denver' },
+      { label: 'Boulder', timeZone: 'America/Denver' },
+      { label: 'Tucson', timeZone: 'America/Phoenix' },
+      { label: 'Las Vegas', timeZone: 'America/Los_Angeles' },
+      { label: 'San Diego', timeZone: 'America/Los_Angeles' },
+      { label: 'San Jose', timeZone: 'America/Los_Angeles' },
+      { label: 'Sacramento', timeZone: 'America/Los_Angeles' },
+      { label: 'Palo Alto', timeZone: 'America/Los_Angeles' },
+      { label: 'Portland', timeZone: 'America/Los_Angeles' },
+      { label: 'Victoria', timeZone: 'America/Vancouver' },
+      { label: 'Juneau', timeZone: 'America/Juneau' },
+      { label: 'Fairbanks', timeZone: 'America/Anchorage' },
+      { label: 'Utqiaġvik', timeZone: 'America/Anchorage' },
+      { label: 'Adak', timeZone: 'America/Adak' },
+      { label: 'Hilo', timeZone: 'Pacific/Honolulu' },
+      { label: 'Dawson City', timeZone: 'America/Dawson' },
+      { label: 'Ottawa', timeZone: 'America/Toronto' },
+      { label: 'Québec City', timeZone: 'America/Toronto' },
+      { label: 'Charlottetown', timeZone: 'America/Halifax' },
+      { label: 'Fredericton', timeZone: 'America/Moncton' },
+      { label: 'Goose Bay', timeZone: 'America/Goose_Bay' },
+      { label: 'Rankin Inlet', timeZone: 'America/Rankin_Inlet' },
+      { label: 'Cambridge Bay', timeZone: 'America/Cambridge_Bay' },
+      { label: 'Guadalajara', timeZone: 'America/Mexico_City' },
+      { label: 'Monterrey', timeZone: 'America/Monterrey' },
+      { label: 'Cancún', timeZone: 'America/Cancun' },
+      { label: 'Oaxaca', timeZone: 'America/Mexico_City' },
+      { label: 'Mérida', timeZone: 'America/Merida' },
+      { label: 'Puebla', timeZone: 'America/Mexico_City' },
+      { label: 'Chihuahua', timeZone: 'America/Chihuahua' },
+      { label: 'Hermosillo', timeZone: 'America/Hermosillo' },
       // South America
       { label: 'Bogotá', timeZone: 'America/Bogota' },
       { label: 'Quito', timeZone: 'America/Guayaquil' },
@@ -138,6 +215,34 @@ subtitle: Updated Sep 2026
       { label: 'Caracas', timeZone: 'America/Caracas' },
       { label: 'Galápagos', timeZone: 'Pacific/Galapagos' },
       { label: 'Ushuaia', timeZone: 'America/Argentina/Ushuaia' },
+      { label: 'Medellín', timeZone: 'America/Bogota' },
+      { label: 'Cartagena', timeZone: 'America/Bogota' },
+      { label: 'Cali', timeZone: 'America/Bogota' },
+      { label: 'Guayaquil', timeZone: 'America/Guayaquil' },
+      { label: 'Cusco', timeZone: 'America/Lima' },
+      { label: 'Arequipa', timeZone: 'America/Lima' },
+      { label: 'Santa Cruz', timeZone: 'America/La_Paz' },
+      { label: 'Sucre', timeZone: 'America/La_Paz' },
+      { label: 'Valparaíso', timeZone: 'America/Santiago' },
+      { label: 'Punta Arenas', timeZone: 'America/Punta_Arenas' },
+      { label: 'Córdoba', timeZone: 'America/Argentina/Cordoba' },
+      { label: 'Mendoza', timeZone: 'America/Argentina/Mendoza' },
+      { label: 'Bariloche', timeZone: 'America/Argentina/Salta' },
+      { label: 'Salta', timeZone: 'America/Argentina/Salta' },
+      { label: 'Rosario', timeZone: 'America/Argentina/Buenos_Aires' },
+      { label: 'Brasília', timeZone: 'America/Sao_Paulo' },
+      { label: 'Salvador', timeZone: 'America/Bahia' },
+      { label: 'Recife', timeZone: 'America/Recife' },
+      { label: 'Fortaleza', timeZone: 'America/Fortaleza' },
+      { label: 'Belém', timeZone: 'America/Belem' },
+      { label: 'Porto Alegre', timeZone: 'America/Sao_Paulo' },
+      { label: 'Curitiba', timeZone: 'America/Sao_Paulo' },
+      { label: 'Florianópolis', timeZone: 'America/Sao_Paulo' },
+      { label: 'Belo Horizonte', timeZone: 'America/Sao_Paulo' },
+      { label: 'Cuiabá', timeZone: 'America/Cuiaba' },
+      { label: 'Campo Grande', timeZone: 'America/Campo_Grande' },
+      { label: 'Porto Velho', timeZone: 'America/Porto_Velho' },
+      { label: 'Rio Branco', timeZone: 'America/Rio_Branco' },
       // Europe
       { label: 'Reykjavík', timeZone: 'Atlantic/Reykjavik' },
       { label: 'Dublin', timeZone: 'Europe/Dublin' },
@@ -173,6 +278,75 @@ subtitle: Updated Sep 2026
       { label: 'Tórshavn', timeZone: 'Atlantic/Faroe' },
       { label: 'Azores', timeZone: 'Atlantic/Azores' },
       { label: 'Longyearbyen', timeZone: 'Arctic/Longyearbyen' },
+      { label: 'Edinburgh', timeZone: 'Europe/London' },
+      { label: 'Glasgow', timeZone: 'Europe/London' },
+      { label: 'Manchester', timeZone: 'Europe/London' },
+      { label: 'Oxford', timeZone: 'Europe/London' },
+      { label: 'Cambridge', timeZone: 'Europe/London' },
+      { label: 'Belfast', timeZone: 'Europe/London' },
+      { label: 'Cardiff', timeZone: 'Europe/London' },
+      { label: 'Cork', timeZone: 'Europe/Dublin' },
+      { label: 'Galway', timeZone: 'Europe/Dublin' },
+      { label: 'Porto', timeZone: 'Europe/Lisbon' },
+      { label: 'Madeira', timeZone: 'Atlantic/Madeira' },
+      { label: 'Seville', timeZone: 'Europe/Madrid' },
+      { label: 'Valencia', timeZone: 'Europe/Madrid' },
+      { label: 'Bilbao', timeZone: 'Europe/Madrid' },
+      { label: 'Granada', timeZone: 'Europe/Madrid' },
+      { label: 'Palma', timeZone: 'Europe/Madrid' },
+      { label: 'Canary Islands', timeZone: 'Atlantic/Canary' },
+      { label: 'Gibraltar', timeZone: 'Europe/Gibraltar' },
+      { label: 'Andorra la Vella', timeZone: 'Europe/Andorra' },
+      { label: 'Lyon', timeZone: 'Europe/Paris' },
+      { label: 'Marseille', timeZone: 'Europe/Paris' },
+      { label: 'Nice', timeZone: 'Europe/Paris' },
+      { label: 'Bordeaux', timeZone: 'Europe/Paris' },
+      { label: 'Strasbourg', timeZone: 'Europe/Paris' },
+      { label: 'Monaco', timeZone: 'Europe/Monaco' },
+      { label: 'Luxembourg', timeZone: 'Europe/Luxembourg' },
+      { label: 'Antwerp', timeZone: 'Europe/Brussels' },
+      { label: 'Rotterdam', timeZone: 'Europe/Amsterdam' },
+      { label: 'The Hague', timeZone: 'Europe/Amsterdam' },
+      { label: 'Hamburg', timeZone: 'Europe/Berlin' },
+      { label: 'Munich', timeZone: 'Europe/Berlin' },
+      { label: 'Frankfurt', timeZone: 'Europe/Berlin' },
+      { label: 'Cologne', timeZone: 'Europe/Berlin' },
+      { label: 'Dresden', timeZone: 'Europe/Berlin' },
+      { label: 'Geneva', timeZone: 'Europe/Zurich' },
+      { label: 'Bern', timeZone: 'Europe/Zurich' },
+      { label: 'Vaduz', timeZone: 'Europe/Vaduz' },
+      { label: 'Salzburg', timeZone: 'Europe/Vienna' },
+      { label: 'Innsbruck', timeZone: 'Europe/Vienna' },
+      { label: 'Venice', timeZone: 'Europe/Rome' },
+      { label: 'Florence', timeZone: 'Europe/Rome' },
+      { label: 'Naples', timeZone: 'Europe/Rome' },
+      { label: 'Turin', timeZone: 'Europe/Rome' },
+      { label: 'Bologna', timeZone: 'Europe/Rome' },
+      { label: 'Palermo', timeZone: 'Europe/Rome' },
+      { label: 'Vatican City', timeZone: 'Europe/Vatican' },
+      { label: 'San Marino', timeZone: 'Europe/San_Marino' },
+      { label: 'Valletta', timeZone: 'Europe/Malta' },
+      { label: 'Ljubljana', timeZone: 'Europe/Ljubljana' },
+      { label: 'Zagreb', timeZone: 'Europe/Zagreb' },
+      { label: 'Split', timeZone: 'Europe/Zagreb' },
+      { label: 'Dubrovnik', timeZone: 'Europe/Zagreb' },
+      { label: 'Sarajevo', timeZone: 'Europe/Sarajevo' },
+      { label: 'Podgorica', timeZone: 'Europe/Podgorica' },
+      { label: 'Tirana', timeZone: 'Europe/Tirane' },
+      { label: 'Skopje', timeZone: 'Europe/Skopje' },
+      { label: 'Pristina', timeZone: 'Europe/Belgrade' },
+      { label: 'Thessaloniki', timeZone: 'Europe/Athens' },
+      { label: 'Santorini', timeZone: 'Europe/Athens' },
+      { label: 'Crete', timeZone: 'Europe/Athens' },
+      { label: 'Nicosia', timeZone: 'Asia/Nicosia' },
+      { label: 'Bratislava', timeZone: 'Europe/Bratislava' },
+      { label: 'Brno', timeZone: 'Europe/Prague' },
+      { label: 'Kraków', timeZone: 'Europe/Warsaw' },
+      { label: 'Gdańsk', timeZone: 'Europe/Warsaw' },
+      { label: 'Wrocław', timeZone: 'Europe/Warsaw' },
+      { label: 'Chișinău', timeZone: 'Europe/Chisinau' },
+      { label: 'Minsk', timeZone: 'Europe/Minsk' },
+      { label: 'Lviv', timeZone: 'Europe/Kyiv' },
       // Africa and the Middle East
       { label: 'Casablanca', timeZone: 'Africa/Casablanca' },
       { label: 'Marrakesh', timeZone: 'Africa/Casablanca' },
@@ -202,6 +376,64 @@ subtitle: Updated Sep 2026
       { label: 'Baku', timeZone: 'Asia/Baku' },
       { label: 'Tbilisi', timeZone: 'Asia/Tbilisi' },
       { label: 'Yerevan', timeZone: 'Asia/Yerevan' },
+      { label: 'Rabat', timeZone: 'Africa/Casablanca' },
+      { label: 'Fez', timeZone: 'Africa/Casablanca' },
+      { label: 'Tangier', timeZone: 'Africa/Casablanca' },
+      { label: 'Laayoune', timeZone: 'Africa/El_Aaiun' },
+      { label: 'Algiers', timeZone: 'Africa/Algiers' },
+      { label: 'Oran', timeZone: 'Africa/Algiers' },
+      { label: 'Tunis', timeZone: 'Africa/Tunis' },
+      { label: 'Tripoli', timeZone: 'Africa/Tripoli' },
+      { label: 'Alexandria', timeZone: 'Africa/Cairo' },
+      { label: 'Luxor', timeZone: 'Africa/Cairo' },
+      { label: 'Nouakchott', timeZone: 'Africa/Nouakchott' },
+      { label: 'Bamako', timeZone: 'Africa/Bamako' },
+      { label: 'Timbuktu', timeZone: 'Africa/Bamako' },
+      { label: 'Niamey', timeZone: 'Africa/Niamey' },
+      { label: 'Ouagadougou', timeZone: 'Africa/Ouagadougou' },
+      { label: 'Banjul', timeZone: 'Africa/Banjul' },
+      { label: 'Bissau', timeZone: 'Africa/Bissau' },
+      { label: 'Conakry', timeZone: 'Africa/Conakry' },
+      { label: 'Freetown', timeZone: 'Africa/Freetown' },
+      { label: 'Monrovia', timeZone: 'Africa/Monrovia' },
+      { label: 'Abidjan', timeZone: 'Africa/Abidjan' },
+      { label: 'Lomé', timeZone: 'Africa/Lome' },
+      { label: 'Cotonou', timeZone: 'Africa/Porto-Novo' },
+      { label: 'Abuja', timeZone: 'Africa/Lagos' },
+      { label: 'Kano', timeZone: 'Africa/Lagos' },
+      { label: 'Douala', timeZone: 'Africa/Douala' },
+      { label: 'Yaoundé', timeZone: 'Africa/Douala' },
+      { label: 'Malabo', timeZone: 'Africa/Malabo' },
+      { label: 'Libreville', timeZone: 'Africa/Libreville' },
+      { label: 'São Tomé', timeZone: 'Africa/Sao_Tome' },
+      { label: 'Brazzaville', timeZone: 'Africa/Brazzaville' },
+      { label: 'Bangui', timeZone: 'Africa/Bangui' },
+      { label: 'N\'Djamena', timeZone: 'Africa/Ndjamena' },
+      { label: 'Lubumbashi', timeZone: 'Africa/Lubumbashi' },
+      { label: 'Goma', timeZone: 'Africa/Lubumbashi' },
+      { label: 'Kigali', timeZone: 'Africa/Kigali' },
+      { label: 'Bujumbura', timeZone: 'Africa/Bujumbura' },
+      { label: 'Juba', timeZone: 'Africa/Juba' },
+      { label: 'Asmara', timeZone: 'Africa/Asmara' },
+      { label: 'Djibouti', timeZone: 'Africa/Djibouti' },
+      { label: 'Mogadishu', timeZone: 'Africa/Mogadishu' },
+      { label: 'Hargeisa', timeZone: 'Africa/Mogadishu' },
+      { label: 'Mombasa', timeZone: 'Africa/Nairobi' },
+      { label: 'Zanzibar', timeZone: 'Africa/Dar_es_Salaam' },
+      { label: 'Arusha', timeZone: 'Africa/Dar_es_Salaam' },
+      { label: 'Lilongwe', timeZone: 'Africa/Blantyre' },
+      { label: 'Lusaka', timeZone: 'Africa/Lusaka' },
+      { label: 'Victoria Falls', timeZone: 'Africa/Harare' },
+      { label: 'Harare', timeZone: 'Africa/Harare' },
+      { label: 'Maputo', timeZone: 'Africa/Maputo' },
+      { label: 'Gaborone', timeZone: 'Africa/Gaborone' },
+      { label: 'Maseru', timeZone: 'Africa/Maseru' },
+      { label: 'Mbabane', timeZone: 'Africa/Mbabane' },
+      { label: 'Durban', timeZone: 'Africa/Johannesburg' },
+      { label: 'Pretoria', timeZone: 'Africa/Johannesburg' },
+      { label: 'Moroni', timeZone: 'Indian/Comoro' },
+      { label: 'Mamoudzou', timeZone: 'Indian/Mayotte' },
+      { label: 'Saint-Denis, Réunion', timeZone: 'Indian/Reunion' },
       // Asia
       { label: 'Karachi', timeZone: 'Asia/Karachi' },
       { label: 'Lahore', timeZone: 'Asia/Karachi' },
@@ -237,6 +469,71 @@ subtitle: Updated Sep 2026
       { label: 'Novosibirsk', timeZone: 'Asia/Novosibirsk' },
       { label: 'Yekaterinburg', timeZone: 'Asia/Yekaterinburg' },
       { label: 'Kamchatka', timeZone: 'Asia/Kamchatka' },
+      { label: 'Islamabad', timeZone: 'Asia/Karachi' },
+      { label: 'Peshawar', timeZone: 'Asia/Karachi' },
+      { label: 'Herat', timeZone: 'Asia/Kabul' },
+      { label: 'Samarkand', timeZone: 'Asia/Samarkand' },
+      { label: 'Bukhara', timeZone: 'Asia/Samarkand' },
+      { label: 'Bishkek', timeZone: 'Asia/Bishkek' },
+      { label: 'Dushanbe', timeZone: 'Asia/Dushanbe' },
+      { label: 'Ashgabat', timeZone: 'Asia/Ashgabat' },
+      { label: 'Astana', timeZone: 'Asia/Almaty' },
+      { label: 'Aktau', timeZone: 'Asia/Aqtau' },
+      { label: 'Kolkata', timeZone: 'Asia/Kolkata' },
+      { label: 'Chennai', timeZone: 'Asia/Kolkata' },
+      { label: 'Hyderabad', timeZone: 'Asia/Kolkata' },
+      { label: 'Pune', timeZone: 'Asia/Kolkata' },
+      { label: 'Jaipur', timeZone: 'Asia/Kolkata' },
+      { label: 'Varanasi', timeZone: 'Asia/Kolkata' },
+      { label: 'Goa', timeZone: 'Asia/Kolkata' },
+      { label: 'Ahmedabad', timeZone: 'Asia/Kolkata' },
+      { label: 'Kochi', timeZone: 'Asia/Kolkata' },
+      { label: 'Leh', timeZone: 'Asia/Kolkata' },
+      { label: 'Thimphu', timeZone: 'Asia/Thimphu' },
+      { label: 'Malé', timeZone: 'Indian/Maldives' },
+      { label: 'Chittagong', timeZone: 'Asia/Dhaka' },
+      { label: 'Mandalay', timeZone: 'Asia/Yangon' },
+      { label: 'Chiang Mai', timeZone: 'Asia/Bangkok' },
+      { label: 'Phuket', timeZone: 'Asia/Bangkok' },
+      { label: 'Vientiane', timeZone: 'Asia/Vientiane' },
+      { label: 'Luang Prabang', timeZone: 'Asia/Vientiane' },
+      { label: 'Ho Chi Minh City', timeZone: 'Asia/Ho_Chi_Minh' },
+      { label: 'Da Nang', timeZone: 'Asia/Ho_Chi_Minh' },
+      { label: 'Siem Reap', timeZone: 'Asia/Phnom_Penh' },
+      { label: 'Penang', timeZone: 'Asia/Kuala_Lumpur' },
+      { label: 'Kota Kinabalu', timeZone: 'Asia/Kuching' },
+      { label: 'Kuching', timeZone: 'Asia/Kuching' },
+      { label: 'Bandar Seri Begawan', timeZone: 'Asia/Brunei' },
+      { label: 'Surabaya', timeZone: 'Asia/Jakarta' },
+      { label: 'Yogyakarta', timeZone: 'Asia/Jakarta' },
+      { label: 'Medan', timeZone: 'Asia/Jakarta' },
+      { label: 'Makassar', timeZone: 'Asia/Makassar' },
+      { label: 'Jayapura', timeZone: 'Asia/Jayapura' },
+      { label: 'Dili', timeZone: 'Asia/Dili' },
+      { label: 'Cebu', timeZone: 'Asia/Manila' },
+      { label: 'Davao', timeZone: 'Asia/Manila' },
+      { label: 'Macau', timeZone: 'Asia/Macau' },
+      { label: 'Shenzhen', timeZone: 'Asia/Shanghai' },
+      { label: 'Guangzhou', timeZone: 'Asia/Shanghai' },
+      { label: 'Hangzhou', timeZone: 'Asia/Shanghai' },
+      { label: 'Nanjing', timeZone: 'Asia/Shanghai' },
+      { label: 'Suzhou', timeZone: 'Asia/Shanghai' },
+      { label: 'Xi\'an', timeZone: 'Asia/Shanghai' },
+      { label: 'Wuhan', timeZone: 'Asia/Shanghai' },
+      { label: 'Chongqing', timeZone: 'Asia/Shanghai' },
+      { label: 'Kunming', timeZone: 'Asia/Shanghai' },
+      { label: 'Guilin', timeZone: 'Asia/Shanghai' },
+      { label: 'Harbin', timeZone: 'Asia/Shanghai' },
+      { label: 'Qingdao', timeZone: 'Asia/Shanghai' },
+      { label: 'Tianjin', timeZone: 'Asia/Shanghai' },
+      { label: 'Xiamen', timeZone: 'Asia/Shanghai' },
+      { label: 'Lhasa', timeZone: 'Asia/Shanghai' },
+      { label: 'Ürümqi', timeZone: 'Asia/Urumqi' },
+      { label: 'Kaohsiung', timeZone: 'Asia/Taipei' },
+      { label: 'Tainan', timeZone: 'Asia/Taipei' },
+      { label: 'Busan', timeZone: 'Asia/Seoul' },
+      { label: 'Jeju', timeZone: 'Asia/Seoul' },
+      { label: 'Incheon', timeZone: 'Asia/Seoul' },
       // Oceania and the far south
       { label: 'Perth', timeZone: 'Australia/Perth' },
       { label: 'Adelaide', timeZone: 'Australia/Adelaide' },
@@ -259,12 +556,55 @@ subtitle: Updated Sep 2026
       { label: 'Midway', timeZone: 'Pacific/Midway' },
       { label: 'McMurdo Station', timeZone: 'Antarctica/McMurdo' },
       { label: 'Rothera Station', timeZone: 'Antarctica/Rothera' },
-      { label: 'Casey Station', timeZone: 'Antarctica/Casey' }
+      { label: 'Casey Station', timeZone: 'Antarctica/Casey' },
+      { label: 'Canberra', timeZone: 'Australia/Sydney' },
+      { label: 'Gold Coast', timeZone: 'Australia/Brisbane' },
+      { label: 'Cairns', timeZone: 'Australia/Brisbane' },
+      { label: 'Townsville', timeZone: 'Australia/Brisbane' },
+      { label: 'Alice Springs', timeZone: 'Australia/Darwin' },
+      { label: 'Uluru', timeZone: 'Australia/Darwin' },
+      { label: 'Broome', timeZone: 'Australia/Perth' },
+      { label: 'Eucla', timeZone: 'Australia/Eucla' },
+      { label: 'Broken Hill', timeZone: 'Australia/Broken_Hill' },
+      { label: 'Lord Howe Island', timeZone: 'Australia/Lord_Howe' },
+      { label: 'Norfolk Island', timeZone: 'Pacific/Norfolk' },
+      { label: 'Christmas Island', timeZone: 'Indian/Christmas' },
+      { label: 'Cocos Islands', timeZone: 'Indian/Cocos' },
+      { label: 'Christchurch', timeZone: 'Pacific/Auckland' },
+      { label: 'Queenstown', timeZone: 'Pacific/Auckland' },
+      { label: 'Dunedin', timeZone: 'Pacific/Auckland' },
+      { label: 'Rotorua', timeZone: 'Pacific/Auckland' },
+      { label: 'Nadi', timeZone: 'Pacific/Fiji' },
+      { label: 'Port Vila', timeZone: 'Pacific/Efate' },
+      { label: 'Honiara', timeZone: 'Pacific/Guadalcanal' },
+      { label: 'Bougainville', timeZone: 'Pacific/Bougainville' },
+      { label: 'Nuku\'alofa', timeZone: 'Pacific/Tongatapu' },
+      { label: 'Pago Pago', timeZone: 'Pacific/Pago_Pago' },
+      { label: 'Rarotonga', timeZone: 'Pacific/Rarotonga' },
+      { label: 'Niue', timeZone: 'Pacific/Niue' },
+      { label: 'Funafuti', timeZone: 'Pacific/Funafuti' },
+      { label: 'Tarawa', timeZone: 'Pacific/Tarawa' },
+      { label: 'Kiritimati', timeZone: 'Pacific/Kiritimati' },
+      { label: 'Kanton Island', timeZone: 'Pacific/Kanton' },
+      { label: 'Majuro', timeZone: 'Pacific/Majuro' },
+      { label: 'Kwajalein', timeZone: 'Pacific/Kwajalein' },
+      { label: 'Palikir', timeZone: 'Pacific/Pohnpei' },
+      { label: 'Chuuk', timeZone: 'Pacific/Chuuk' },
+      { label: 'Kosrae', timeZone: 'Pacific/Kosrae' },
+      { label: 'Koror', timeZone: 'Pacific/Palau' },
+      { label: 'Saipan', timeZone: 'Pacific/Saipan' },
+      { label: 'Yaren', timeZone: 'Pacific/Nauru' },
+      { label: 'Wallis and Futuna', timeZone: 'Pacific/Wallis' },
+      { label: 'Marquesas Islands', timeZone: 'Pacific/Marquesas' },
+      { label: 'Gambier Islands', timeZone: 'Pacific/Gambier' },
+      { label: 'Pitcairn Islands', timeZone: 'Pacific/Pitcairn' },
+      { label: 'Tokelau', timeZone: 'Pacific/Fakaofo' }
     ];
 
     var timeEl = document.getElementById('clock-time');
     var inEl = document.getElementById('clock-in');
     var placeEl = document.getElementById('clock-place');
+    var diffEl = document.getElementById('clock-diff');
     var format;
     var current = -1;
     var scrambling = false;  // the scramble owns the time while it runs
@@ -283,6 +623,7 @@ subtitle: Updated Sep 2026
       }
       current = i;
       tick();
+      if (!scrambling) diffEl.textContent = diff();
       return true;
     }
 
@@ -292,6 +633,24 @@ subtitle: Updated Sep 2026
 
     function tick() {
       if (!scrambling) timeEl.textContent = now();
+    }
+
+    // How far the place's clock runs ahead of (or behind) the viewer's own,
+    // like " (+13h)" or " (−4h 30m)", and nothing when they read the same.
+    // The place's offset comes from its wall time read back as if it were UTC.
+    function diff() {
+      var date = new Date();
+      var p = {};
+      new Intl.DateTimeFormat('en-US', {
+        timeZone: PLACES[current].timeZone, hourCycle: 'h23',
+        year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric'
+      }).formatToParts(date).forEach(function (part) { p[part.type] = +part.value; });
+      var there = (Date.UTC(p.year, p.month - 1, p.day, p.hour % 24, p.minute) - Math.floor(date / 60000) * 60000) / 60000;
+      var minutes = Math.round(there + date.getTimezoneOffset());
+      if (!minutes) return '';
+      var abs = Math.abs(minutes);
+      return ' (' + (minutes > 0 ? '+' : '\u2212') + Math.floor(abs / 60) + 'h' +
+        (abs % 60 ? ' ' + abs % 60 + 'm' : '') + ')';
     }
 
     function elsewhere() {
@@ -304,7 +663,7 @@ subtitle: Updated Sep 2026
         scrambling = true;
         if (!setZone(i)) { scrambling = false; continue; }
         // The whole line scrambles, time and all, into the new place
-        window.scrambleSwap([[timeEl, now], [inEl, ' in '], [placeEl, PLACES[i].label]], 700, function () {
+        window.scrambleSwap([[timeEl, now], [inEl, ' in '], [placeEl, PLACES[i].label], [diffEl, diff]], 700, function () {
           scrambling = false;
         });
         return;

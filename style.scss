@@ -81,11 +81,11 @@ a:focus {
 .bio .chip {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 0 6px;
-  border-radius: 6px;
+  gap: 4.4px;
+  padding: 0 6.6px;
+  border-radius: 6.6px;
   background-color: var(--chip-bg);
-  font-size: 13px;
+  font-size: inherit;
   line-height: 1.5;
   vertical-align: -1px;
   white-space: nowrap;
@@ -99,18 +99,33 @@ a:focus {
 }
 
 .chip-icon {
-  width: 12px;
-  height: 12px;
+  width: 13.2px;
+  height: 13.2px;
   flex: none;
 }
 
-// The whole page fades in together; the layout's script takes the class off
-.page {
-  transition: opacity 0.5s ease;
+// The page comes in piece by piece, each one fading up a beat after the last.
+// The layout's script numbers the pieces (--i) and swaps anim-hide for anim-play.
+$reveal: '.header, .bio > p, .block, .rule, .updated, .term';
+
+.anim-hide {
+  #{$reveal} {
+    opacity: 0;
+  }
 }
 
-.anim-hide .page {
-  opacity: 0;
+.anim-play {
+  #{$reveal} {
+    animation: rise-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    animation-delay: calc(var(--i, 0) * 70ms);
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
 }
 
 /**************/
@@ -217,7 +232,7 @@ a:focus {
 }
 
 .block-label {
-  font-size: 12.5px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--muted);
   margin: 0 0 12px;
