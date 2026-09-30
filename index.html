@@ -1,23 +1,24 @@
 ---
 layout: default
 home: true
+subtitle: Updated Sep 2026
 ---
-<section class="bio fade-intro">
+<section class="bio">
   <p>
-    I study ORFE at Princeton with minors in Classics, CS, and ML.
+    I study applied math &amp; computer science at Princeton.
   </p>
   <p>
-    I train humanoid robots in the <a href="https://pvl.cs.princeton.edu/">Princeton Vision & Learning Lab</a>. Previously, I evaluated and fine-tuned frontier LLMs at <a href="https://scale.com/">Scale AI</a>.
+    I train humanoid robots in the <a href="https://pvl.cs.princeton.edu/">Princeton Vision & Learning Lab</a>. Previously, I trained frontier LLMs &amp; agents at <a href="https://scale.com/">Scale AI</a>.
   </p>
   <p>
-    Outside of school, I compete as a D1 athlete for Princeton Men's Swimming. This summer, I completed my first <a href="{{ site.baseurl }}/pdfs/im70.3.pdf">Ironman 70.3</a>.
+    Outside of school, I compete as a Division I athlete for Princeton Men's Swimming. This summer, I finished my first <a href="{{ site.baseurl }}/pdfs/im70.3.pdf">Ironman 70.3</a>.
   </p>
   <p>
     Find me on <a href="https://www.linkedin.com/in/conan-chen">LinkedIn</a> or reach me <a href="#" id="email-link" onclick="copyEmail(event)">by email</a>.
   </p>
 </section>
 
-<div class="fade-target">
+<div>
   <section class="block">
     <h2 class="block-label block-label-plain">Experiences</h2>
 
@@ -57,6 +58,7 @@ home: true
     </div>
   </section>
 
+  {% comment %}
   <section class="block">
     <h2 class="block-label block-label-plain">Games</h2>
 
@@ -80,6 +82,7 @@ home: true
     <div class="dino-score"><span class="dino-hi"></span><span class="dino-points"></span></div>
     <div class="dino-runner"><svg class="dino" viewBox="0 0 20 22" width="20" height="22" aria-hidden="true"><path d="M10 0h8v1h-8zM9 1h10v1h-10zM9 2h2v1h-2zM12 2h7v1h-7zM9 3h10v1h-10zM9 4h10v1h-10zM9 5h10v1h-10zM9 6h5v1h-5zM9 7h9v1h-9zM0 8h1v1h-1zM9 8h5v1h-5zM0 9h1v1h-1zM9 9h6v1h-6zM0 10h2v1h-2zM9 10h6v1h-6zM0 11h3v1h-3zM9 11h7v1h-7zM17 11h1v1h-1zM1 12h3v1h-3zM9 12h7v1h-7zM17 12h2v1h-2zM2 13h3v1h-3zM9 13h8v1h-8zM3 14h4v1h-4zM9 14h7v1h-7zM4 15h11v1h-11zM5 16h10v1h-10zM6 17h8v1h-8zM7 18h7v1h-7z"/><path class="dino-legs-a" d="M7 19h2v1h-2zM11 19h2v1h-2zM6 20h2v1h-2zM11 20h2v1h-2zM11 21h3v1h-3z"/><path class="dino-legs-b" d="M7 19h2v1h-2zM11 19h2v1h-2zM7 20h2v1h-2zM12 20h2v1h-2zM6 21h3v1h-3z"/><path class="dino-legs-idle" d="M7 19h2v1h-2zM11 19h2v1h-2zM7 20h2v1h-2zM11 20h2v1h-2zM6 21h3v1h-3zM11 21h3v1h-3z"/></svg></div>
   </div>
+  {% endcomment %}
   <hr class="rule">
   <p class="updated" id="clock"><span id="clock-time"></span> in <button type="button" class="clock-place" id="clock-place" title="Somewhere else">Princeton, NJ</button></p>
 </div>
@@ -305,6 +308,7 @@ home: true
   })();
 </script>
 
+{% comment %}
 <script>
   // The Chrome offline game, sitting on the rule at the foot of the page. It
   // waits, still, until someone presses space or taps it; then the ground rolls,
@@ -1538,3 +1542,4 @@ home: true
     };
   })();
 </script>
+{% endcomment %}
