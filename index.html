@@ -8,10 +8,10 @@ subtitle: Updated Sep 2026
     I'm a junior at Princeton studying applied math.
   </p>
   <p>
-    Currently, I work with humanoid robots in the <a class="chip" href="https://pvl.cs.princeton.edu/"><img class="chip-icon chip-logo" src="{{ site.baseurl }}/images/logos/pvl.png" alt="">Princeton Vision &amp; Learning Lab</a>. Previously, I interned at <a class="chip" href="https://scale.com/"><img class="chip-icon chip-logo row-icon-mono" src="{{ site.baseurl }}/images/logos/scale.png" alt="">Scale AI</a>.
+    Currently, I work with humanoid robots in the <a href="https://pvl.cs.princeton.edu/">Princeton Vision &amp; Learning Lab</a>. Previously, I interned at <a href="https://scale.com/">Scale AI</a>.
   </p>
   <p>
-    I also compete as a Division I swimmer and recreational triathlete. I completed my first <a class="chip" href="{{ site.baseurl }}/pdfs/im70.3.pdf"><img class="chip-icon" src="{{ site.baseurl }}/images/logos/ironman.png" alt="">Ironman 70.3</a> this summer.
+    I also compete as a Division I swimmer and recreational triathlete. I completed my first <a href="{{ site.baseurl }}/pdfs/im70.3.pdf">Ironman 70.3</a> this summer.
   </p>
   <p>
     Find me on <a class="chip chip-rotating" id="social-link" href="https://www.linkedin.com/in/conan-chen"><span class="chip-icon-slot" id="social-icon"><svg class="chip-icon" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="3" fill="#0a66c2"/><path fill="#fff" d="M5.3 9.2h3v9.6h-3zM6.8 4.4a1.7 1.7 0 1 1 0 3.5 1.7 1.7 0 0 1 0-3.5zM10.2 9.2h2.9v1.3c.4-.8 1.4-1.6 2.9-1.6 3.1 0 3.6 2 3.6 4.6v5.3h-3v-4.7c0-1.1 0-2.6-1.6-2.6s-1.8 1.2-1.8 2.5v4.8h-3z"/></svg></span><span id="social-text">LinkedIn</span></a> or reach me <a class="chip" href="#" id="email-link" onclick="copyEmail(event)"><svg class="chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span id="email-text">by email</span></a>
@@ -178,10 +178,11 @@ subtitle: Updated Sep 2026
       // The body has momentum: the pulls and the kick push it along and the
       // water drags it back, harder the faster it goes, so it speeds up
       // through each pull and coasts down between them rather than jumping
-      var KICK_PUSH = 0.35;        // share of the push that comes from the legs
-      var KICK_SWING = 0.32;       // radians each leg sweeps up and down
+      var KICK_PUSH = 0.25;        // share of the push that comes from the legs
+      var KICK_SWING = 0.27;       // radians each leg sweeps up and down
+      var PULL_POWER = 1.2;        // how much harder the arms pull than it takes to hold pace
       var DRAG = 0.7;              // how quickly the water bleeds off speed
-      var BODY = 13, ARM = 7.5, LEG = 7, HEAD = 2.1;
+      var BODY = 13, ARM = 8.5, LEG = 7, HEAD = 2.1;
       var FLIP = 0.75;             // s for the somersault
       var PUSH = 0.21;             // s gliding off the wall before kicking
       var KICKS = 5, KICK = 0.36;  // underwater dolphin kicks, s each
@@ -317,10 +318,12 @@ subtitle: Updated Sep 2026
       }
 
       // Scaled so that, with the steady flutter kick on top, the push
-      // averages out to holding swimming pace
+      // averages out to holding swimming pace, then made PULL_POWER times
+      // stronger, so each pull surges the body on harder (the pace is refitted
+      // in size(), so a length still takes LAP seconds)
       var ARMS_PUSH = 0;
       for (var at = 0; at < 1; at += 0.001) ARMS_PUSH += pulling(at) * 0.001;
-      ARMS_PUSH = (1 - KICK_PUSH) / ARMS_PUSH;
+      ARMS_PUSH = PULL_POWER * (1 - KICK_PUSH) / ARMS_PUSH;
 
       function push() {
         return ARMS_PUSH * pulling(phase) + KICK_PUSH * (1 + 0.25 * Math.sin(3 * TAU * phase));

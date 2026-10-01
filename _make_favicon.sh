@@ -1,7 +1,8 @@
 #!/bin/sh
-# Regenerates every favicon: a full yin-yang, turned 45 degrees, on a transparent
-# background. Needs Pillow (pip install pillow).
+# Regenerates every favicon: half a yin-yang (the white half, outlined in
+# black, with both dots black), turned 45 degrees, on a transparent background. Needs Pillow (pip install pillow).
 python3 - <<'PY'
+from math import cos, sin, radians
 from PIL import Image, ImageDraw
 
 RADIUS = 0.308 # radius of the whole yin-yang circle, as a share of the canvas size
@@ -21,16 +22,21 @@ def yinyang(size):
     c = big / 2
     r = RADIUS * big
     white, black = (255, 255, 255, 255), (0, 0, 0, 255)
-    # A black disc, its right half white, plus the white top bulb and the black
-    # bottom bulb, each with a dot of the other color
-    disc(draw, c, c, r, black)
-    draw.pieslice([c - r, c - r, c + r, c + r], -90, 90, fill=white)
-    disc(draw, c, c - r / 2, r / 2, white)
-    disc(draw, c, c + r / 2, r / 2, black)
+    # The white half's edge: down the right of the rim, back up round the
+    # right of the bottom bulb to the middle, and up round the left of the top
+    # bulb to where it started
+    def arc(cx, cy, rad, start, end, steps=200):
+        return [(cx + rad * cos(radians(start + (end - start) * i / steps)),
+                 cy + rad * sin(radians(start + (end - start) * i / steps)))
+                for i in range(steps + 1)]
+    edge = (arc(c, c, r, -90, 90) + arc(c, c + r / 2, r / 2, 90, -90)
+            + arc(c, c - r / 2, r / 2, 90, 270))
+    draw.polygon(edge, fill=white)
+    draw.line(edge + edge[:2], fill=black, width=round(RING * r), joint="curve")
+    # Its own dot in the top bulb, and the dot floating where the other
+    # half's would be, both black
     disc(draw, c, c - r / 2, EYE * r, black)
-    disc(draw, c, c + r / 2, EYE * r, white)
-    # The outline goes on last, over the edge of the white half
-    draw.ellipse([c - r, c - r, c + r, c + r], outline=black, width=round(RING * r))
+    disc(draw, c, c + r / 2, EYE * r, black)
     img = img.rotate(-ROTATE, resample=Image.BICUBIC)
     return img.resize((size, size), Image.LANCZOS)
 
