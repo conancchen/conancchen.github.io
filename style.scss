@@ -7,7 +7,7 @@
 // Light is the default; the toggle opts into dark and remembers the choice
 :root {
   color-scheme: light;
-  --bg: #ffffff;
+  --bg: #fbfaf8;
   --text: #16150f;
   --muted: #8a8a8a;
   --rule: #e0dfdb;
@@ -15,22 +15,30 @@
   --underline: #d3d2ce;
   --toast-bg: #3a3a38;
   --toast-text: #f7f6f3;
-  --chip-bg: #f0efec;
+  --chip-bg: #efeeea;
   --chip-bg-hover: #e6e5e1;
+  --lane: #d3d2cd;
+  --foam: #b4b3ae;
+  --underwater: 0.6;  // how strongly the swimmer shows below the surface
+  --glow: rgba(110, 165, 215, 0.14);  // the water's tint just under the surface
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #000000;
+  --bg: #121212;
   --text: #f2f2f0;
   --muted: #8a8a8a;
   --rule: #3a3a3a;
   --link: #9a9a98;
   --underline: #55554f;
   --toast-bg: #f2f2f0;
-  --toast-text: #000000;
-  --chip-bg: #1c1c1b;
+  --toast-text: #121212;
+  --chip-bg: #1f1f1e;
   --chip-bg-hover: #2a2a28;
+  --lane: #3a3a3a;
+  --foam: #e6e6e4;
+  --underwater: 0.35;
+  --glow: rgba(80, 190, 235, 0.22);
 }
 
 /**************/
@@ -38,6 +46,13 @@
 /**************/
 * {
   box-sizing: border-box;
+}
+
+// Mobile browsers otherwise inflate long paragraphs (the bio) but not short
+// lines (the heading), so the two stop matching on phones
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -82,7 +97,7 @@ a:focus {
   display: inline-flex;
   align-items: center;
   gap: 4.4px;
-  padding: 0 6.6px;
+  padding: 0 3.5px;
   border-radius: 6.6px;
   background-color: var(--chip-bg);
   font-size: inherit;
@@ -101,6 +116,23 @@ a:focus {
 .chip-icon {
   width: 13.2px;
   height: 13.2px;
+  flex: none;
+}
+
+// Square logos get slightly rounded corners
+.chip-logo {
+  border-radius: 3px;
+}
+
+// The social chip cycles between profiles; its width eases to fit each name,
+// and the scrambling letters are clipped to it while they settle
+.bio .chip-rotating {
+  overflow: hidden;
+  transition: background-color 0.15s ease, width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.chip-icon-slot {
+  display: inline-flex;
   flex: none;
 }
 
@@ -133,13 +165,12 @@ $reveal: '.header, .bio > p, .block, .rule, .updated, .term';
 /**************/
 .page {
   width: 100%;
-  max-width: 568px;  // a 520px text column plus the 24px gutters
+  max-width: 608px;  // a 560px text column plus the 24px gutters
   margin: 0 auto;
   padding: 64px 24px 48px;
 }
 
 .header {
-  max-width: 600px;
   margin-bottom: 16px;
 }
 
@@ -167,6 +198,9 @@ $reveal: '.header, .bio > p, .block, .rule, .updated, .term';
   align-items: center;
   gap: 2px;
   flex-shrink: 0;
+  // The buttons' padding and the yin-yang's inset inside its icon would leave
+  // it short of the column's right edge; this pulls its rim onto that edge
+  margin-right: -5.5px;
 }
 
 .icon-button {
@@ -215,6 +249,14 @@ $reveal: '.header, .bio > p, .block, .rule, .updated, .term';
   }
 }
 
+// The theme wipe draws its own circle over the page, so the browser's default
+// cross-fade between the old and new snapshots is switched off
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
 .bio p {
   margin: 0 0 12px;
   text-wrap: pretty;
@@ -254,21 +296,12 @@ $reveal: '.header, .bio > p, .block, .rule, .updated, .term';
   font-weight: 400;
 }
 
-// A small logo ahead of each experience, sat on the text's baseline
-.row-icon {
-  width: 14px;
-  height: 14px;
-  margin-right: 8px;
-  vertical-align: -2px;
-  border-radius: 3px;
-}
-
 // Logos drawn in plain black are flipped to white on the dark page
 :root[data-theme="dark"] .row-icon-mono {
   filter: invert(1);
 }
 
-// An experience opens a note about itself when pressed
+// An entry opens a note about itself when pressed
 .entry > summary {
   cursor: pointer;
   list-style: none;
@@ -314,16 +347,57 @@ $reveal: '.header, .bio > p, .block, .rule, .updated, .term';
   font-weight: 400;
 }
 
-.row-year {
-  color: var(--muted);
-  font-size: 13px;
-  white-space: nowrap;
+// Pressing the reading row opens the book out on the line below it, at the
+// same size, the title in italics as titles go
+.reading {
+  display: none;
 }
 
-.rule {
-  border: none;
-  border-top: 1px solid var(--rule);
-  margin: 32px 0 14px;
+.entry[open] .reading {
+  display: block;
+  margin-top: 4px;
+  animation: note-in 0.18s ease both;
+}
+
+.row-book {
+  color: var(--muted);
+}
+
+// The divider above the clock is the surface of a pool, drawn with its
+// swimmer on a canvas by the script in index.html
+.lane {
+  position: relative;
+  touch-action: none;
+  height: 2px;
+  margin: 30px 0 15px;
+}
+
+// An invisible strip along the water line takes the pointer: a click drops a
+// splash, and a press and drag carries the swimmer. The canvas itself never
+// takes the pointer, so the text around it stays clickable. A drag on a phone
+// moves the swimmer rather than scrolling the page.
+.lane::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -8px;
+  height: 18px;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.lane.holding::before {
+  cursor: grabbing;
+}
+
+// The canvas's waterline sits where the line is
+.swimmer {
+  position: absolute;
+  left: 0;
+  top: -40px;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .updated {
@@ -356,267 +430,6 @@ $reveal: '.header, .bio > p, .block, .rule, .updated, .term';
 
 .clock-place:hover {
   color: var(--text);
-}
-
-// A pixel dinosaur running in place on the rule, hopping the cacti that scroll
-// past it, with sand below the line and clouds drifting above — the Chrome
-// offline game, driven by the script in index.html
-// The box is taller than the space it takes up: it reaches up into the sky the
-// clouds drift through and 8px past the rule, where the sand lies, while
-// negative margin keeps the page around it where it was. That lets `overflow`
-// do the clipping — far cheaper per frame than a clip-path, which made the
-// browser re-mask the strip on every one — and `contain` keeps the animation
-// from ever invalidating the rest of the page. GROUND (8px) is where the rule
-// sits inside it; everything on the ground is positioned from there.
-.dino-track {
-  position: relative;
-  height: 74px;
-  margin-top: 2px;
-  margin-bottom: -8px;
-  overflow: hidden;
-  contain: layout paint;
-  color: var(--muted);
-  cursor: pointer;
-  touch-action: manipulation;
-}
-
-.dino-runner {
-  position: absolute;
-  bottom: 8px;
-  left: 24px;
-  will-change: transform;
-}
-
-.cactus,
-.cloud {
-  display: block;
-  fill: currentColor;
-  shape-rendering: crispEdges;
-}
-
-// Folded away from the Dino link under Games: the strip closes up to nothing
-// and the rule it ran on stays, with room kept above it. It only animates when
-// the link is pressed, so a page that loads folded doesn't close on arrival.
-.dino-track.folded {
-  height: 0;
-  margin-top: 14px;
-  margin-bottom: 0;
-  visibility: hidden;
-}
-
-.dino-track.folding {
-  transition: height 220ms ease, margin 220ms ease, visibility 220ms;
-}
-
-// The dino reads brighter than the scenery it runs through
-.dino {
-  display: block;
-  fill: var(--text);
-  opacity: 0.8;
-  shape-rendering: crispEdges;
-}
-
-// One element per layer of scenery slides as a whole, so a frame moves four
-// things instead of thirty and the compositor can own them
-.layer {
-  position: absolute;
-  inset: 0;
-  will-change: transform;
-}
-
-.cactus,
-.cloud,
-.sand {
-  position: absolute;
-  bottom: 8px;
-}
-
-.sand {
-  background: currentColor;
-  opacity: 0.55;
-}
-
-// Clouds sit further off, so they are fainter as well as slower
-.cloud {
-  opacity: 0.4;
-}
-
-// Score sits in the top right of the strip, and only while a run is going on
-.dino-score {
-  position: absolute;
-  right: 0;
-  bottom: 52px;
-  display: flex;
-  gap: 10px;
-  font-size: 10px;
-  letter-spacing: 0.06em;
-  font-variant-numeric: tabular-nums;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.dino-track.scored .dino-score {
-  opacity: 1;
-}
-
-.dino-hi {
-  opacity: 0.55;
-}
-
-// A finished run dims until the strip settles back to waiting
-.dino-track.over .dino-runner,
-.dino-track.over .cactus {
-  opacity: 0.45;
-}
-
-// The two leg poses alternate as the ground goes by, so the dino runs; the
-// script swaps the .step class on the runner
-.dino-legs-b,
-.dino-legs-idle {
-  opacity: 0;
-}
-
-.dino-runner.step .dino-legs-a {
-  opacity: 0;
-}
-
-.dino-runner.step .dino-legs-b {
-  opacity: 1;
-}
-
-// Mid-hop it keeps both feet tucked, like the real thing (this comes after the
-// stride above, so it wins)
-.dino-runner.jumping .dino-legs-a {
-  opacity: 1;
-}
-
-.dino-runner.jumping .dino-legs-b {
-  opacity: 0;
-}
-
-// Waiting to be played, or just finished: it stands on both feet, still
-.dino-track.still .dino-legs-a,
-.dino-track.still .dino-legs-b {
-  opacity: 0;
-}
-
-.dino-track.still .dino-legs-idle {
-  opacity: 1;
-}
-
-/**************/
-/* SNAKE      */
-/**************/
-// The snake and its apples are drawn on one canvas laid over the whole window
-// by the script in index.html. It never takes the pointer, so the page under it
-// stays readable and clickable while a game is on — it only has to sit below
-// the toast.
-.snake-canvas {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 900;
-}
-
-// A word the snake can push aside. Transforms do not take on ordinary inline
-// text, so each word is its own inline-block; the spaces between them are left
-// as plain text, so lines still break where they always did.
-.ripple-word {
-  display: inline-block;
-}
-
-// An inline-block is an atomic inline, and a link's underline is not drawn
-// through one — so without this, wrapping a bio link's words would strip the
-// underline from the words and leave it only under the spaces. Each word
-// carries its own instead, and a nudged word takes its stretch of the line
-// with it. The shorthand resets the color, so the link's is put back after it.
-.bio a .ripple-word {
-  text-decoration: underline;
-  text-decoration-color: inherit;
-  text-decoration-thickness: 1px;
-}
-
-// While a game is on, the score stands in for the theme toggle in the header.
-// Once there is a best score it rides along in front, dimmed.
-.snake-score {
-  display: none;
-  color: var(--muted);
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  font-variant-numeric: tabular-nums;
-  padding: 4px 1px;
-}
-
-// While the snake is out, a drag has to steer it rather than scroll the page.
-// Once a touch turns into a scroll the browser stops sending pointer moves
-// altogether, which left the snake frozen on a phone while the page slid about
-// under it. Taps are untouched, so the link that puts the snake away is still
-// there to press, and not being able to scroll costs nothing while a
-// full-window game is on. Not selecting text is the same bargain on a desktop:
-// dragging the cursor around would otherwise highlight half the page.
-.snake-live,
-.snake-live body {
-  touch-action: none;
-  overscroll-behavior: none;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-.snake-hi {
-  display: inline-block;
-  opacity: 0.55;
-  white-space: pre;
-}
-
-// Beating the old best lights the HI up in the snake's blue for the rest of
-// the game, with a pop as it happens
-.snake-score.record .snake-hi {
-  opacity: 1;
-  color: #4a63d8;
-  animation: snake-record 0.45s ease-out;
-}
-
-@keyframes snake-record {
-  0% { transform: scale(1); }
-  35% { transform: scale(1.35); }
-  100% { transform: scale(1); }
-}
-
-// The two switches sit side by side at the left of their row, with a dot
-// between them, rather than pushed to either end of the line. They are wrapped
-// in one inline box so the row's own spacing has a single thing to place.
-.snake-row {
-  display: inline;
-}
-
-.snake-sep {
-  color: var(--muted);
-  padding: 0 2px;
-}
-
-// Hard mode sits beside the way in: dim while it is off, and the red of the
-// apples once it is on
-.snake-hard-link {
-  color: var(--muted);
-}
-
-.snake-hard-link[aria-pressed='true'] {
-  color: #e5484d;
-}
-
-// The Dino link dims while the strip is folded away
-.dino-link[aria-pressed='false'] {
-  color: var(--muted);
-}
-
-.snaking #theme-toggle {
-  display: none;
-}
-
-.snaking .snake-score {
-  display: inline-block;
 }
 
 /**************/

@@ -5,48 +5,88 @@ subtitle: Updated Sep 2026
 ---
 <section class="bio">
   <p>
-    I'm a junior studying applied math at Princeton.
+    I'm a junior at Princeton studying applied math.
   </p>
   <p>
-    Currently, I work with humanoid robots in the <a href="https://pvl.cs.princeton.edu/">Princeton Vision &amp; Learning Lab</a>. Previously, I interned at <a href="https://scale.com/">Scale AI</a>.
+    Currently, I work with humanoid robots in the <a class="chip" href="https://pvl.cs.princeton.edu/"><img class="chip-icon chip-logo" src="{{ site.baseurl }}/images/logos/pvl.png" alt="">Princeton Vision &amp; Learning Lab</a>. Previously, I interned at <a class="chip" href="https://scale.com/"><img class="chip-icon chip-logo row-icon-mono" src="{{ site.baseurl }}/images/logos/scale.png" alt="">Scale AI</a>.
   </p>
   <p>
-    I also compete as a Division I swimmer and recreational triathlete. Recently, I completed my first <a href="{{ site.baseurl }}/pdfs/im70.3.pdf">Ironman 70.3</a>.
+    I also compete as a Division I swimmer and recreational triathlete. I completed my first <a class="chip" href="{{ site.baseurl }}/pdfs/im70.3.pdf"><img class="chip-icon" src="{{ site.baseurl }}/images/logos/ironman.png" alt="">Ironman 70.3</a> this summer.
   </p>
   <p>
-    Find me on <a class="chip" href="https://www.linkedin.com/in/conan-chen"><svg class="chip-icon" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="3" fill="#0a66c2"/><path fill="#fff" d="M5.3 9.2h3v9.6h-3zM6.8 4.4a1.7 1.7 0 1 1 0 3.5 1.7 1.7 0 0 1 0-3.5zM10.2 9.2h2.9v1.3c.4-.8 1.4-1.6 2.9-1.6 3.1 0 3.6 2 3.6 4.6v5.3h-3v-4.7c0-1.1 0-2.6-1.6-2.6s-1.8 1.2-1.8 2.5v4.8h-3z"/></svg>LinkedIn</a> or reach me <a class="chip" href="#" id="email-link" onclick="copyEmail(event)"><svg class="chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span id="email-text">by email</span></a>
+    Find me on <a class="chip chip-rotating" id="social-link" href="https://www.linkedin.com/in/conan-chen"><span class="chip-icon-slot" id="social-icon"><svg class="chip-icon" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="3" fill="#0a66c2"/><path fill="#fff" d="M5.3 9.2h3v9.6h-3zM6.8 4.4a1.7 1.7 0 1 1 0 3.5 1.7 1.7 0 0 1 0-3.5zM10.2 9.2h2.9v1.3c.4-.8 1.4-1.6 2.9-1.6 3.1 0 3.6 2 3.6 4.6v5.3h-3v-4.7c0-1.1 0-2.6-1.6-2.6s-1.8 1.2-1.8 2.5v4.8h-3z"/></svg></span><span id="social-text">LinkedIn</span></a> or reach me <a class="chip" href="#" id="email-link" onclick="copyEmail(event)"><svg class="chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span id="email-text">by email</span></a>
   </p>
 </section>
 
+<script>
+  // The "Find me on" chip turns over every few seconds between the places I
+  // can be found: the label scrambles into the next name while the icon pops
+  // in and the chip eases to its new width. It holds still while hovered or
+  // focused, so it never changes under a click, and stays on LinkedIn for
+  // anyone who prefers reduced motion.
+  (function () {
+    var LINKEDIN_ICON = document.getElementById('social-icon').innerHTML;
+    var PROFILES = [
+      { label: 'LinkedIn', href: 'https://www.linkedin.com/in/conan-chen', icon: LINKEDIN_ICON },
+      {
+        label: 'GitHub',
+        href: 'https://github.com/conancchen',
+        icon: '<svg class="chip-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>'
+      },
+      {
+        label: 'Strava',
+        href: 'https://www.strava.com/athletes/42953307',
+        icon: '<svg class="chip-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="#fc4c02" transform="translate(.96 .96) scale(.92)" d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>'
+      }
+    ];
+    var HOLD = 3000;      // ms each profile stays up
+    var SCRAMBLE = 450;   // ms for the label to settle
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    var chip = document.getElementById('social-link');
+    var icon = document.getElementById('social-icon');
+    var text = document.getElementById('social-text');
+    var current = 0;
+    var paused = false;
+
+    function show(profile) {
+      // Pin the current width, measure the new one, then ease between them
+      var from = chip.offsetWidth;
+      chip.style.width = '';
+      text.textContent = profile.label;
+      icon.innerHTML = profile.icon;
+      var to = chip.offsetWidth;
+      chip.style.width = from + 'px';
+      chip.offsetWidth;  // commit the starting width before transitioning
+      chip.style.width = to + 'px';
+
+      chip.href = profile.href;
+      icon.animate(
+        [{ opacity: 0, transform: 'scale(0.5)' }, { opacity: 1, transform: 'scale(1)' }],
+        { duration: 300, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)' }
+      );
+      scrambleSwap([[text, profile.label]], SCRAMBLE);
+    }
+
+    ['mouseenter', 'focus'].forEach(function (type) {
+      chip.addEventListener(type, function () { paused = true; });
+    });
+    ['mouseleave', 'blur'].forEach(function (type) {
+      chip.addEventListener(type, function () { paused = false; });
+    });
+
+    setInterval(function () {
+      if (paused || document.hidden) return;
+      current = (current + 1) % PROFILES.length;
+      show(PROFILES[current]);
+    }, HOLD);
+  })();
+</script>
+
 <div>
   <section class="block">
-    <h2 class="block-label block-label-plain">Experiences</h2>
-
-    <details class="entry">
-      <summary class="row">
-        <span class="row-label"><img class="row-icon" src="{{ site.baseurl }}/images/logos/citadel.png" alt="" width="14" height="14">Citadel Securities</span>
-        <span class="row-year">2027</span>
-      </summary>
-      <p class="row-note">Incoming Quant Trading Intern</p>
-    </details>
-    <details class="entry">
-      <summary class="row">
-        <span class="row-label"><img class="row-icon" src="{{ site.baseurl }}/images/logos/pvl.png" alt="" width="14" height="14">Princeton Vision &amp; Learning Lab</span>
-        <span class="row-year">2026</span>
-      </summary>
-      <p class="row-note">Fall 2026 IW, <a href="https://orfe.princeton.edu/undergraduate/eric-fs-pai-83-fund">ORFE Eric Pai Summer Research Grant</a><br>Mentor: Erich Liang, Advisor: Jia Deng</p>
-    </details>
-    <details class="entry">
-      <summary class="row">
-        <span class="row-label"><img class="row-icon row-icon-mono" src="{{ site.baseurl }}/images/logos/scale.png" alt="" width="14" height="14">Scale AI</span>
-        <span class="row-year">2025</span>
-      </summary>
-      <p class="row-note">Technical Advisor Intern (GenAI)</p>
-    </details>
-  </section>
-
-  <section class="block">
-    <h2 class="block-label block-label-plain">Misc</h2>
+    <h2 class="block-label block-label-plain">More</h2>
 
     <div class="row">
       <a href="{{ site.baseurl }}/coursework/" class="row-link">Coursework</a>
@@ -54,34 +94,687 @@ subtitle: Updated Sep 2026
     <div class="row">
       <a href="https://conancchen.github.io/strava/" class="row-link">Custom Strava</a>
     </div>
+    <details class="entry">
+      <summary class="row">
+        <span class="row-label">Currently Reading<span class="reading"><a class="row-book" id="book" href="https://www.goodreads.com/book/show/9555.The_Elephant_Vanishes"><em id="book-title">The Elephant Vanishes</em><span id="book-by">, Haruki Murakami</span></a></span></span>
+      </summary>
+    </details>
+    <script>
+      // The book beside the reading row turns over every few seconds,
+      // scrambling into the next title and author, and its link goes along
+      // with it. It holds still while hovered or focused so it never changes
+      // under a click, and stays on the first book for anyone who prefers
+      // reduced motion.
+      (function () {
+        var BOOKS = [
+          { title: 'The Elephant Vanishes', by: ', Haruki Murakami', href: 'https://www.goodreads.com/book/show/9555.The_Elephant_Vanishes' },
+          { title: 'Flash Boys', by: ', Michael Lewis', href: 'https://www.goodreads.com/book/show/24724602-flash-boys' },
+          { title: 'The Picture of Dorian Gray', by: ', Oscar Wilde', href: 'https://www.goodreads.com/book/show/5297.The_Picture_of_Dorian_Gray' }
+        ];
+        var HOLD = 3500;     // ms each book stays up
+        var SCRAMBLE = 500;  // ms for the text to settle
+
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        var link = document.getElementById('book');
+        var title = document.getElementById('book-title');
+        var by = document.getElementById('book-by');
+        var current = 0;
+        var paused = false;
+
+        ['mouseenter', 'focus'].forEach(function (type) {
+          link.addEventListener(type, function () { paused = true; });
+        });
+        ['mouseleave', 'blur'].forEach(function (type) {
+          link.addEventListener(type, function () { paused = false; });
+        });
+
+        setInterval(function () {
+          if (paused || document.hidden) return;
+          current = (current + 1) % BOOKS.length;
+          var book = BOOKS[current];
+          link.href = book.href;
+          scrambleSwap([[title, book.title], [by, book.by]], SCRAMBLE);
+        }, HOLD);
+      })();
+    </script>
   </section>
 
-  {% comment %}
-  <section class="block">
-    <h2 class="block-label block-label-plain">Games</h2>
+  <div class="rule lane" id="lane" aria-hidden="true"></div>
+  <script>
+    // The divider is the surface of a pool, seen from the side: a line that
+    // rolls with a couple of slow swells, with a swimmer doing freestyle laps
+    // in it who kicks up a bow wave ahead and a wake behind. The surface is
+    // the waterline: whatever is above it is drawn solid and whatever is below
+    // it faint, so the arms come out of the water on the recovery and
+    // disappear into it on the pull. Each arm swings around the shoulder with
+    // a high, bent elbow over the water, reaches out ahead and holds there
+    // while the body glides, waiting for the other arm to come back over
+    // before it pulls long under the body. The legs flutter six kicks to a
+    // stroke cycle, throwing up white water; the body has momentum, speeding
+    // up through each pull and coasting between them; and the head lifts and
+    // turns to breathe once a cycle. It comes into view mid-dive from the
+    // left and goes in with a splash. At each wall it flip-turns (tucks
+    // and somersaults underwater), glides off the wall in a streamline, takes
+    // five dolphin kicks underwater, and surfaces swimming the other way.
+    (function () {
+      var lane = document.getElementById('lane');
+      var canvas = document.createElement('canvas');
+      canvas.className = 'swimmer';
+      lane.appendChild(canvas);
+      var ctx = canvas.getContext('2d');
 
-    <div class="row">
-      <span class="snake-row">
-        <a href="#" class="row-link" id="snake-link" role="button" aria-pressed="false" onclick="toggleSnake(event)" title="Chase the apples with your cursor">Snake</a>
-        <span class="snake-sep" aria-hidden="true">·</span>
-        <a href="#" class="row-link snake-hard-link" id="snake-hard" role="button" aria-pressed="false" onclick="toggleHardSnake(event)" title="Two apples at once, bouncing across the page">Hard</a>
-      </span>
-    </div>
-    <div class="row">
-      <span class="snake-row">
-        <a href="#" class="row-link dino-link" id="dino-link" role="button" aria-pressed="false" onclick="toggleDino(event)" title="Bring the dino out">Dino</a>
-        <span class="snake-sep" aria-hidden="true">·</span>
-        <a href="#" class="row-link snake-hard-link" id="dino-hard" role="button" aria-pressed="false" onclick="toggleHardDino(event)" title="The whole run at 2× speed">Hard</a>
-      </span>
-    </div>
-  </section>
+      var H = 61, WATER = 40;      // canvas height and waterline, px (room above
+                                   // for the dive)
+      var LAP = 10;                // s for one length, turn included
+      var CYCLE = 1.9;             // s per stroke cycle (both arms)
+      var RECOVERY = 0.26;         // share of each arm's cycle spent over the water
+      // Each arm waits out front until the other has come back up nearly to
+      // the top of its recovery before it starts to pull; the arms run half
+      // a cycle apart
+      var WAIT = 0.45;             // share of the other arm's recovery
+      var PULL = 0.5 - WAIT * RECOVERY;
+      var REACH = 1 - PULL - RECOVERY;   // share spent stretched out ahead
+      // The body has momentum: the pulls and the kick push it along and the
+      // water drags it back, harder the faster it goes, so it speeds up
+      // through each pull and coasts down between them rather than jumping
+      var KICK_PUSH = 0.35;        // share of the push that comes from the legs
+      var KICK_SWING = 0.32;       // radians each leg sweeps up and down
+      var DRAG = 0.7;              // how quickly the water bleeds off speed
+      var BODY = 13, ARM = 7.5, LEG = 7, HEAD = 2.1;
+      var FLIP = 0.75;             // s for the somersault
+      var PUSH = 0.21;             // s gliding off the wall before kicking
+      var KICKS = 5, KICK = 0.36;  // underwater dolphin kicks, s each
+      var DEPTH = 9;               // px below the surface it pushes off and kicks at
+      var BREAKOUT = 0.5;          // s to ease from the streamline into the stroke
+      // The start: the swimmer comes into the frame from the left already
+      // mid-dive, high over the water and stretched out, and falls in an arc
+      // to go in hands first a little way down the lane
+      var FLIGHT = 0.9;            // s from coming into view to hitting the water
+      var DIVE_FROM = [-6, 12];    // px: shoulders where it comes into view
+      var ENTRY_X = 115;           // px down the lane where the shoulders go in
+      var UNDER = PUSH + KICKS * KICK;
+      var DOLPHIN_SWING = 0.32;    // radians the legs sweep in the dolphin kick
+      // Where the legs are when the last dolphin kick ends, for the flutter
+      // kick to ease out of
+      var DOLPHIN_END = DOLPHIN_SWING * Math.sin(2 * Math.PI * KICKS - 2.6);
+      var TAU = 2 * Math.PI;
 
-  <div class="dino-track folded" aria-hidden="true" title="Press space to jump">
-    <div class="dino-score"><span class="dino-hi"></span><span class="dino-points"></span></div>
-    <div class="dino-runner"><svg class="dino" viewBox="0 0 20 22" width="20" height="22" aria-hidden="true"><path d="M10 0h8v1h-8zM9 1h10v1h-10zM9 2h2v1h-2zM12 2h7v1h-7zM9 3h10v1h-10zM9 4h10v1h-10zM9 5h10v1h-10zM9 6h5v1h-5zM9 7h9v1h-9zM0 8h1v1h-1zM9 8h5v1h-5zM0 9h1v1h-1zM9 9h6v1h-6zM0 10h2v1h-2zM9 10h6v1h-6zM0 11h3v1h-3zM9 11h7v1h-7zM17 11h1v1h-1zM1 12h3v1h-3zM9 12h7v1h-7zM17 12h2v1h-2zM2 13h3v1h-3zM9 13h8v1h-8zM3 14h4v1h-4zM9 14h7v1h-7zM4 15h11v1h-11zM5 16h10v1h-10zM6 17h8v1h-8zM7 18h7v1h-7z"/><path class="dino-legs-a" d="M7 19h2v1h-2zM11 19h2v1h-2zM6 20h2v1h-2zM11 20h2v1h-2zM11 21h3v1h-3z"/><path class="dino-legs-b" d="M7 19h2v1h-2zM11 19h2v1h-2zM7 20h2v1h-2zM12 20h2v1h-2zM6 21h3v1h-3z"/><path class="dino-legs-idle" d="M7 19h2v1h-2zM11 19h2v1h-2zM7 20h2v1h-2zM11 20h2v1h-2zM6 21h3v1h-3zM11 21h3v1h-3z"/></svg></div>
-  </div>
-  {% endcomment %}
-  <hr class="rule">
+      var SPEED = 30;              // px/s swimming pace, fitted to LAP in size()
+      var W = 0, x = ENTRY_X, dir = 1, mode = 'dive', modeTime = 0, phase = 0, pivot = 0;
+      var entering = false;        // still sinking from the dive into the glide
+      var splashed = false;        // the hands have hit the water on the dive
+      var splashes = [];           // where the water was hit, and when, for ripples
+      var pace = 1;                // current speed, as a multiple of SPEED
+      var holdFar = false;         // far arm still out front from the breakout
+      var time = 0, surface = [];
+
+      function size() {
+        var scale = window.devicePixelRatio || 1;
+        W = lane.clientWidth;
+        canvas.width = W * scale;
+        canvas.height = H * scale;
+        canvas.style.width = W + 'px';
+        canvas.style.height = H + 'px';
+        ctx.setTransform(scale, 0, 0, scale, 0, 0);
+        x = Math.min(Math.max(x, 20), W - 20);
+        // Pace the swimming so a whole length takes LAP seconds: the turn and
+        // the underwater kicks cover a fixed number of swimming-pace seconds'
+        // worth of distance, and the stroking makes up the rest
+        var under = 0;
+        for (var t = 0; t < UNDER; t += 0.01) under += underwater(t) * 0.01;
+        var drift = 0.9 * FLIP / 2;
+        // (The length runs from 16px off one wall to 16px off the other, and
+        // the somersault itself sets the shoulders back a body length.)
+        SPEED = (W - 32 + BODY) / (drift + under + LAP - FLIP - UNDER);
+        // That estimate ignores where in the stroke each length starts and
+        // ends, which the uneven pulls of the gallop make matter, so search
+        // around it, timing a simulated length at each pace, for the pace
+        // that comes out right
+        var slow = SPEED / 2, fast = SPEED * 2;
+        for (var i = 0; i < 14; i++) {
+          SPEED = (slow + fast) / 2;
+          if (timeLength() > LAP) slow = SPEED;
+          else fast = SPEED;
+        }
+      }
+
+      // Swims a length off-screen, from one turn to the next, and returns how
+      // long it took; the swimmer is put back where it was afterwards
+      function timeLength() {
+        var saved = [x, dir, mode, modeTime, phase, pivot, time, pace, entering];
+        x = W / 2; dir = 1; mode = 'swim'; modeTime = 0; phase = 0; pace = 1; entering = false;
+        var flips = [], clock = 0, was = mode;
+        while (flips.length < 2 && clock < 120) {
+          step(1 / 120);
+          clock += 1 / 120;
+          if (mode === 'flip' && was !== 'flip') flips.push(clock);
+          was = mode;
+        }
+        x = saved[0]; dir = saved[1]; mode = saved[2]; modeTime = saved[3];
+        phase = saved[4]; pivot = saved[5]; time = saved[6]; pace = saved[7]; entering = saved[8];
+        return flips.length < 2 ? LAP : flips[1] - flips[0];
+      }
+
+      // Speed off the wall, as a multiple of swimming pace, t seconds after
+      // the push: fast and slowing, then a surge on each downkick, all quicker
+      // than swimming, settling to swimming pace as it breaks out
+      function underwater(t) {
+        var v = t < PUSH
+          ? 3 - 1.2 * t / PUSH
+          : 1.6 + 0.5 * Math.max(0, Math.sin(TAU * (t - PUSH) / KICK));
+        var breakout = Math.min(Math.max((UNDER - t) / KICK, 0), 1);
+        return 1 + (v - 1) * breakout;
+      }
+
+      function line(x1, y1, x2, y2, width) {
+        ctx.lineWidth = width;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+      }
+
+      // One arm, drawn from the shoulder: p runs 0..1 through its cycle
+      function arm(p, sy, held) {
+        var angle, bend;
+        if (held) {
+          // Kept out ahead from the streamline until its turn comes round
+          angle = TAU;
+          bend = 0;
+        } else if (p < RECOVERY) {
+          // Out at the hip, up and over the water, elbow high and forearm hanging
+          var r = p / RECOVERY;
+          r = r * r * (3 - 2 * r);
+          angle = Math.PI + Math.PI * r;
+          bend = 2.0 * Math.sin(Math.PI * r);
+        } else if (p < RECOVERY + REACH) {
+          // In ahead of the head and held there, long and sinking slightly,
+          // while the body glides over it
+          var g = (p - RECOVERY) / REACH;
+          angle = TAU + 0.18 * g;
+          bend = 0.1 * g;
+        } else {
+          // Then a long pull back under the body
+          var q = (p - RECOVERY - REACH) / PULL;
+          angle = TAU + 0.18 + (Math.PI - 0.18) * q;
+          bend = 0.1 + 0.4 * Math.sin(Math.PI * q);
+        }
+        var ex = Math.cos(angle) * ARM / 2, ey = sy + Math.sin(angle) * ARM / 2;
+        line(0, sy, ex, ey, 1.5);
+        line(ex, ey, ex + Math.cos(angle + bend) * ARM / 2, ey + Math.sin(angle + bend) * ARM / 2, 1.4);
+      }
+
+      // How hard the arms are pulling at a point in the stroke: each pull
+      // builds up through the catch, peaks as the hand pushes past the hip,
+      // and lets go
+      function pulling(at) {
+        var total = 0;
+        [at % 1, (at + 0.5) % 1].forEach(function (p) {
+          if (p >= RECOVERY + REACH) total += Math.sin(Math.PI * Math.pow((p - RECOVERY - REACH) / PULL, 1.4));
+        });
+        return total;
+      }
+
+      // Scaled so that, with the steady flutter kick on top, the push
+      // averages out to holding swimming pace
+      var ARMS_PUSH = 0;
+      for (var at = 0; at < 1; at += 0.001) ARMS_PUSH += pulling(at) * 0.001;
+      ARMS_PUSH = (1 - KICK_PUSH) / ARMS_PUSH;
+
+      function push() {
+        return ARMS_PUSH * pulling(phase) + KICK_PUSH * (1 + 0.25 * Math.sin(3 * TAU * phase));
+      }
+
+      // The swimmer stroking, in its own frame: shoulders at the origin,
+      // facing +x, y measured down from the waterline
+      function stroking() {
+        // Riding a little higher in the water when moving faster
+        var by = 1.3 - 0.8 * (pace - 1);
+        // Coming out of the streamline: the head rises from between the arms
+        // and the legs ease from the dolphin kick into the flutter over the
+        // first half second, and there's no breath on the breakout stroke
+        var e = Math.min(modeTime / BREAKOUT, 1);
+        e = e * e * (3 - 2 * e);
+        // A breath each cycle: the head lifts and turns as the far arm
+        // finishes its pull and comes over, so the face rolls up out of the
+        // water and the mouth opens
+        var b = (phase + 1 - 0.44) % 1;
+        var breath = b < 0.4 && modeTime > CYCLE / 2 ? Math.sin(Math.PI * b / 0.4) : 0;
+        var hx = 2.2 + 1.1 * e;
+        var hy = (1 - e) * 0.7 + e * (by - 1.4) - 1.1 * breath;
+        // The far arm goes in first and fainter, behind the body, so the two
+        // arms read as taking turns rather than as one arm stroking twice
+        var alpha = ctx.globalAlpha;
+        ctx.globalAlpha = alpha * 0.45;
+        var far = (phase + 0.5) % 1;
+        if (holdFar && far >= RECOVERY && far < RECOVERY + REACH) holdFar = false;
+        arm(far, by - 0.5, holdFar);
+        ctx.globalAlpha = alpha;
+        line(-BODY, by + 0.2, 0, by, 2.6);
+        var face = -1.1 * breath, mouth = 0.75 * breath;
+        ctx.beginPath();
+        ctx.moveTo(hx, hy);
+        ctx.arc(hx, hy, HEAD, face + mouth, face - mouth + TAU);
+        ctx.closePath();
+        ctx.fill();
+        arm(phase % 1, by);
+        for (var k = 0; k < 2; k++) {
+          var kick = e * KICK_SWING * Math.sin(3 * TAU * phase + k * Math.PI) + (1 - e) * DOLPHIN_END;
+          line(-BODY, by + 0.2, -BODY - Math.cos(kick) * LEG, by + 0.2 + Math.sin(kick) * LEG, 1.8);
+        }
+      }
+
+      // Arms together past the head, legs together, dolphin kicking once it
+      // is clear of the wall (t is time since the push-off). The kick is a
+      // wave running from the chest down through the hips to the feet,
+      // growing as it goes, so the whole body undulates and the hands barely
+      // move.
+      function streamline(t) {
+        var kicking = Math.min(Math.max((t - PUSH) / KICK, 0), 1);
+        var wave = TAU * Math.max(t - PUSH, 0) / KICK;
+        function bob(lag, size) { return kicking * size * Math.sin(wave - lag); }
+        var shoulders = bob(0.6, 0.35), middle = bob(1.2, 0.7), hips = bob(1.8, 1.1);
+        ctx.lineWidth = 2.6;
+        ctx.beginPath();
+        ctx.moveTo(0, shoulders);
+        ctx.quadraticCurveTo(-BODY / 2, 2 * middle - (shoulders + hips) / 2, -BODY, hips);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(2.2, shoulders - 0.6, HEAD, 0, TAU);
+        ctx.fill();
+        line(0, shoulders - 1.6, ARM + 1.5, bob(0, 0.15) - 0.8, 1.5);
+        var kick = kicking * DOLPHIN_SWING * Math.sin(wave - 2.6);
+        line(-BODY, hips, -BODY - Math.cos(kick) * LEG, hips + Math.sin(kick) * LEG, 1.8);
+      }
+
+      // Partway through the somersault, u running 0..1: the head ducks, the
+      // knees fold up to the chest and open out again, and the arms sweep
+      // from the sides round past the head into the streamline for the push
+      function flipping(u) {
+        var tuck = Math.sin(Math.PI * Math.min(u / 0.85, 1));
+        var hips = -BODY * (1 - 0.35 * tuck);
+        line(hips, 0, 0, 0, 2.6);
+        ctx.beginPath();
+        ctx.arc(3.3 - 1.2 * tuck, -0.6 + 2.2 * tuck, HEAD, 0, TAU);
+        ctx.fill();
+        var thigh = Math.PI - 1.9 * tuck, shin = thigh - 1.5 * tuck;
+        var kx = hips + Math.cos(thigh) * LEG / 2, ky = Math.sin(thigh) * LEG / 2;
+        line(hips, 0, kx, ky, 1.8);
+        line(kx, ky, kx + Math.cos(shin) * LEG / 2, ky + Math.sin(shin) * LEG / 2, 1.8);
+        var a = Math.max(0, (u - 0.45) / 0.55);
+        var sweep = Math.PI * (1 - a * a * (3 - 2 * a));
+        line(0, -0.8, Math.cos(sweep) * (ARM + 1), -0.8 + Math.sin(sweep) * 0.6, 1.5);
+      }
+
+      // Laid out straight in the air: arms out past the head, legs together
+      function diving() {
+        line(-BODY, 0, 0, 0, 2.6);
+        ctx.beginPath();
+        ctx.arc(2.6, -0.6, HEAD, 0, TAU);
+        ctx.fill();
+        line(0, -0.5, ARM, -0.5, 1.5);
+        line(-BODY, 0, -BODY - LEG, 0, 1.8);
+      }
+
+      // The diver t seconds into the start: shoulders and body angle. It comes
+      // in at the top of its arc and falls like a thrown thing, steady across
+      // and speeding up downward, the body tilting to follow its path, so it
+      // is nose down by the time it reaches the water.
+      var DIVE_SPEED = (ENTRY_X - DIVE_FROM[0]) / FLIGHT;  // px/s across
+      function diver(t) {
+        var u = Math.min(t / FLIGHT, 1);
+        var drop = WATER + 2 - DIVE_FROM[1];
+        return [
+          DIVE_FROM[0] + DIVE_SPEED * u * FLIGHT,
+          DIVE_FROM[1] + drop * u * u,
+          Math.atan2(2 * drop * u / FLIGHT, DIVE_SPEED)
+        ];
+      }
+
+      function pose() {
+        if (mode === 'dive') {
+          var d = diver(modeTime);
+          ctx.translate(d[0], d[1]);
+          ctx.rotate(d[2]);
+          diving();
+        } else if (mode === 'swim') {
+          ctx.translate(x, WATER);
+          ctx.scale(dir, 1);
+          stroking();
+        } else if (mode === 'flip') {
+          // Rotate about the middle of the body, easing in and out of the
+          // somersault and sinking to push-off depth as it goes over
+          var u = modeTime / FLIP;
+          var turn = u * u * (3 - 2 * u);
+          var sink = Math.min(u / 0.6, 1);
+          ctx.translate(pivot, WATER + DEPTH * sink * sink * (3 - 2 * sink));
+          ctx.scale(dir, 1);
+          ctx.rotate(Math.PI * turn);
+          ctx.translate(BODY / 2, 0);
+          flipping(u);
+        } else {
+          // Holding depth through the kicks, rising to the surface over the
+          // last two
+          var g = Math.min(Math.max((modeTime - (UNDER - KICK * 2)) / (KICK * 2), 0), 1);
+          g = g * g * (3 - 2 * g);
+          // Off the dive it starts at the surface, still nose down, and
+          // sinks to kicking depth as it levels out
+          var dip = entering ? Math.min(modeTime / 0.45, 1) : 1;
+          dip = dip * dip * (3 - 2 * dip);
+          ctx.translate(x, WATER + DEPTH * dip * (1 - g) + 1.3 * g);
+          ctx.scale(dir, 1);
+          ctx.rotate(diver(FLIGHT)[2] * (1 - dip));
+          streamline(modeTime);
+        }
+      }
+
+      // The height of the water every 2px along the lane: two slow swells
+      // rolling past, plus the swimmer's bow wave and wake, which die down
+      // while it is under the water
+      function water() {
+        surface.length = 0;
+        var churn = mode === 'swim' ? pace : 0.25;
+        for (var px = 0; px <= W + 2; px += 2) {
+          var y = 0.7 * Math.sin(px * 0.045 - time * 1.4) + 0.35 * Math.sin(px * 0.12 + time * 2.1);
+          var ahead = (px - x) * dir;
+          if (ahead > -BODY - LEG && ahead < 10) {
+            // Bow wave building up in front of the head
+            y -= churn * 1.1 * Math.exp(-Math.pow((ahead - 5) / 4, 2)) * (0.8 + 0.2 * Math.sin(time * 9));
+          }
+          if (ahead < -BODY) {
+            // Wake trailing behind the kick, rippling and fading with distance
+            var back = -BODY - ahead;
+            y += churn * 0.9 * Math.exp(-back / 28) * Math.sin(back * 0.35 + time * 7);
+          }
+          // Rings spreading out from where the dive went in
+          splashes.forEach(function (hit) {
+            var age = time - hit.time, from = Math.abs(px - hit.x);
+            if (from < age * 60) {
+              y += 1.8 * Math.exp(-age * 1.6 - from / 40) * Math.sin(from * 0.4 - age * 11);
+            }
+          });
+          surface.push(WATER + y);
+        }
+      }
+
+      // Something hitting the water at px: a burst of spray and a ring of
+      // ripples. The dive throws its spray forward; a dropped-in splash
+      // (lean 0) throws it evenly both ways.
+      function splash(px, lean) {
+        if (lean === undefined) lean = 0.15;
+        splashes.push({ x: px, time: time });
+        for (var i = 0; i < 34 && foam.length < 400; i++) {
+          foam.push({
+            x: px + (Math.random() - 0.5) * 6,
+            y: WATER - Math.random(),
+            vx: (Math.random() - 0.5 + lean) * 40,
+            vy: -(15 + Math.random() * 35),
+            size: 0.6 + Math.random() * 0.7,
+            age: 0,
+            life: 3,
+            floating: false
+          });
+        }
+      }
+
+      function surfacePath() {
+        ctx.moveTo(0, surface[0]);
+        for (var i = 1; i < surface.length; i++) ctx.lineTo(i * 2, surface[i]);
+      }
+
+      // Draw the water line, then the pose twice: once clipped to the air
+      // above the surface and once to the water below it
+      function draw() {
+        var style = getComputedStyle(document.documentElement);
+        var color = style.getPropertyValue('--muted');
+        var under = parseFloat(style.getPropertyValue('--underwater')) || 0.3;
+        water();
+        ctx.clearRect(0, 0, W, H);
+
+        // A faint glow in the water just under the surface, fading out with
+        // depth; it follows the surface, so it rides the swells and ripples
+        var glow = ctx.createLinearGradient(0, WATER - 2, 0, WATER + 8);
+        glow.addColorStop(0, style.getPropertyValue('--glow'));
+        glow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        surfacePath();
+        ctx.lineTo(W + 2, H);
+        ctx.lineTo(0, H);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.strokeStyle = style.getPropertyValue('--lane');
+        ctx.lineWidth = 1.2;
+        ctx.lineJoin = ctx.lineCap = 'round';
+        ctx.beginPath();
+        surfacePath();
+        ctx.stroke();
+
+        [[0, 1], [H, under]].forEach(function (band) {
+          ctx.save();
+          ctx.beginPath();
+          surfacePath();
+          ctx.lineTo(W + 2, band[0]);
+          ctx.lineTo(0, band[0]);
+          ctx.closePath();
+          ctx.clip();
+          ctx.globalAlpha = band[1];
+          ctx.strokeStyle = ctx.fillStyle = color;
+          ctx.lineCap = 'round';
+          pose();
+          ctx.restore();
+        });
+
+        ctx.fillStyle = style.getPropertyValue('--foam');
+        foam.forEach(function (bit) {
+          ctx.globalAlpha = 0.9 * (1 - bit.age / bit.life);
+          ctx.beginPath();
+          ctx.arc(bit.x, bit.y, bit.size, 0, TAU);
+          ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+      }
+
+      // White water off the kick: whenever a foot comes up through the
+      // surface it throws spray, more the faster it is moving, which arcs up
+      // and back, falls onto the water, and floats there as foam in the wake
+      // for a moment before it fades
+      var foam = [];
+      function surfaceAt(px) {
+        return surface[Math.min(Math.max(Math.round(px / 2), 0), surface.length - 1)];
+      }
+      function churn(dt) {
+        if (mode === 'swim' && !held) {
+          var by = 1.3 - 0.8 * (pace - 1);
+          for (var k = 0; k < 2; k++) {
+            var swing = 3 * TAU * phase + k * Math.PI;
+            var kick = KICK_SWING * Math.sin(swing);
+            var footY = by + 0.2 + Math.sin(kick) * LEG;
+            var footSpeed = Math.cos(kick) * LEG * KICK_SWING * Math.cos(swing) * 3 * TAU / CYCLE;
+            if (footY > 0.8 || footSpeed > 0) continue;  // under the water, or on its way down
+            var spawn = -footSpeed * dt * 1.8;
+            while (spawn > 0 && foam.length < 140) {
+              if (Math.random() < spawn) {
+                foam.push({
+                  x: x - dir * (BODY + Math.cos(kick) * LEG) + (Math.random() - 0.5) * 2,
+                  y: WATER + Math.min(footY, 0) - Math.random(),
+                  vx: -dir * (4 + Math.random() * 14),
+                  vy: -(6 + Math.random() * 16),
+                  size: 0.55 + Math.random() * 0.6,
+                  age: 0,
+                  life: 2,
+                  floating: false
+                });
+              }
+              spawn -= 1;
+            }
+          }
+        }
+        foam = foam.filter(function (bit) {
+          bit.age += dt;
+          if (bit.floating) {
+            bit.x += bit.vx * 0.15 * dt;
+            bit.y = surfaceAt(bit.x) - 0.4;
+          } else {
+            bit.vy += 80 * dt;
+            bit.x += bit.vx * dt;
+            bit.y += bit.vy * dt;
+            if (bit.vy > 0 && bit.y >= surfaceAt(bit.x)) {
+              bit.floating = true;
+              bit.life = bit.age + 0.5 + Math.random() * 0.7;
+            }
+          }
+          return bit.age < bit.life;
+        });
+      }
+
+      function step(dt) {
+        time += dt;
+        modeTime += dt;
+        splashes = splashes.filter(function (hit) { return time - hit.time < 3; });
+        if (mode === 'dive') {
+          // Splash the moment the leading hand touches the water
+          var d = diver(modeTime);
+          var hx = d[0] + Math.cos(d[2]) * ARM + Math.sin(d[2]) * 0.5;
+          var hy = d[1] + Math.sin(d[2]) * ARM - Math.cos(d[2]) * 0.5;
+          if (!splashed && hy >= WATER) {
+            splashed = true;
+            splash(hx);
+          }
+          if (modeTime >= FLIGHT) {
+            mode = 'glide';
+            modeTime = 0;
+            x = ENTRY_X;
+            dir = 1;
+            entering = true;
+          }
+        } else if (mode === 'swim') {
+          phase += dt / CYCLE;
+          if (phase >= 1) phase -= 1;
+          pace += DRAG * (push() - pace * pace) * dt;
+          x += dir * SPEED * pace * dt;
+          // Start the turn a little out, since it carries on into the wall
+          if ((dir > 0 && x + 16 >= W) || (dir < 0 && x - 16 <= 0)) {
+            mode = 'flip';
+            modeTime = 0;
+            pivot = x - dir * BODY / 2;
+          }
+        } else if (mode === 'flip') {
+          // Still drifting into the wall as it goes over, slowing to a stop,
+          // but never through it: the body stays in the pool, clear of the
+          // wall, and the feet end up planted on it
+          pivot += dir * SPEED * 0.9 * Math.max(0, 1 - modeTime / FLIP) * dt;
+          var clear = BODY / 2 + HEAD + 4;
+          pivot = Math.min(Math.max(pivot, clear), W - clear);
+          if (modeTime >= FLIP) {
+            dir = -dir;
+            x = pivot + dir * BODY / 2;
+            mode = 'glide';
+            modeTime = 0;
+          }
+        } else {
+          var v = underwater(modeTime);
+          if (entering) {
+            // Off the dive there's no wall to push from: it hits the water
+            // a little slower than it flew, the water slows it further into
+            // the kicks, and they never carry it faster than it went in
+            var hit = Math.max(0.8 * DIVE_SPEED / SPEED, 1.7);
+            v = modeTime < PUSH ? hit + (1.6 - hit) * modeTime / PUSH : Math.min(v, hit);
+          }
+          x += dir * SPEED * v * dt;
+          if (modeTime >= UNDER) {
+            // Breaking out straight into the first pull
+            entering = false;
+            mode = 'swim';
+            modeTime = 0;
+            phase = RECOVERY + REACH - 0.02;
+            pace = underwater(UNDER);
+            holdFar = true;
+          }
+        }
+      }
+
+      size();
+      // Refitting the pace times a few dozen simulated lengths, so wait for
+      // the window to settle rather than doing it on every resize event
+      var resizing;
+      window.addEventListener('resize', function () {
+        clearTimeout(resizing);
+        resizing = setTimeout(size, 150);
+      });
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        // Held still mid-length rather than crouched at the start
+        mode = 'swim';
+        x = W / 3;
+        draw();
+        new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+        return;
+      }
+
+      // The water answers the pointer. A quick click drops a splash where it
+      // lands. Pressing and holding freezes the swimmer where it is, and
+      // dragging carries it up and down the pool, turning it to face the way
+      // it's being dragged; let go and it swims on from there. A press turns
+      // into a hold once it's been down a moment or has moved a few pixels.
+      var held = false, press = null;
+      function poolX(event) {
+        return event.clientX - lane.getBoundingClientRect().left;
+      }
+      function grab() {
+        held = true;
+        lane.classList.add('holding');
+        // Wherever it was in the start or a turn, it's swimming once picked up
+        if (mode !== 'swim') {
+          mode = 'swim';
+          modeTime = BREAKOUT;
+          entering = false;
+          splashed = true;
+          holdFar = false;
+        }
+      }
+      function carry(px) {
+        var to = Math.min(Math.max(px, 20), W - 20);
+        if (Math.abs(to - x) > 0.5) dir = to > x ? 1 : -1;
+        x = to;
+      }
+      lane.addEventListener('pointerdown', function (event) {
+        press = { x: poolX(event), timer: setTimeout(grab, 180) };
+        // Keep hearing about the pointer once it strays off the thin strip
+        try { lane.setPointerCapture(event.pointerId); } catch (e) {}
+      });
+      lane.addEventListener('pointermove', function (event) {
+        if (!press) return;
+        if (!held && Math.abs(poolX(event) - press.x) > 4) grab();
+        if (held) carry(poolX(event));
+      });
+      function release(event, cancelled) {
+        if (!press) return;
+        clearTimeout(press.timer);
+        if (!held && !cancelled) splash(press.x, 0);
+        held = false;
+        press = null;
+        lane.classList.remove('holding');
+      }
+      lane.addEventListener('pointerup', function (event) { release(event, false); });
+      lane.addEventListener('pointercancel', function (event) { release(event, true); });
+
+      var last = null;
+      function frame(now) {
+        // Cap the step so a backgrounded tab doesn't send it flying
+        var dt = last === null ? 0 : Math.min((now - last) / 1000, 0.05);
+        last = now;
+        // Held, the swimmer stands still while the water carries on
+        if (held) time += dt;
+        else step(dt);
+        churn(dt);
+        draw();
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    })();
+  </script>
   <p class="updated" id="clock"><span id="clock-time"></span><span id="clock-in"> in </span><button type="button" class="clock-place" id="clock-place" title="Somewhere else">Princeton</button><span id="clock-diff"></span></p>
 </div>
 
@@ -678,1238 +1371,3 @@ subtitle: Updated Sep 2026
   })();
 </script>
 
-{% comment %}
-<script>
-  // The Chrome offline game, sitting on the rule at the foot of the page. It
-  // waits, still, until someone presses space or taps it; then the ground rolls,
-  // the dino runs, the score counts up, and hitting a cactus ends the run. A
-  // finished run stays up for a moment and then settles back to waiting.
-  //
-  // Each layer of scenery is one element that slides as a whole, with its
-  // sprites parked at fixed offsets inside it. That way a frame writes four
-  // transforms instead of one per sprite, and the browser can hand the whole
-  // thing to the compositor.
-  (function () {
-    var track = document.querySelector('.dino-track');
-    var runner = track && track.querySelector('.dino-runner');
-    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!runner) return;
-
-    var pointsEl = track.querySelector('.dino-points');
-    var hiEl = track.querySelector('.dino-hi');
-
-    var BASE_SPEED = 165;   // px per second the ground goes by
-    var MAX_SPEED = 360;    // it winds up to here over a long run
-    var ACCEL = 7;          // px per second of speed gained each second
-    var DINO_X = 24;        // px from the left edge the dino runs at
-    var DINO_W = 20;        // px, the dino sprite's width
-    var JUMP_MS = 550;      // how long a hop lasts, start to landing
-    var HARD_PACE = 2;      // how much faster the whole run goes in Hard mode
-    var JUMP_H = 36;        // px, how high it peaks
-    var STRIDE = 17;        // px of ground per step, so the legs keep pace with the speed
-    var PER_POINT = 20;     // px of ground per point of score
-    var REST_MS = 6000;     // how long a finished run stays up before it settles back
-    var FORGIVE = 3;        // px shaved off the dino's box, so near misses are misses
-    var REBASE_AT = 4000;   // px of travel before a layer's offsets are wound back to zero
-    var GROUND = 8;         // px from the bottom of the strip to the rule the dino runs on
-
-    var WAITING = 0, PLAYING = 1, OVER = 2;
-
-    var CACTI = [
-      { w: 9, h: 18, d: 'M3 3h3v1h-3zM3 4h3v1h-3zM3 5h3v1h-3zM0 6h1v1h-1zM3 6h3v1h-3zM0 7h1v1h-1zM3 7h3v1h-3zM8 7h1v1h-1zM0 8h1v1h-1zM3 8h3v1h-3zM8 8h1v1h-1zM0 9h2v1h-2zM3 9h3v1h-3zM8 9h1v1h-1zM1 10h6v1h-6zM8 10h1v1h-1zM2 11h6v1h-6zM3 12h3v1h-3zM3 13h3v1h-3zM3 14h3v1h-3zM3 15h3v1h-3zM3 16h3v1h-3zM3 17h3v1h-3z' },
-      { w: 9, h: 18, d: 'M3 0h3v1h-3zM3 1h3v1h-3zM3 2h3v1h-3zM3 3h3v1h-3zM0 4h1v1h-1zM3 4h3v1h-3zM0 5h1v1h-1zM3 5h3v1h-3zM8 5h1v1h-1zM0 6h1v1h-1zM3 6h3v1h-3zM8 6h1v1h-1zM0 7h1v1h-1zM3 7h3v1h-3zM8 7h1v1h-1zM0 8h2v1h-2zM3 8h3v1h-3zM7 8h2v1h-2zM1 9h7v1h-7zM2 10h5v1h-5zM3 11h3v1h-3zM3 12h3v1h-3zM3 13h3v1h-3zM3 14h3v1h-3zM3 15h3v1h-3zM3 16h3v1h-3zM3 17h3v1h-3z' },
-      { w: 19, h: 18, d: 'M3 0h3v1h-3zM3 1h3v1h-3zM3 2h3v1h-3zM3 3h3v1h-3zM13 3h3v1h-3zM0 4h1v1h-1zM3 4h3v1h-3zM13 4h3v1h-3zM0 5h1v1h-1zM3 5h3v1h-3zM8 5h1v1h-1zM13 5h3v1h-3zM0 6h1v1h-1zM3 6h3v1h-3zM8 6h1v1h-1zM10 6h1v1h-1zM13 6h3v1h-3zM0 7h1v1h-1zM3 7h3v1h-3zM8 7h1v1h-1zM10 7h1v1h-1zM13 7h3v1h-3zM18 7h1v1h-1zM0 8h2v1h-2zM3 8h3v1h-3zM7 8h2v1h-2zM10 8h1v1h-1zM13 8h3v1h-3zM18 8h1v1h-1zM1 9h7v1h-7zM10 9h2v1h-2zM13 9h3v1h-3zM18 9h1v1h-1zM2 10h5v1h-5zM11 10h6v1h-6zM18 10h1v1h-1zM3 11h3v1h-3zM12 11h6v1h-6zM3 12h3v1h-3zM13 12h3v1h-3zM3 13h3v1h-3zM13 13h3v1h-3zM3 14h3v1h-3zM13 14h3v1h-3zM3 15h3v1h-3zM13 15h3v1h-3zM3 16h3v1h-3zM13 16h3v1h-3zM3 17h3v1h-3zM13 17h3v1h-3z' }
-    ];
-
-    var CLOUDS = [
-      { w: 14, h: 5, d: 'M4 0h5v1h-5zM2 1h9v1h-9zM1 2h13v1h-13zM0 3h14v1h-14zM1 4h12v1h-12z' },
-      { w: 10, h: 4, d: 'M3 0h4v1h-4zM1 1h8v1h-8zM0 2h10v1h-10zM1 3h8v1h-8z' }
-    ];
-
-    // Each layer scrolls at its own share of the speed: clouds drift, so they
-    // hang back
-    var layers = [
-      { cls: 'cloud', factor: 0.18, gap: [120, 420], shapes: CLOUDS, low: 46, high: 68 },
-      { cls: 'sand', factor: 1, gap: [14, 80] },
-      { cls: 'cactus', factor: 1, gap: [200, 520], shapes: CACTI, solid: true }
-    ];
-
-    layers.forEach(function (layer) {
-      layer.items = [];
-      layer.offset = 0;
-      layer.el = document.createElement('div');
-      layer.el.className = 'layer';
-      track.appendChild(layer.el);
-    });
-    var CACTUS = layers[2];
-
-    var state = WAITING;
-    var speed = BASE_SPEED;
-    var score = 0;
-    var shown = -1;
-    // Hard mode runs the whole game faster — ground, jumps, and the wind-up
-    // alike, so every gap that can be cleared normally still can — and keeps
-    // a best score of its own. The choice is remembered between visits.
-    var hard = false;
-    try { hard = localStorage.getItem('dino-hard') === '1'; } catch (e) {}
-    var hi = loadHi();
-
-    function pace() {
-      return hard ? HARD_PACE : 1;
-    }
-
-    function hiKey() {
-      return hard ? 'dino-hi-hard' : 'dino-hi';
-    }
-
-    function loadHi() {
-      try { return parseInt(localStorage.getItem(hiKey()), 10) || 0; } catch (e) { return 0; }
-    }
-
-    var jumpStart = -Infinity;
-    var jumping = false;
-    var travelled = 0;
-    var stepped = false;
-    var overAt = 0;
-    var last = null;
-
-    // Reading the width mid-frame would make the browser lay the page out again
-    // every frame, so it is measured once and on resize
-    var width = track.offsetWidth;
-    window.addEventListener('resize', function () { width = track.offsetWidth; });
-
-    function sprite(cls, shape) {
-      var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      svg.setAttribute('class', cls);
-      svg.setAttribute('viewBox', '0 0 ' + shape.w + ' ' + shape.h);
-      svg.setAttribute('width', shape.w);
-      svg.setAttribute('height', shape.h);
-      var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      path.setAttribute('d', shape.d);
-      svg.appendChild(path);
-      return svg;
-    }
-
-    // Sand is just a dash of ground, a pixel or two tall, below the rule
-    function grain() {
-      var el = document.createElement('i');
-      el.className = 'sand';
-      el.style.width = (1 + Math.floor(Math.random() * 4)) + 'px';
-      el.style.height = (Math.random() < 0.25 ? 2 : 1) + 'px';
-      el.style.bottom = (GROUND - 2 - Math.floor(Math.random() * 5)) + 'px';
-      return el;
-    }
-
-    // `left` is where the sprite sits inside its layer, which never changes;
-    // the layer slides underneath it
-    function spawn(layer, left) {
-      var w, h = 0, el;
-      if (layer.cls === 'sand') {
-        el = grain();
-        w = 4;
-      } else {
-        var shape = layer.shapes[Math.floor(Math.random() * layer.shapes.length)];
-        el = sprite(layer.cls, shape);
-        w = shape.w;
-        h = shape.h;
-        if (layer.low != null) {
-          el.style.bottom = (layer.low + Math.random() * (layer.high - layer.low)) + 'px';
-        }
-      }
-      el.style.left = Math.round(left) + 'px';
-      layer.el.appendChild(el);
-      layer.items.push({ el: el, left: left, w: w, h: h });
-      layer.nextGap = layer.gap[0] + Math.random() * (layer.gap[1] - layer.gap[0]);
-    }
-
-    function clear(layer) {
-      layer.items.forEach(function (it) { layer.el.removeChild(it.el); });
-      layer.items = [];
-      layer.nextGap = layer.gap[1];
-    }
-
-    // Sand and clouds are laid out across the whole strip up front, so the
-    // scene looks like somewhere even while it is standing still
-    function prefill(layer) {
-      for (var x = -30; x < width; x += layer.gap[0] + Math.random() * (layer.gap[1] - layer.gap[0])) {
-        spawn(layer, x);
-      }
-    }
-
-    // Offsets would otherwise climb without limit, which grows the layer's
-    // painted area; every so often everything is wound back to the start
-    function rebase(layer) {
-      layer.items.forEach(function (it) {
-        it.left -= layer.offset;
-        it.el.style.left = Math.round(it.left) + 'px';
-      });
-      layer.offset = 0;
-    }
-
-    function pad(n) {
-      var s = String(Math.floor(n));
-      while (s.length < 5) s = '0' + s;
-      return s;
-    }
-
-    function paint() {
-      track.classList.toggle('still', state !== PLAYING);
-      track.classList.toggle('over', state === OVER);
-      track.classList.toggle('scored', state !== WAITING);
-    }
-
-    function tally() {
-      if (state === WAITING || Math.floor(score) === shown) return;
-      shown = Math.floor(score);
-      pointsEl.textContent = pad(score);
-      hiEl.textContent = hi ? 'HI ' + pad(hi) : '';
-    }
-
-    function start() {
-      state = PLAYING;
-      speed = BASE_SPEED;
-      score = 0;
-      shown = -1;
-      clear(CACTUS);  // nobody should begin already stood under one
-      paint();
-      tally();
-    }
-
-    function gameOver() {
-      state = OVER;
-      overAt = performance.now();
-      if (score > hi) {
-        hi = Math.floor(score);
-        try { localStorage.setItem(hiKey(), String(hi)); } catch (e) {}
-      }
-      shown = -1;
-      paint();
-      tally();
-    }
-
-    function wait() {
-      state = WAITING;
-      speed = BASE_SPEED;
-      clear(CACTUS);
-      runner.style.transform = '';
-      runner.classList.remove('jumping', 'step');
-      jumping = false;
-      jumpStart = -Infinity;
-      paint();
-    }
-
-    function jump() {
-      if (performance.now() - jumpStart > JUMP_MS / pace()) jumpStart = performance.now();
-    }
-
-    // Space, the up arrow, a click or a tap: start a run, hop, or try again
-    function press() {
-      if (state === PLAYING) {
-        jump();
-      } else if (state === WAITING) {
-        start();
-        jump();
-      } else if (performance.now() - overAt > 400) {  // ignore the press that ended the run
-        start();
-      }
-    }
-
-    // Only claim the keyboard while the strip is actually on screen, so the
-    // space bar still scrolls the page everywhere else
-    var onScreen = true;
-    if (window.IntersectionObserver) {
-      onScreen = false;
-      new IntersectionObserver(function (entries) {
-        onScreen = entries[entries.length - 1].isIntersecting;
-      }).observe(track);
-    }
-
-    // The Dino link under Games folds the strip away and brings it back; the
-    // rule it runs on stays either way. It starts folded, and the choice is
-    // remembered between visits, like the theme is.
-    var link = document.getElementById('dino-link');
-    var hardLink = document.getElementById('dino-hard');
-    var folded = true;
-    try { folded = localStorage.getItem('dino-hidden') !== '0'; } catch (e) {}
-
-    function fold() {
-      track.classList.toggle('folded', folded);
-      if (!link) return;
-      link.setAttribute('aria-pressed', folded ? 'false' : 'true');
-      link.setAttribute('title', folded ? 'Bring the dino out' : 'Put the dino away');
-    }
-
-    function hardLabel() {
-      if (!hardLink) return;
-      hardLink.setAttribute('aria-pressed', hard ? 'true' : 'false');
-      hardLink.setAttribute('title', hard ? 'Back to normal speed' : 'The whole run at 2× speed');
-    }
-
-    // Switching speed is switching games, with a different best, so a run
-    // under way is given up
-    window.toggleHardDino = function (event) {
-      event.preventDefault();
-      hard = !hard;
-      try { localStorage.setItem('dino-hard', hard ? '1' : '0'); } catch (e) {}
-      hi = loadHi();
-      if (state !== WAITING) wait();
-      hardLabel();
-    };
-
-    hardLabel();
-
-    window.toggleDino = function (event) {
-      event.preventDefault();
-      folded = !folded;
-      try { localStorage.setItem('dino-hidden', folded ? '1' : '0'); } catch (e) {}
-      track.classList.add('folding');  // only a press animates, never the page loading folded
-      if (folded && state !== WAITING) wait();  // a run put away is a run given up
-      fold();
-    };
-
-    fold();
-
-    window.addEventListener('keydown', function (e) {
-      if (folded || !onScreen || e.metaKey || e.ctrlKey || e.altKey) return;
-      if (e.key !== ' ' && e.key !== 'Spacebar' && e.key !== 'ArrowUp') return;
-      var tag = (e.target.tagName || '').toLowerCase();
-      if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable) return;
-      e.preventDefault();
-      press();
-    });
-
-    track.addEventListener('pointerdown', function (e) {
-      e.preventDefault();
-      press();
-    });
-
-    function frame(now) {
-      requestAnimationFrame(frame);
-      if (last === null) { last = now; return; }
-      var dt = Math.min((now - last) / 1000, 0.1) * pace();  // clamp, so a backgrounded tab doesn't teleport everything
-      last = now;
-
-      if (state === OVER && now - overAt > REST_MS) wait();
-      if (state !== PLAYING) return;  // waiting and finished: the scene holds still
-
-      speed = Math.min(MAX_SPEED, speed + ACCEL * dt);
-      score += speed * dt / PER_POINT;
-      tally();
-
-      var moved = speed * dt;
-
-      // The legs swap pose every STRIDE px of ground, so the stride is tied to
-      // the speed rather than to a clock of its own
-      travelled += moved;
-      var stepping = Math.floor(travelled / STRIDE) % 2 === 1;
-      if (stepping !== stepped) {
-        stepped = stepping;
-        runner.classList.toggle('step', stepping);
-      }
-
-      var t = (now - jumpStart) / (JUMP_MS / pace());
-      var airborne = t >= 0 && t <= 1;
-      var height = airborne ? -4 * JUMP_H * t * (1 - t) : 0;
-      runner.style.transform = airborne ? 'translateY(' + Math.round(height) + 'px)' : '';
-      if (airborne !== jumping) {
-        jumping = airborne;
-        runner.classList.toggle('jumping', airborne);
-      }
-
-      for (var l = 0; l < layers.length; l++) {
-        var layer = layers[l];
-        layer.offset += moved * layer.factor;
-        if (layer.offset > REBASE_AT) rebase(layer);
-        layer.el.style.transform = 'translateX(' + -Math.round(layer.offset) + 'px)';
-
-        var rightmost = -Infinity;
-
-        for (var i = layer.items.length - 1; i >= 0; i--) {
-          var it = layer.items[i];
-          var x = it.left - layer.offset;  // where it is on screen
-          if (x + it.w < 0) {
-            layer.el.removeChild(it.el);
-            layer.items.splice(i, 1);
-            continue;
-          }
-          if (x > rightmost) rightmost = x;
-
-          if (layer.solid &&
-              x < DINO_X + DINO_W - FORGIVE && x + it.w > DINO_X + FORGIVE &&
-              height > -it.h + 1) {
-            gameOver();
-            return;
-          }
-        }
-
-        if (rightmost <= width - (layer.nextGap || layer.gap[0])) {
-          spawn(layer, layer.offset + width);
-        }
-      }
-    }
-
-    prefill(layers[0]);
-    prefill(layers[1]);
-    paint();
-    if (!reduceMotion) requestAnimationFrame(frame);
-  })();
-</script>
-
-<script>
-  // A snake that chases the cursor, woken by the Snake link under Misc. There
-  // is an apple on the page at all times, gliding in a straight line and
-  // glancing off the window's edges; steering the head onto it eats it, the
-  // next appears somewhere else that same instant, and the snake lengthens as
-  // the score ticks up in the header, where the theme toggle usually sits.
-  // Hard mode, beside the link, puts two apples out at once and sets them
-  // bounding across the page in arcs instead, with the ground moving to
-  // another edge of the window every two points, and keeps a best score of its own.
-  // Pressing the link again only
-  // puts the snake away — the game it was in the middle of is still there when
-  // it comes back, and nothing but a refresh starts it over.
-  //
-  // It all lives on one fixed canvas laid over the page. The canvas never takes
-  // the pointer, so everything underneath stays readable and clickable while a
-  // game is on.
-  (function () {
-    var link = document.getElementById('snake-link');
-    var hardLink = document.getElementById('snake-hard');
-    var scoreEl = document.getElementById('snake-points');
-    var hiEl = document.getElementById('snake-hi');
-    if (!link || !hardLink || !scoreEl || !hiEl) return;
-
-    var START_LEN = 12;     // segments the snake starts with
-    var GROW = 4;           // segments an apple is worth at the start of a game
-    var GROW_EVERY = 5;     // apples it takes for each apple to be worth one more
-    var GROW_MAX = 12;      // the most an apple is ever worth
-    var SIZE = 8.5 / 7;     // the snake, scaled up with the apples from their old 7px radius
-    var SPACING = 9 * SIZE; // px the body keeps between one segment and the next
-    var HEAD_R = 8 * SIZE;  // px, radius of the head, a shade wider than the body
-    var BODY_R = 6 * SIZE;  // px, radius of the bead right behind the head
-    var TAIL_R = 2.5 * SIZE; // px, radius of the last bead; the body tapers between the two
-    var EYE_R = 3.2 * SIZE; // px, radius of an eye
-    var PUPIL_R = 1.6 * SIZE; // px, radius of a pupil
-    var OUTLINE = 1.5;      // px of page color drawn around the snake, so it reads over text
-    var CHASE = 22;         // how hard the head is pulled toward the cursor, per second
-    var MAX_SPEED = 2600;   // px per second the head can travel, however far the cursor is
-    var APPLE_R = 8.5;      // px, radius of an apple
-    var CLEAR_OF_HEAD = 60; // px a new apple keeps from the head, so it isn't eaten as it lands
-    var CLEAR_OF_APPLE = 40; // px Hard mode's apples keep apart, so they read as separate
-    var HARD_APPLES = 2;    // apples out at once in Hard mode
-    var GLIDE_MIN = 60;     // px per second, the slowest an easy apple glides
-    var GLIDE_MAX = 120;    // px per second, the fastest
-    var DRIFT_MIN = 72;     // px per second, the slowest a Hard apple wanders
-    var DRIFT_MAX = 176;    // px per second, the fastest
-    var GRAVITY = 2000;     // px per second², the pull on a Hard mode apple
-    var FLIP_EVERY = 2;     // points between each turn of Hard mode's gravity to another side
-    // Which way Hard mode's gravity pulls: toward the bottom, top, left, or
-    // right edge of the window, whichever is the ground at the moment
-    var SIDES = [{ x: 0, y: 1 }, { x: 0, y: -1 }, { x: -1, y: 0 }, { x: 1, y: 0 }];
-    var HOP_MIN = 230;      // px, the lowest a bounce carries one
-    var HOP_MAX = 430;      // px, the highest
-    var TOUCH_LIFT = 38;    // px the snake rides above a fingertip, so it isn't hidden under it
-    // Doubling back is fatal, but a hard turn is not: the beads just behind the
-    // head are always close to it, and a tight corner brings the next few
-    // within reach too, so the first NECK of them cannot be bitten. Past that,
-    // touching itself means the head has genuinely crossed its own body.
-    var NECK = 8;
-    var SELF_GIVE = 2 * SIZE; // px shaved off the bite, so a near miss stays a miss
-    var FLASH_MS = 220;     // how long the snake flashes where it hit itself
-    var BLINK_MS = 55;      // how fast it flashes
-    var UNRAVEL_MS = 620;   // how long it then takes to come apart
-    var STAGGER = 0.55;     // the share of that spent waiting its turn, head first
-    var DEATH_MS = FLASH_MS + UNRAVEL_MS;
-    var MAX_SEG = 300;      // a ceiling on the body, so a long game can't drag the page down
-    var MAX_DPR = 2;        // a phone's third pixel of density buys nothing here and costs a lot
-    var POP_MS = 220;       // how long an apple takes to swell to full size
-    var EDGE = 20;          // px an apple keeps clear of the window's edges
-    var RIPPLE_R = 64;      // px, how close the head has to be for a word to feel it
-    var RIPPLE_PUSH = 1.5;  // px a word is shoved aside at most
-    var RIPPLE_EASE = 14;   // how quickly a word runs to where it ought to be, per second
-    // Text the snake can push around. The header is left out — the title
-    // animation owns those text nodes — and so is the clock, which rewrites
-    // itself every second.
-    var RIPPLE_SEL = '.bio p, .block-label, .row-label, .row-link, .row-year, .row-note';
-    var BITE = 30;          // px between centres that counts as eaten, with some give
-
-    // The Chrome game's palette: a blue snake with wide eyes, and an apple with
-    // a sheen on it. All of it is fixed rather than themed, so the snake looks
-    // the same crossing a dark page as a light one.
-    var SNAKE = '#4a63d8';
-    var HURT = '#e5484d';   // what it flashes as it dies, the color of the apple
-    var EYE = '#ffffff';
-    var PUPIL = '#2f2f33';
-    var APPLE = '#e5484d';
-    var APPLE_LIT = '#f07f82';
-    var STEM = '#7a4a2b';
-    var LEAF = '#5db85c';
-    var APPLE_ALPHA = 0.85;  // apples sit back a touch, but still read clearly
-
-    var canvas = null;
-    var ctx = null;
-    var raf = null;
-    var seg = [];         // the body, head first; each { x, y }
-    var apples = [];      // each { x, y, born, vx, vy, hop }; hop is 0 for an easy apple, which glides
-    var score = 0;
-    // Hard mode is a game of its own, so it carries its own best score, and the
-    // choice is remembered between visits like the theme is
-    var hard = false;
-    try { hard = localStorage.getItem('snake-hard') === '1'; } catch (e) {}
-    var hi = loadHi();    // the best score on this browser, kept across visits
-    var beat = hi;        // the best as this game began: the number a record has to pass
-    var pointer = null;   // where the cursor was last seen, once it has moved
-    var touching = false; // whether this game is being played with a finger
-    var LIVE = 0, DYING = 1, OVER = 2;
-    var state = LIVE;
-    var diedAt = 0;
-    var travelled = 0;    // how far the head has gone, to know the body is strung out
-    var walled = false;   // whether the head has been clear of every edge, so hitting one counts
-    var last = 0;
-    var paper = '#202020';  // the page behind the snake, for its halo; read once a game
-    var words = [];       // every word the snake can push, with where it rests
-    var wrapped = [];     // the text nodes those words were cut from, to put back after
-    var displaced = 0;    // how many of those words are currently off their mark
-    var rx = 0;           // where the head was when the ripple last had anything to do
-    var ry = 0;
-    var fall = SIDES[0];  // the way Hard mode's gravity pulls; down, until the first flip
-    var apple = null;     // one apple, drawn once and then stamped out for each of them
-    var appleDpr = 0;     // the density it was drawn at, so it is redrawn if that changes
-    var settle = null;    // pending remeasure, held off until the window stops changing
-    var TAU = Math.PI * 2;
-    var w = 0;
-    var h = 0;
-
-    // Measuring the words forces the browser to lay the page out, and a phone
-    // fires resize all the way through a scroll as its address bar slides away.
-    // The canvas is resized at once, since that is now cheap when nothing
-    // changed, but the measuring waits for the window to hold still.
-    function remeasure() {
-      resize();
-      clearTimeout(settle);
-      settle = setTimeout(measureWords, 150);
-    }
-
-    function resize() {
-      // Phones report a density of 3, which would have this clearing and
-      // refilling nine pixels for every one on the page. Two is past the point
-      // the difference shows.
-      var dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
-      var cw = Math.round(window.innerWidth * dpr);
-      var ch = Math.round(window.innerHeight * dpr);
-      w = window.innerWidth;
-      h = window.innerHeight;
-      // A window that shrinks onto the head is not the player running into it
-      walled = false;
-      // Mobile browsers fire resize every time the address bar slides away.
-      // Assigning a canvas's width reallocates it even when the number is the
-      // same, so the sizes are compared first.
-      if (canvas.width === cw && canvas.height === ch) return;
-      canvas.width = cw;
-      canvas.height = ch;
-      // Draw in CSS pixels and let the transform handle the display's density
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      if (dpr !== appleDpr) makeApple(dpr);
-    }
-
-    function onMove(e) {
-      // A fingertip covers far more of the page than a cursor does, and what it
-      // covers is exactly the head. On touch the snake rides above the finger
-      // instead, which also leaves the apple it is closing on in view.
-      var lift = 0;
-      if (e.pointerType === 'touch') {
-        touching = true;
-        lift = TOUCH_LIFT;
-      }
-      pointer = { x: e.clientX, y: Math.max(4, e.clientY - lift) };
-    }
-
-    // Where an apple may land. Riding above the finger puts the foot of the
-    // window out of the snake's reach, so on touch nothing is dropped there.
-    function spawnBox() {
-      var foot = EDGE + (touching ? TOUCH_LIFT : 0);
-      return {
-        x0: EDGE, x1: Math.max(EDGE + 1, w - EDGE),
-        y0: EDGE, y1: Math.max(EDGE + 1, h - foot)
-      };
-    }
-
-    // Each word gets a span of its own so it can be moved on its own. The
-    // spaces between them stay plain text, so lines still break where they did.
-    function wrapWords() {
-      var blocks = document.querySelectorAll(RIPPLE_SEL);
-      for (var b = 0; b < blocks.length; b++) {
-        var walker = document.createTreeWalker(blocks[b], NodeFilter.SHOW_TEXT);
-        var texts = [];
-        while (walker.nextNode()) texts.push(walker.currentNode);
-
-        for (var t = 0; t < texts.length; t++) {
-          var node = texts[t];
-          if (!/\S/.test(node.nodeValue)) continue;
-          var parts = node.nodeValue.split(/(\s+)/);
-          var frag = document.createDocumentFragment();
-          var made = [];
-          for (var i = 0; i < parts.length; i++) {
-            if (!parts[i]) continue;
-            var piece;
-            if (/^\s+$/.test(parts[i])) {
-              piece = document.createTextNode(parts[i]);
-            } else {
-              piece = document.createElement('span');
-              piece.className = 'ripple-word';
-              piece.textContent = parts[i];
-              words.push({ el: piece, x: 0, y: 0, moved: false, live: false });
-            }
-            frag.appendChild(piece);
-            made.push(piece);
-          }
-          if (!made.length) continue;
-          node.parentNode.replaceChild(frag, node);
-          wrapped.push({ node: node, parts: made });
-        }
-      }
-    }
-
-    function unwrapWords() {
-      for (var i = wrapped.length - 1; i >= 0; i--) {
-        var w = wrapped[i];
-        var parent = w.parts[0].parentNode;
-        if (!parent) continue;  // something else rewrote this text in the meantime
-        parent.insertBefore(w.node, w.parts[0]);
-        for (var j = 0; j < w.parts.length; j++) parent.removeChild(w.parts[j]);
-      }
-      wrapped = [];
-      words = [];
-    }
-
-    // Where every word sits when nothing is pushing it, in page coordinates so
-    // that scrolling needs no remeasuring. Clearing the transforms and reading
-    // the boxes are kept in separate passes, so the browser lays the page out
-    // once rather than once per word.
-    function measureWords() {
-      var i;
-      for (i = 0; i < words.length; i++) {
-        words[i].el.style.transform = '';
-        words[i].x = 0;
-        words[i].y = 0;
-        words[i].moved = false;
-      }
-      var sx = window.scrollX || window.pageXOffset || 0;
-      var sy = window.scrollY || window.pageYOffset || 0;
-      for (i = 0; i < words.length; i++) {
-        var r = words[i].el.getBoundingClientRect();
-        // A word inside a closed note has no box yet; it starts feeling the
-        // snake once the note is opened and everything is measured again
-        words[i].live = r.width > 0 && r.height > 0;
-        words[i].px = r.left + r.width / 2 + sx;
-        words[i].py = r.top + r.height / 2 + sy;
-      }
-    }
-
-    // Words near the head are shoved away from it and ease back once it has
-    // passed, so the text ripples where the snake crosses it
-    function ripple(dt) {
-      var head = seg[0];
-      // A finger lifted or a cursor left alone: with every word already back on
-      // its mark there is nothing to work out, so the whole sweep is skipped
-      if (!displaced && Math.abs(head.x - rx) < 0.01 && Math.abs(head.y - ry) < 0.01) return;
-      rx = head.x;
-      ry = head.y;
-      displaced = 0;
-      var hx = head.x + (window.scrollX || window.pageXOffset || 0);
-      var hy = head.y + (window.scrollY || window.pageYOffset || 0);
-      var k = Math.min(1, RIPPLE_EASE * dt);
-
-      for (var i = 0; i < words.length; i++) {
-        var word = words[i];
-        if (!word.live) continue;
-        var tx = 0;
-        var ty = 0;
-        var dx = word.px - hx;
-        var dy = word.py - hy;
-        var d2 = dx * dx + dy * dy;
-        if (d2 < RIPPLE_R * RIPPLE_R) {
-          var d = Math.sqrt(d2) || 1;
-          var push = RIPPLE_PUSH * (1 - d / RIPPLE_R);
-          tx = (dx / d) * push;
-          ty = (dy / d) * push;
-        }
-        word.x += (tx - word.x) * k;
-        word.y += (ty - word.y) * k;
-
-        if (Math.abs(word.x) < 0.05 && Math.abs(word.y) < 0.05) {
-          // Settled: drop the transform rather than leave a dead one behind
-          if (word.moved) {
-            word.el.style.transform = '';
-            word.moved = false;
-            word.x = 0;
-            word.y = 0;
-          }
-        } else {
-          word.el.style.transform =
-            'translate(' + word.x.toFixed(2) + 'px, ' + word.y.toFixed(2) + 'px)';
-          word.moved = true;
-          displaced++;
-        }
-      }
-    }
-
-    // The link that starts a game is the one that puts it away again
-    // Three things the link can be: the way in, the way out, and the way round
-    // again once the snake has killed itself
-    function label(kind) {
-      link.textContent =
-        kind === 'on' ? 'Hide Snake'
-          : kind === 'dead' ? (record() ? 'Replay Snake · New best!' : 'Replay Snake')
-          : 'Snake';
-      link.setAttribute('aria-pressed', kind === 'on' ? 'true' : 'false');
-      link.setAttribute('title',
-        kind === 'on' ? 'Put the snake away'
-          : kind === 'dead' ? 'Start another game'
-          : 'Chase the apples with your cursor');
-    }
-
-    // The Hard link is a switch rather than a second way in: it says which game
-    // the next apple belongs to, lit while it is on
-    function hardLabel() {
-      hardLink.setAttribute('aria-pressed', hard ? 'true' : 'false');
-      hardLink.setAttribute('title', hard
-        ? 'Back to one apple, gliding in a straight line'
-        : 'Two apples at once, bouncing across the page');
-    }
-
-    // Three digits until the hundreds run out, then however many it takes
-    function pad(n) {
-      var s = String(n);
-      return s.length < 3 ? ('00' + s).slice(-3) : s;
-    }
-
-    // The best score sits dimmed beside this game's, as the dino's does. It is
-    // saved the moment it is beaten rather than at the end, so a record set in
-    // a game that is then put away, or lost to a refresh, still counts.
-    // A record needs something to break, so the very first game doesn't count
-    function record() {
-      return beat > 0 && score > beat;
-    }
-
-    // Each difficulty keeps its own best, so a Hard game is never measured
-    // against a score set with one apple gliding along
-    function hiKey() {
-      return hard ? 'snake-hi-hard' : 'snake-hi';
-    }
-
-    function loadHi() {
-      try { return parseInt(localStorage.getItem(hiKey()), 10) || 0; } catch (e) { return 0; }
-    }
-
-    function showScore() {
-      // Lit from the apple that breaks the old best until the game ends, with a
-      // pop on that first apple so it is noticed mid-chase
-      scoreEl.parentNode.classList.toggle('record', record());
-      if (score > hi) {
-        hi = score;
-        try { localStorage.setItem(hiKey(), String(hi)); } catch (e) {}
-      }
-      scoreEl.textContent = pad(score);
-      hiEl.textContent = hi ? 'HI ' + pad(hi) + ' ' : '';
-    }
-
-    function clearOf(x, y, ox, oy, r) {
-      var dx = x - ox;
-      var dy = y - oy;
-      return dx * dx + dy * dy >= r * r;
-    }
-
-    // Somewhere clear of the head, so the apple that replaces the one just
-    // eaten cannot land under the snake and be swallowed on the spot — and,
-    // in Hard mode, clear of the apples still out, so they read as separate
-    function dropApple() {
-      var head = seg[0];
-      var box = spawnBox();
-      var x, y, i;
-      for (var tries = 0; tries < 12; tries++) {
-        x = box.x0 + Math.random() * (box.x1 - box.x0);
-        y = box.y0 + Math.random() * (box.y1 - box.y0);
-        if (!clearOf(x, y, head.x, head.y, CLEAR_OF_HEAD)) continue;
-        var alone = true;
-        for (i = 0; i < apples.length; i++) {
-          if (!clearOf(x, y, apples[i].x, apples[i].y, CLEAR_OF_APPLE)) alone = false;
-        }
-        if (alone) break;
-      }
-      var a = { x: x, y: y, born: last, vx: 0, vy: 0, hop: 0 };
-      if (!hard) {
-        // Set off in any direction at a steady speed, to carry on in a
-        // straight line until it glances off an edge
-        var angle = Math.random() * Math.PI * 2;
-        var glide = GLIDE_MIN + Math.random() * (GLIDE_MAX - GLIDE_MIN);
-        a.vx = Math.cos(angle) * glide;
-        a.vy = Math.sin(angle) * glide;
-      } else {
-        // Thrown one way or the other and left to fall: the sideways speed
-        // holds, so the bounces draw a row of parabolas across the window.
-        // Each apple is given a hop of its own, high or low, so they never
-        // fall into step — but it is the same hop every time it lands, for
-        // as long as that apple is out.
-        a.drift = DRIFT_MIN + Math.random() * (DRIFT_MAX - DRIFT_MIN);
-        a.hop = Math.sqrt(2 * GRAVITY * (HOP_MIN + Math.random() * (HOP_MAX - HOP_MIN)));
-        sideways(a);
-        a.vx -= fall.x * a.hop;
-        a.vy -= fall.y * a.hop;
-      }
-      apples.push(a);
-    }
-
-    // Sets a Hard apple drifting one way or the other along the ground, with
-    // nothing yet toward or away from it
-    function sideways(a) {
-      var s = Math.random() < 0.5 ? -a.drift : a.drift;
-      a.vx = Math.abs(fall.y) * s;
-      a.vy = Math.abs(fall.x) * s;
-    }
-
-    // Every FLIP_EVERY points in Hard mode the ground moves to another edge of
-    // the window. The apples out at the time drop from where they hang toward
-    // it, drifting along it as they did along the old one.
-    function flipGravity() {
-      var next;
-      do { next = SIDES[Math.floor(Math.random() * SIDES.length)]; } while (next === fall);
-      fall = next;
-      for (var i = 0; i < apples.length; i++) {
-        if (apples[i].hop) sideways(apples[i]);
-      }
-    }
-
-    // An easy apple glides in a straight line and is turned back off every
-    // edge alike. Hard mode's apples bound around the window, each pulled toward
-    // the ground as it goes and thrown back off it, so they draw parabolas across the page
-    // and one can drop out from under the head as it closes in. Nothing is ever
-    // taken out of them: a bounce leaves the floor at the speed that apple was
-    // launched at rather than at whatever it happened to land with, so it goes
-    // on reaching the same height however long it has been out — no slow
-    // settling, and no rounding to lose height to. They are turned around at
-    // the sides and the ceiling rather than reflected off where they ended up,
-    // so an apple left outside the box by a resize walks back in.
-    function driftApples(dt) {
-      var box = spawnBox();
-      for (var i = 0; i < apples.length; i++) {
-        var a = apples[i];
-        if (a.hop) {
-          a.vx += GRAVITY * fall.x * dt;
-          a.vy += GRAVITY * fall.y * dt;
-        }
-        a.x += a.vx * dt;
-        a.y += a.vy * dt;
-        // Off the ground a Hard apple is thrown back at its own hop; off any
-        // other edge, and every edge for an easy apple, it is simply turned round
-        var bounce = a.hop || 0;
-        if (a.x < box.x0) { a.x = box.x0; a.vx = fall.x < 0 && bounce ? bounce : Math.abs(a.vx); }
-        else if (a.x > box.x1) { a.x = box.x1; a.vx = fall.x > 0 && bounce ? -bounce : -Math.abs(a.vx); }
-        if (a.y < box.y0) { a.y = box.y0; a.vy = fall.y < 0 && bounce ? bounce : Math.abs(a.vy); }
-        else if (a.y > box.y1) { a.y = box.y1; a.vy = fall.y > 0 && bounce ? -bounce : -Math.abs(a.vy); }
-      }
-    }
-
-    // A segment is dragged along behind the one ahead of it, and only once it
-    // has fallen more than SPACING behind — which is what makes the body curve
-    // through the turns the head took rather than cutting the corner
-    function follow() {
-      for (var i = 1; i < seg.length; i++) {
-        var ahead = seg[i - 1];
-        var s = seg[i];
-        var dx = ahead.x - s.x;
-        var dy = ahead.y - s.y;
-        var d = Math.sqrt(dx * dx + dy * dy);
-        if (d > SPACING) {
-          var k = (d - SPACING) / d;
-          s.x += dx * k;
-          s.y += dy * k;
-        }
-      }
-    }
-
-    function eat() {
-      var head = seg[0];
-      for (var i = apples.length - 1; i >= 0; i--) {
-        var a = apples[i];
-        var dx = a.x - head.x;
-        var dy = a.y - head.y;
-        if (dx * dx + dy * dy > BITE * BITE) continue;
-        apples.splice(i, 1);
-        // Worth more the longer the game goes on, so the body fills the window
-        // faster just as the player is getting comfortable
-        var grow = Math.min(GROW + Math.floor(score / GROW_EVERY), GROW_MAX);
-        score++;
-        if (hard && score % FLIP_EVERY === 0) flipGravity();
-        showScore();
-        // The new segments start stacked on the tail and unfurl behind it as
-        // the snake moves on
-        var tail = seg[seg.length - 1];
-        for (var g = 0; g < grow && seg.length < MAX_SEG; g++) {
-          seg.push({ x: tail.x, y: tail.y });
-        }
-      }
-    }
-
-    // Has the head run into its own body? Only once the snake has pulled itself
-    // out into a line at least once — at the start of a game every bead sits on
-    // top of every other, which would otherwise be a death on the first frame.
-    function bitSelf() {
-      if (travelled < START_LEN * SPACING) return false;
-      var head = seg[0];
-      for (var i = NECK; i < seg.length; i++) {
-        var dx = seg[i].x - head.x;
-        var dy = seg[i].y - head.y;
-        var r = HEAD_R + radius(i) - SELF_GIVE;
-        if (dx * dx + dy * dy < r * r) return true;
-      }
-      return false;
-    }
-
-    // Has the head run into the edge of the window? Only once it has been
-    // clear of all four since the game began, was picked back up, or the
-    // window changed size — otherwise a snake that starts at the cursor, and
-    // the cursor is at an edge, would die before it had moved.
-    function hitWall() {
-      var head = seg[0];
-      var touches = head.x - HEAD_R <= 0 || head.x + HEAD_R >= w ||
-        head.y - HEAD_R <= 0 || head.y + HEAD_R >= h;
-      if (!touches) walled = true;
-      return walled && touches;
-    }
-
-    function die() {
-      state = DYING;
-      diedAt = last;
-    }
-
-    // How much of a bead is left. Dying, they go one after another from the
-    // head down, so the snake comes apart from the end that hit something.
-    function beadScale(i) {
-      if (state !== DYING) return 1;
-      var p = (last - diedAt - FLASH_MS) / UNRAVEL_MS;
-      if (p <= 0) return 1;
-      var q = (p - (i / seg.length) * STAGGER) / (1 - STAGGER);
-      return q <= 0 ? 1 : q >= 1 ? 0 : 1 - q;
-    }
-
-    function dot(x, y, r, color) {
-      ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
-      ctx.fillStyle = color;
-      ctx.fill();
-    }
-
-    // The snake is a string of beads that overlap into a body, tapering from
-    // the head down to the tip of the tail
-    function radius(i) {
-      if (i === 0) return HEAD_R;
-      if (seg.length < 3) return BODY_R;
-      return BODY_R + (TAIL_R - BODY_R) * ((i - 1) / (seg.length - 2));
-    }
-
-    // It flashes where it hit, then stays that colour while it comes apart
-    function bodyColor() {
-      if (state !== DYING) return SNAKE;
-      var t = last - diedAt;
-      if (t >= FLASH_MS) return HURT;
-      return Math.floor(t / BLINK_MS) % 2 ? HURT : SNAKE;
-    }
-
-    function drawFace() {
-      var head = seg[0];
-      // Read the heading a few segments back, so it comes from the line of the
-      // body rather than from one twitchy step
-      var neck = seg[Math.min(3, seg.length - 1)];
-      var dx = head.x - neck.x;
-      var dy = head.y - neck.y;
-      var d = Math.sqrt(dx * dx + dy * dy) || 1;
-      dx /= d;
-      dy /= d;
-      var px = -dy;  // across the head, for setting the eyes either side
-      var py = dx;
-
-      // The line of the mouth, drawn across the snout
-      ctx.beginPath();
-      ctx.moveTo(head.x + dx * HEAD_R * 0.78 + px * 2.6 * SIZE, head.y + dy * HEAD_R * 0.78 + py * 2.6 * SIZE);
-      ctx.lineTo(head.x + dx * HEAD_R * 0.78 - px * 2.6 * SIZE, head.y + dy * HEAD_R * 0.78 - py * 2.6 * SIZE);
-      ctx.strokeStyle = PUPIL;
-      ctx.lineWidth = 1.2 * SIZE;
-      ctx.lineCap = 'round';
-      ctx.stroke();
-
-      // Two wide eyes, pupils pushed toward wherever it is headed — or, once it
-      // has hit itself, the old cartoon shorthand for the opposite
-      var dead = state !== LIVE;
-      if (dead) {
-        ctx.strokeStyle = EYE;
-        ctx.lineWidth = 1.6 * SIZE;
-      }
-      for (var side = -1; side <= 1; side += 2) {
-        var ex = head.x + (dx * 1.4 + px * side * 3.4) * SIZE;
-        var ey = head.y + (dy * 1.4 + py * side * 3.4) * SIZE;
-        if (!dead) {
-          dot(ex, ey, EYE_R, EYE);
-          dot(ex + dx * 1.1 * SIZE, ey + dy * 1.1 * SIZE, PUPIL_R, PUPIL);
-          continue;
-        }
-        // An X, drawn on the head's own axes so it turns with it
-        var ux = (dx + px) * 2.4 * SIZE;
-        var uy = (dy + py) * 2.4 * SIZE;
-        var vx = (dx - px) * 2.4 * SIZE;
-        var vy = (dy - py) * 2.4 * SIZE;
-        ctx.beginPath();
-        ctx.moveTo(ex - ux, ey - uy);
-        ctx.lineTo(ex + ux, ey + uy);
-        ctx.moveTo(ex - vx, ey - vy);
-        ctx.lineTo(ex + vx, ey + vy);
-        ctx.stroke();
-      }
-    }
-
-    // An apple is a dozen path operations, and there can be a dozen apples on
-    // the page. Drawing one into a small canvas at the start turns each of them
-    // into a single stamp per frame, which is what a phone can actually keep up
-    // with. The box is sized off APPLE_R so the leaf and stem always fit.
-    var SPR_CX = Math.ceil(APPLE_R * 1.6);
-    var SPR_CY = Math.ceil(APPLE_R * 2.4);
-    var SPR_W = SPR_CX + Math.ceil(APPLE_R * 1.6);
-    var SPR_H = SPR_CY + Math.ceil(APPLE_R * 1.4);
-
-    function makeApple(dpr) {
-      appleDpr = dpr;
-      apple = document.createElement('canvas');
-      apple.width = Math.round(SPR_W * dpr);
-      apple.height = Math.round(SPR_H * dpr);
-      var c = apple.getContext('2d');
-      c.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-      var r = APPLE_R;
-      // Stem and leaf go down first, so the fruit laps over where they meet it
-      c.beginPath();
-      c.moveTo(SPR_CX, SPR_CY - r * 0.6);
-      c.lineTo(SPR_CX + r * 0.18, SPR_CY - r * 1.7);
-      c.strokeStyle = STEM;
-      c.lineWidth = Math.max(1, r * 0.22);
-      c.lineCap = 'round';
-      c.stroke();
-      c.beginPath();
-      c.ellipse(SPR_CX + r * 0.72, SPR_CY - r * 1.6, r * 0.46, r * 0.24, -0.45, 0, TAU);
-      c.fillStyle = LEAF;
-      c.fill();
-
-      c.beginPath();
-      c.arc(SPR_CX, SPR_CY, r, 0, TAU);
-      c.fillStyle = APPLE;
-      c.fill();
-      c.beginPath();
-      c.arc(SPR_CX - r * 0.34, SPR_CY - r * 0.36, r * 0.3, 0, TAU);
-      c.fillStyle = APPLE_LIT;
-      c.fill();
-    }
-
-    function drawApple(a) {
-      // Swelling in on arrival, so an apple is noticed rather than just there
-      var t = Math.min(1, (last - a.born) / POP_MS);
-      var k = 1 - (1 - t) * (1 - t);
-      ctx.globalAlpha = APPLE_ALPHA;
-      ctx.drawImage(apple, a.x - SPR_CX * k, a.y - SPR_CY * k, SPR_W * k, SPR_H * k);
-      ctx.globalAlpha = 1;
-    }
-
-    // Every bead of a pass goes into one path and is filled in one go. Filling
-    // them one at a time meant a draw call per bead per pass, which on a long
-    // snake was hundreds of them a frame; the picture is identical, since the
-    // beads all wind the same way and so fill as their union.
-    function beads(grow, color) {
-      ctx.beginPath();
-      var any = false;
-      for (var i = seg.length - 1; i >= 0; i--) {
-        var r = radius(i) * beadScale(i);
-        if (r <= 0.2) continue;  // this one has finished coming apart
-        r += grow;
-        // Without this the arc would be joined to the last one by a straight line
-        ctx.moveTo(seg[i].x + r, seg[i].y);
-        ctx.arc(seg[i].x, seg[i].y, r, 0, TAU);
-        any = true;
-      }
-      if (!any) return;
-      ctx.fillStyle = color;
-      ctx.fill();
-    }
-
-    function draw() {
-      ctx.clearRect(0, 0, w, h);
-      for (var a = 0; a < apples.length; a++) drawApple(apples[a]);
-
-      // The whole halo is laid down before any of the snake, so the outline
-      // traces the whole silhouette instead of ringing each bead in turn
-      beads(OUTLINE, paper);
-      beads(0, bodyColor());
-      // Once the head has started coming apart there is nothing left to put a
-      // face on
-      if (beadScale(0) > 0.55) drawFace();
-    }
-
-    function frame(now) {
-      raf = requestAnimationFrame(frame);
-      // A tab left in the background piles up time it never drew; cap the step
-      // so coming back doesn't teleport the snake across the page
-      var dt = Math.min((now - last) / 1000, 0.05);
-      last = now;
-
-      // A dying snake takes no more steering: it holds where it hit itself
-      // while it comes apart, and then the board is cleared for the replay
-      if (state === DYING) {
-        if (now - diedAt >= DEATH_MS) {
-          state = OVER;
-          apples = [];
-          ctx.clearRect(0, 0, w, h);
-          // The game is over, so the page is free to scroll again
-          document.documentElement.classList.remove('snake-live');
-          label('dead');
-          cancelAnimationFrame(raf);
-          raf = null;
-          return;
-        }
-        ripple(dt);
-        draw();
-        return;
-      }
-
-      if (pointer) {
-        var head = seg[0];
-        var dx = pointer.x - head.x;
-        var dy = pointer.y - head.y;
-        var d = Math.sqrt(dx * dx + dy * dy);
-        if (d > 0.5) {
-          // Eased, so the head sweeps in from across the page and then settles
-          // onto the cursor instead of shivering around it
-          var step = Math.min(d, d * CHASE * dt, MAX_SPEED * dt);
-          head.x += (dx / d) * step;
-          head.y += (dy / d) * step;
-          travelled += step;
-        }
-      }
-
-      follow();
-      if (bitSelf() || hitWall()) {
-        die();
-        draw();
-        return;
-      }
-      driftApples(dt);
-      eat();
-      // The board is never short: this covers the first frame of a game and
-      // puts the next apple out the same frame the last one is eaten
-      while (apples.length < (hard ? HARD_APPLES : 1)) dropApple();
-      ripple(dt);
-      draw();
-    }
-
-    // Everything a new game starts over from. Putting the snake away leaves all
-    // of this alone, which is why a hidden game comes back as it was; only a
-    // death, or a refresh, clears it.
-    function reset() {
-      seg = [];
-      apples = [];
-      score = 0;
-      fall = SIDES[0];
-      beat = hi;
-      travelled = 0;
-      state = LIVE;
-    }
-
-    function start() {
-      canvas = document.createElement('canvas');
-      canvas.className = 'snake-canvas';
-      canvas.setAttribute('aria-hidden', 'true');
-      document.body.appendChild(canvas);
-      ctx = canvas.getContext('2d');
-      appleDpr = 0;  // force the sprite to be drawn for this game's density
-      resize();
-      paper = getComputedStyle(document.documentElement)
-        .getPropertyValue('--bg').trim() || paper;
-
-      // Hiding the snake only puts it away: a game already under way — its
-      // length, its apples and its score — is picked up where it left off
-      if (!seg.length) {
-        var x = pointer ? pointer.x : w / 2;
-        var y = pointer ? pointer.y : h / 2;
-        for (var i = 0; i < START_LEN; i++) seg.push({ x: x, y: y });
-      }
-      // A window resized while the snake was away could have left an apple
-      // outside it, or out of reach at the foot of it
-      var box = spawnBox();
-      apples.forEach(function (a) {
-        a.x = Math.min(Math.max(a.x, box.x0), box.x1);
-        a.y = Math.min(Math.max(a.y, box.y0), box.y1);
-      });
-      showScore();
-
-      document.documentElement.classList.add('snaking', 'snake-live');
-      label('on');  // before the words are cut up, since it rewrites the link
-      wrapWords();
-      measureWords();
-      window.addEventListener('resize', remeasure);
-      window.addEventListener('pointermove', onMove);
-      // Opening a note pushes everything below it down, and `toggle` does not
-      // bubble, so it has to be caught on the way in
-      document.addEventListener('toggle', measureWords, true);
-
-      last = performance.now();
-      raf = requestAnimationFrame(frame);
-    }
-
-    function stop() {
-      cancelAnimationFrame(raf);
-      raf = null;
-      // Put away mid-death, it counts as dead: there is nothing left to come
-      // back to, so the next press starts a new game
-      if (state === DYING) state = OVER;
-      window.removeEventListener('resize', remeasure);
-      window.removeEventListener('pointermove', onMove);
-      document.removeEventListener('toggle', measureWords, true);
-      clearTimeout(settle);
-      unwrapWords();  // before the label is rewritten, which would strip the link's spans
-      canvas.parentNode.removeChild(canvas);
-      canvas = null;
-      ctx = null;
-      document.documentElement.classList.remove('snaking', 'snake-live');
-      label('off');
-    }
-
-    // Switching difficulty is switching games — a different board and a
-    // different best — so whatever was under way is dropped for a fresh one,
-    // and if the snake is away the change is simply waiting for the next game
-    window.toggleHardSnake = function (event) {
-      event.preventDefault();
-      hard = !hard;
-      try { localStorage.setItem('snake-hard', hard ? '1' : '0'); } catch (e) {}
-      hi = loadHi();
-      hardLabel();
-      var out = !!canvas;
-      if (out) stop();
-      reset();
-      if (out) start();
-      else showScore();
-    };
-
-    hardLabel();  // the choice this browser was last left on
-
-    window.toggleSnake = function (event) {
-      event.preventDefault();
-      if (canvas) {
-        // Out on the page. A dead snake replays; a live one is put away with
-        // its game intact.
-        var again = state === OVER;
-        stop();
-        if (!again) return;
-        reset();
-      } else if (state === OVER) {
-        reset();  // it died and was then put away, so start it afresh
-      }
-      start();
-    };
-  })();
-</script>
-{% endcomment %}
