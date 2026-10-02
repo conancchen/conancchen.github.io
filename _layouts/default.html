@@ -7,7 +7,7 @@
   <!-- Runs before paint so the saved theme applies without a flash -->
   <script>
     (function () {
-      document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
+      document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'dark');
 
       // Hides the page before first paint, so it never
       // flashes fully rendered first. Skipped entirely under reduced motion,
@@ -127,18 +127,15 @@
       toggle.setAttribute('title', label);
     }
 
-    // Each switch spins the yin-yang anywhere from three to five full turns,
-    // picked at random: clockwise into dark, counterclockwise into light. The
-    // longer spins get a little more time.
+    // Each switch spins the yin-yang one full turn: clockwise into dark,
+    // counterclockwise into light
     var yinyangAngle = 0;
 
     function switchTheme(next) {
       localStorage.setItem('theme', next);
       applyTheme(next);
-      var spin = 1080 + Math.random() * 720;  // degrees
-      yinyangAngle += next === 'dark' ? spin : -spin;
+      yinyangAngle += next === 'dark' ? 360 : -360;
       var icon = document.querySelector('#theme-toggle .icon-yinyang');
-      icon.style.transitionDuration = (0.5 + 0.2 * spin / 360) + 's';
       icon.style.setProperty('--angle', yinyangAngle + 'deg');
     }
 
@@ -183,21 +180,11 @@
       return Promise.resolve();
     }
 
-    var emailResetTimer;
     var toastTimer;
 
     function copyEmail(event) {
       event.preventDefault();
       var address = 'conanc@princeton.edu';
-      var label = document.getElementById('email-text');
-      label.textContent = 'at ' + address;
-
-      // Rapid clicks restart the countdown instead of stacking timers
-      clearTimeout(emailResetTimer);
-      emailResetTimer = setTimeout(function () {
-        label.textContent = 'by email';
-      }, 5000);
-
       var toast = document.getElementById('copy-toast');
       function notify() {
         toast.style.opacity = '1';
@@ -210,7 +197,7 @@
     // Staggers the fade-in: numbers each piece in page order so the CSS can
     // delay it, then starts them all at once.
     if (document.documentElement.classList.contains('anim-hide')) {
-      var pieces = document.querySelectorAll('.header, .bio > p, .block, .rule, .updated, .term');
+      var pieces = document.querySelectorAll('.header, .bio, .block, .rule, .updated, .term');
       for (var i = 0; i < pieces.length; i++) pieces[i].style.setProperty('--i', Math.min(i, 12));
       document.documentElement.classList.add('anim-play');
       document.documentElement.classList.remove('anim-hide');

@@ -14,7 +14,7 @@ subtitle: Updated Sep 2026
     I also compete as a Division I swimmer and recreational triathlete. I completed my first <a href="{{ site.baseurl }}/pdfs/im70.3.pdf">Ironman 70.3</a> this summer.
   </p>
   <p>
-    Find me on <a class="chip chip-rotating" id="social-link" href="https://www.linkedin.com/in/conan-chen"><span class="chip-icon-slot" id="social-icon"><svg class="chip-icon" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="3" fill="#0a66c2"/><path fill="#fff" d="M5.3 9.2h3v9.6h-3zM6.8 4.4a1.7 1.7 0 1 1 0 3.5 1.7 1.7 0 0 1 0-3.5zM10.2 9.2h2.9v1.3c.4-.8 1.4-1.6 2.9-1.6 3.1 0 3.6 2 3.6 4.6v5.3h-3v-4.7c0-1.1 0-2.6-1.6-2.6s-1.8 1.2-1.8 2.5v4.8h-3z"/></svg></span><span id="social-text">LinkedIn</span></a> or reach me <a class="chip" href="#" id="email-link" onclick="copyEmail(event)"><svg class="chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span id="email-text">by email</span></a>
+    Find me on <a class="chip chip-rotating" id="social-link" href="https://www.linkedin.com/in/conan-chen"><span class="chip-icon-slot" id="social-icon"><svg class="chip-icon" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="3" fill="#0a66c2"/><path fill="#fff" d="M5.3 9.2h3v9.6h-3zM6.8 4.4a1.7 1.7 0 1 1 0 3.5 1.7 1.7 0 0 1 0-3.5zM10.2 9.2h2.9v1.3c.4-.8 1.4-1.6 2.9-1.6 3.1 0 3.6 2 3.6 4.6v5.3h-3v-4.7c0-1.1 0-2.6-1.6-2.6s-1.8 1.2-1.8 2.5v4.8h-3z"/></svg></span><span id="social-text">LinkedIn</span></a> or reach me at <a class="chip" href="#" id="email-link" onclick="copyEmail(event)"><svg class="chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span id="email-text">conanc@princeton.edu</span></a>
   </p>
 </section>
 
@@ -152,8 +152,8 @@ subtitle: Updated Sep 2026
     // while the body glides, waiting for the other arm to come back over
     // before it pulls long under the body. The legs flutter six kicks to a
     // stroke cycle, throwing up white water; the body has momentum, speeding
-    // up through each pull and coasting between them; and the head lifts and
-    // turns to breathe once a cycle. It comes into view mid-dive from the
+    // up through each pull and coasting between them; and the head rolls to
+    // the side to breathe once a cycle. It comes into view mid-dive from the
     // left and goes in with a splash. At each wall it flip-turns (tucks
     // and somersaults underwater), glides off the wall in a streamline, takes
     // five dolphin kicks underwater, and surfaces swimming the other way.
@@ -182,7 +182,7 @@ subtitle: Updated Sep 2026
       var KICK_SWING = 0.27;       // radians each leg sweeps up and down
       var PULL_POWER = 1.2;        // how much harder the arms pull than it takes to hold pace
       var DRAG = 0.7;              // how quickly the water bleeds off speed
-      var BODY = 13, ARM = 8.5, LEG = 7, HEAD = 2.1;
+      var BODY = 13, ARM = 9.35, LEG = 7.7, HEAD = 2.1;
       var FLIP = 0.75;             // s for the somersault
       var PUSH = 0.21;             // s gliding off the wall before kicking
       var KICKS = 5, KICK = 0.36;  // underwater dolphin kicks, s each
@@ -339,13 +339,14 @@ subtitle: Updated Sep 2026
         // first half second, and there's no breath on the breakout stroke
         var e = Math.min(modeTime / BREAKOUT, 1);
         e = e * e * (3 - 2 * e);
-        // A breath each cycle: the head lifts and turns as the far arm
-        // finishes its pull and comes over, so the face rolls up out of the
-        // water and the mouth opens
+        // A breath each cycle: as the far arm finishes its pull and comes
+        // over, the head rolls to the side with the body rather than lifting,
+        // so it stays low in the water and only the mouth breaks the surface,
+        // opening just above the waterline
         var b = (phase + 1 - 0.44) % 1;
         var breath = b < 0.4 && modeTime > CYCLE / 2 ? Math.sin(Math.PI * b / 0.4) : 0;
         var hx = 2.2 + 1.1 * e;
-        var hy = (1 - e) * 0.7 + e * (by - 1.4) - 1.1 * breath;
+        var hy = (1 - e) * 0.7 + e * (by - 1.4) - 0.3 * breath;
         // The far arm goes in first and fainter, behind the body, so the two
         // arms read as taking turns rather than as one arm stroking twice
         var alpha = ctx.globalAlpha;
@@ -355,7 +356,7 @@ subtitle: Updated Sep 2026
         arm(far, by - 0.5, holdFar);
         ctx.globalAlpha = alpha;
         line(-BODY, by + 0.2, 0, by, 2.6);
-        var face = -1.1 * breath, mouth = 0.75 * breath;
+        var face = -0.25 * breath, mouth = 0.6 * breath;
         ctx.beginPath();
         ctx.moveTo(hx, hy);
         ctx.arc(hx, hy, HEAD, face + mouth, face - mouth + TAU);

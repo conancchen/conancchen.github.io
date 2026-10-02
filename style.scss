@@ -17,8 +17,8 @@
   --toast-text: #f7f6f3;
   --chip-bg: #efeeea;
   --chip-bg-hover: #e6e5e1;
-  --lane: #d3d2cd;
-  --foam: #b4b3ae;
+  --lane: #adc3da;  // the water line
+  --foam: #94aecb;  // spray and foam off the swimmer
   --underwater: 0.6;  // how strongly the swimmer shows below the surface
   --glow: rgba(55, 135, 240, 0.22);  // the water's tint just under the surface
 }
@@ -35,7 +35,7 @@
   --toast-text: #121212;
   --chip-bg: #1f1f1e;
   --chip-bg-hover: #2a2a28;
-  --lane: #3a3a3a;
+  --lane: #3a5a78;
   --foam: #e6e6e4;
   --underwater: 0.35;
   --glow: rgba(60, 160, 250, 0.3);
@@ -131,9 +131,9 @@ a:focus {
   flex: none;
 }
 
-// The page comes in piece by piece, each one fading up a beat after the last.
+// The page comes in piece by piece, each one coming into focus a beat after the last.
 // The layout's script numbers the pieces (--i) and swaps anim-hide for anim-play.
-$reveal: '.header, .bio > p, .block, .rule, .updated, .term';
+$reveal: '.header, .bio, .block, .rule, .updated, .term';
 
 .anim-hide {
   #{$reveal} {
@@ -143,15 +143,16 @@ $reveal: '.header, .bio > p, .block, .rule, .updated, .term';
 
 .anim-play {
   #{$reveal} {
-    animation: rise-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    animation: blur-in 1.35s cubic-bezier(0.22, 1, 0.36, 1) backwards;
     animation-delay: calc(var(--i, 0) * 70ms);
   }
 }
 
-@keyframes rise-in {
+@keyframes blur-in {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    filter: blur(8px);
+    transform: translateY(4px);
   }
 }
 
