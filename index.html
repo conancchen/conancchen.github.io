@@ -538,8 +538,11 @@ subtitle: Updated Sep 2026
         // A faint glow in the water just under the surface, fading out with
         // depth; it follows the surface, so it rides the swells and ripples
         var glow = ctx.createLinearGradient(0, WATER - 2, 0, WATER + 8);
-        glow.addColorStop(0, style.getPropertyValue('--glow'));
-        glow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        // fading to a clear version of the same blue, not to clear black,
+        // keeps the fade from going gray partway down
+        var tint = style.getPropertyValue('--glow').trim();
+        glow.addColorStop(0, tint);
+        glow.addColorStop(1, tint.replace(/[\d.]+\)$/, '0)'));
         ctx.fillStyle = glow;
         ctx.beginPath();
         surfacePath();

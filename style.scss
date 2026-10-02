@@ -20,7 +20,7 @@
   --lane: #d3d2cd;
   --foam: #b4b3ae;
   --underwater: 0.6;  // how strongly the swimmer shows below the surface
-  --glow: rgba(110, 165, 215, 0.14);  // the water's tint just under the surface
+  --glow: rgba(55, 135, 240, 0.22);  // the water's tint just under the surface
 }
 
 :root[data-theme="dark"] {
@@ -38,7 +38,7 @@
   --lane: #3a3a3a;
   --foam: #e6e6e4;
   --underwater: 0.35;
-  --glow: rgba(80, 190, 235, 0.22);
+  --glow: rgba(60, 160, 250, 0.3);
 }
 
 /**************/
@@ -160,7 +160,7 @@ $reveal: '.header, .bio > p, .block, .rule, .updated, .term';
 /**************/
 .page {
   width: 100%;
-  max-width: 608px;  // a 560px text column plus the 24px gutters
+  max-width: 568px;  // a 520px text column plus the 24px gutters, matching /strava
   margin: 0 auto;
   padding: 64px 24px 48px;
 }
