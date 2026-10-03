@@ -366,7 +366,7 @@ $reveal: '.header, .bio, .block, .rule, .updated, .term';
 }
 
 // An invisible strip along the water line takes the pointer: a click drops a
-// splash, and a press and drag carries the swimmer. The canvas itself never
+// splash, and a press and drag carries the swimmer, or lifts it out. The canvas itself never
 // takes the pointer, so the text around it stays clickable. A drag on a phone
 // moves the swimmer rather than scrolling the page.
 .lane::before {
@@ -384,11 +384,12 @@ $reveal: '.header, .bio, .block, .rule, .updated, .term';
   cursor: grabbing;
 }
 
-// The canvas's waterline sits where the line is
+// The canvas's waterline sits where the line is (the script sets its top, as
+// the canvas reaches up to the header)
 .swimmer {
   position: absolute;
   left: 0;
-  top: -40px;
+  top: -60px;
   z-index: 1;
   pointer-events: none;
 }
