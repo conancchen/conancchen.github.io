@@ -157,9 +157,9 @@ subtitle: Updated Sep 2026
     // left and goes in with a splash. At each wall it flip-turns (tucks
     // and somersaults underwater), glides off the wall in a streamline, takes
     // five dolphin kicks underwater, and surfaces swimming the other way.
-    // Dropped from too high, it's hurt: it floats limp, face down, until two
-    // scuba divers swim in, one from each side, and tow it out of the pool;
-    // after that the pool is left empty.
+    // Dropped from too high, it's hurt: it floats limp, face down, until a
+    // scuba diver swims in from the far side and pushes it out of the nearer
+    // side of the pool; after that the pool is left empty.
     (function () {
       var lane = document.getElementById('lane');
       var canvas = document.createElement('canvas');
@@ -232,9 +232,9 @@ subtitle: Updated Sep 2026
       var entrySpeed = 0;          // speed going in, as a multiple of SPEED (0: off the dive)
       var injured = false;         // going to be hurt when it goes under
       var FLOAT = 1;               // px below the surface it floats, hurt
-      var DIVER_SPEED = 140;       // px/s the rescue divers swim in at
-      var rescue = null;           // the rescue under way: its stage and divers
-      var bubbles = [];            // the divers' breath, rising to the surface
+      var DIVER_SPEED = 140;       // px/s the rescue diver swims in at
+      var rescue = null;           // the rescue under way: its stage and diver
+      var bubbles = [];            // the diver's breath, rising to the surface
       var hurtColor = 'red';       // the swimmer's color while hurt, from --hurt
       var GRAVITY = 300;           // px/s/s: about twice real for its size, as true to scale looks floaty
       var UNDER_DIST = 0;          // swimming-pace seconds the glide and kicks carry it
@@ -525,7 +525,8 @@ subtitle: Updated Sep 2026
         line(-BODY, 0.8, -BODY - Math.cos(0.3 + sway) * LEG, 0.8 + Math.sin(0.3 + sway) * LEG, 1.8);
       }
 
-      // Where a diver takes hold of the hurt swimmer: either side of its middle
+      // Where the diver takes hold of the hurt swimmer: just behind its
+      // middle, on the side it's pushed from
       function holdAt(d) {
         return [x - dir * (BODY + LEG) / 2 + d.side * 4, WATER + plunging[0] + 0.8];
       }
@@ -820,7 +821,7 @@ subtitle: Updated Sep 2026
             });
           }
         }
-        // The divers' bubbles wobble up and burst at the surface
+        // The diver's bubbles wobble up and burst at the surface
         bubbles = bubbles.filter(function (b) {
           b.age += dt;
           if (b.age < 0) return true;
@@ -992,10 +993,10 @@ subtitle: Updated Sep 2026
       }
 
       // Hurt: it sinks a little and bobs back up to float at the surface,
-      // drifting to a stop. A moment later a diver swims in from each side
-      // and they take hold of it, one either side of its middle, then tow it
-      // off out of the nearer side of the pool. Then the pool stays empty
-      // until the page is loaded again.
+      // drifting to a stop. A moment later a diver swims in from the far side
+      // of the pool, comes up behind it and takes hold, then pushes it off
+      // out of the nearer side. Then the pool stays empty until the page is
+      // loaded again.
       function hurting(dt) {
         plunging[1] += (PLUNGE_SPRING * PLUNGE_SPRING * (FLOAT - plunging[0]) - 2 * PLUNGE_SPRING * plunging[1]) * dt;
         plunging[0] = Math.min(plunging[0] + plunging[1] * dt, MAX_PLUNGE);
@@ -1010,9 +1011,10 @@ subtitle: Updated Sep 2026
         var mid = x - dir * (BODY + LEG) / 2;
         if (rescue.stage === 'wait' && rescue.time > 0.25) {
           rescue.stage = 'swim in';
-          rescue.divers = [-1, 1].map(function (side) {
-            return { side: side, x: side < 0 ? -30 : W + 30, depth: 13, facing: -side, kick: Math.random(), breath: 0.5 + Math.random() };
-          });
+          // Out the nearer side, so the diver comes from the far one
+          rescue.exit = mid < W / 2 ? -1 : 1;
+          var side = -rescue.exit;
+          rescue.divers = [{ side: side, x: side < 0 ? -30 : W + 30, depth: 13, facing: -side, kick: Math.random(), breath: 0.5 + Math.random() }];
         }
         var arrived = 0;
         rescue.divers.forEach(function (d) {
@@ -1038,13 +1040,12 @@ subtitle: Updated Sep 2026
             }
           }
         });
-        if (rescue.stage === 'swim in' && arrived === 2) {
+        if (rescue.stage === 'swim in' && arrived === rescue.divers.length) {
           rescue.stage = 'grip';
           rescue.time = 0;
           rescue.divers.forEach(function (d) { d.facing = -d.side; });
         } else if (rescue.stage === 'grip' && rescue.time > 0.25) {
           rescue.stage = 'carry';
-          rescue.exit = mid < W / 2 ? -1 : 1;
           rescue.divers.forEach(function (d) { d.facing = rescue.exit; });
         } else if (rescue.stage === 'carry' && (rescue.exit < 0 ? mid < -50 : mid > W + 50)) {
           rescue.stage = 'gone';
@@ -1088,7 +1089,7 @@ subtitle: Updated Sep 2026
         return event.clientY - lane.getBoundingClientRect().top;
       }
       function grab() {
-        // Hurt, it's left to the divers
+        // Hurt, it's left to the diver
         if (mode === 'hurt') return;
         held = true;
         injured = false;
