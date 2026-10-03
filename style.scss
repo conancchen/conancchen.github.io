@@ -19,6 +19,7 @@
   --chip-bg-hover: #e6e5e1;
   --lane: #adc3da;  // the water line
   --foam: #94aecb;  // spray and foam off the swimmer
+  --hurt: #d93025;  // the swimmer, hurt from a fall
   --underwater: 0.6;  // how strongly the swimmer shows below the surface
   --glow: rgba(55, 135, 240, 0.22);  // the water's tint just under the surface
 }
@@ -37,6 +38,7 @@
   --chip-bg-hover: #2a2a28;
   --lane: #3a5a78;
   --foam: #e6e6e4;
+  --hurt: #ff5a4f;
   --underwater: 0.35;
   --glow: rgba(60, 160, 250, 0.3);
 }
@@ -357,10 +359,16 @@ $reveal: '.header, .bio, .block, .rule, .updated, .term';
 }
 
 // The divider above the clock is the surface of a pool, drawn with its
-// swimmer on a canvas by the script in index.html
+// swimmer on a canvas by the script in index.html. The lane itself sits above
+// the page, not just its canvas: while the reveal animates it, the lane
+// becomes its own layer, and the canvas's z-index alone would then only lift
+// it within the lane, leaving it under the text animating in around it
 .lane {
   position: relative;
+  z-index: 1;
   touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
   height: 2px;
   margin: 30px 0 15px;
 }

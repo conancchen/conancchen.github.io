@@ -157,6 +157,9 @@ subtitle: Updated Sep 2026
     // left and goes in with a splash. At each wall it flip-turns (tucks
     // and somersaults underwater), glides off the wall in a streamline, takes
     // five dolphin kicks underwater, and surfaces swimming the other way.
+    // Dropped from too high, it's hurt: it floats limp, face down, until two
+    // scuba divers swim in, one from each side, and tow it out of the pool;
+    // after that the pool is left empty.
     (function () {
       var lane = document.getElementById('lane');
       var canvas = document.createElement('canvas');
@@ -227,6 +230,12 @@ subtitle: Updated Sep 2026
       var wet = 0;                 // still dripping, 1 fresh out of the water
       var entryAngle = 0;          // body angle going into the glide
       var entrySpeed = 0;          // speed going in, as a multiple of SPEED (0: off the dive)
+      var injured = false;         // going to be hurt when it goes under
+      var FLOAT = 1;               // px below the surface it floats, hurt
+      var DIVER_SPEED = 140;       // px/s the rescue divers swim in at
+      var rescue = null;           // the rescue under way: its stage and divers
+      var bubbles = [];            // the divers' breath, rising to the surface
+      var hurtColor = 'red';       // the swimmer's color while hurt, from --hurt
       var GRAVITY = 300;           // px/s/s: about twice real for its size, as true to scale looks floaty
       var UNDER_DIST = 0;          // swimming-pace seconds the glide and kicks carry it
       var time = 0, surface = [];
@@ -248,7 +257,8 @@ subtitle: Updated Sep 2026
         canvas.style.width = W + 'px';
         canvas.style.height = H + 'px';
         ctx.setTransform(scale, 0, 0, scale, 0, 0);
-        x = Math.min(Math.max(x, 20), W - 20);
+        // (Not while it's being towed out, partly past the side already)
+        if (mode !== 'hurt') x = Math.min(Math.max(x, 20), W - 20);
         // Pace the swimming so a whole length takes LAP seconds: the turn and
         // the underwater kicks cover a fixed number of swimming-pace seconds'
         // worth of distance, and the stroking makes up the rest
@@ -498,6 +508,67 @@ subtitle: Updated Sep 2026
         }
       }
 
+      // Hurt, floating face down at the surface and turned red to show it's in
+      // a bad way: head hanging, arms and legs dangling and swaying with the water
+      function limp() {
+        var sway = 0.15 * Math.sin(time * 1.7);
+        var alpha = ctx.globalAlpha;
+        ctx.globalAlpha = alpha * 0.45;
+        line(0, 0.3, Math.cos(1.4 - sway) * ARM, 0.3 + Math.sin(1.4 - sway) * ARM, 1.5);
+        line(-BODY, 0.8, -BODY - Math.cos(0.45) * LEG, 0.8 + Math.sin(0.45) * LEG, 1.8);
+        ctx.globalAlpha = alpha;
+        line(-BODY, 0.8, 0, 0, 2.6);
+        ctx.beginPath();
+        ctx.arc(2.3, 1.1, HEAD, 0, TAU);
+        ctx.fill();
+        line(0, 0.3, Math.cos(1.15 + sway) * ARM, 0.3 + Math.sin(1.15 + sway) * ARM, 1.5);
+        line(-BODY, 0.8, -BODY - Math.cos(0.3 + sway) * LEG, 0.8 + Math.sin(0.3 + sway) * LEG, 1.8);
+      }
+
+      // Where a diver takes hold of the hurt swimmer: either side of its middle
+      function holdAt(d) {
+        return [x - dir * (BODY + LEG) / 2 + d.side * 4, WATER + plunging[0] + 0.8];
+      }
+
+      // A rescue diver, lying flat and facing the way it swims: a tank on its
+      // back with a hose round to the mouth, a mask, and fins flapping slowly
+      // on the ends of its legs. Swimming in, its arms are tucked at its
+      // sides; once there, one reaches out to hold on to the swimmer.
+      function scuba(d) {
+        ctx.save();
+        ctx.translate(d.x, WATER + d.depth);
+        ctx.scale(d.facing, 1);
+        line(-10, -3, -2.5, -3, 2.4);
+        line(-BODY, 0, 0, 0, 2.6);
+        ctx.beginPath();
+        ctx.arc(2.6, -0.2, HEAD, 0, TAU);
+        ctx.fill();
+        ctx.lineWidth = 0.6;
+        ctx.beginPath();
+        ctx.moveTo(-2.5, -3.4);
+        ctx.quadraticCurveTo(3, -5.5, 4.4, 0.9);
+        ctx.stroke();
+        for (var k = 0; k < 2; k++) {
+          var kick = 0.3 * Math.sin(TAU * d.kick + k * Math.PI);
+          var fx = -BODY - Math.cos(kick) * LEG, fy = Math.sin(kick) * LEG;
+          var fin = kick - 0.35 * Math.cos(TAU * d.kick + k * Math.PI);
+          line(-BODY, 0, fx, fy, 1.8);
+          line(fx, fy, fx - Math.cos(fin) * 4.5, fy + Math.sin(fin) * 4.5, 1.3);
+        }
+        if (rescue.stage === 'swim in') {
+          line(0, 0.3, -5.5, 1.6, 1.4);
+        } else {
+          var hand = holdAt(d);
+          var hx = (hand[0] - d.x) * d.facing, hy = hand[1] - WATER - d.depth;
+          var far = Math.min(ARM / Math.hypot(hx, hy - 0.3), 1);
+          line(0, 0.3, hx * far, 0.3 + (hy - 0.3) * far, 1.4);
+        }
+        // The mask's lens, cut out of the head
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.fillRect(3.3, -1.3, 1.3, 1.5);
+        ctx.restore();
+      }
+
       // The body's angle out of the water, in the swimmer's own frame: tipped
       // from flat to hanging feet down, plus the swing
       function tilt() {
@@ -512,7 +583,16 @@ subtitle: Updated Sep 2026
       }
 
       function pose() {
-        if (aloft()) {
+        if (mode === 'hurt') {
+          // Turning from however it hit the water to lying limp along it
+          var settle = Math.min(modeTime / 0.6, 1);
+          settle = settle * settle * (3 - 2 * settle);
+          ctx.translate(x, WATER + plunging[0] + 0.4 * Math.sin(time * 1.3));
+          ctx.scale(dir, 1);
+          ctx.rotate(entryAngle * (1 - settle) + 0.06 * settle);
+          ctx.strokeStyle = ctx.fillStyle = hurtColor;
+          limp();
+        } else if (aloft()) {
           ctx.translate(x, WATER - lift);
           ctx.scale(dir, 1);
           ctx.rotate(tilt());
@@ -560,7 +640,7 @@ subtitle: Updated Sep 2026
       // while it is under the water
       function water() {
         surface.length = 0;
-        var churn = aloft() ? 0 : mode === 'swim' ? pace : 0.25;
+        var churn = aloft() || mode === 'hurt' ? 0 : mode === 'swim' ? pace : 0.25;
         for (var px = 0; px <= W + 2; px += 2) {
           var y = 0.7 * Math.sin(px * 0.045 - time * 1.4) + 0.35 * Math.sin(px * 0.12 + time * 2.1);
           var ahead = (px - x) * dir;
@@ -576,8 +656,9 @@ subtitle: Updated Sep 2026
           // Rings spreading out from where the dive went in
           splashes.forEach(function (hit) {
             var age = time - hit.time, from = Math.abs(px - hit.x);
+            var size = hit.size || 1;
             if (from < age * 60) {
-              y += 1.8 * Math.exp(-age * 1.6 - from / 40) * Math.sin(from * 0.4 - age * 11);
+              y += 1.8 * size * Math.exp(-age * 1.6 - from / (40 * Math.sqrt(size))) * Math.sin(from * 0.4 - age * 11);
             }
           });
           surface.push(WATER + y);
@@ -586,17 +667,25 @@ subtitle: Updated Sep 2026
 
       // Something hitting the water at px: a burst of spray and a ring of
       // ripples. The dive throws its spray forward; a dropped-in splash
-      // (lean 0) throws it evenly both ways.
-      function splash(px, lean, count) {
+      // (lean 0) throws it evenly both ways. The harder the hit (power, 1 by
+      // default), the higher and wider the spray flies, in bigger drops, and
+      // the taller the ripples and the further they carry.
+      function splash(px, lean, count, power) {
         if (lean === undefined) lean = 0.15;
-        splashes.push({ x: px, time: time });
+        power = power || 1;
+        var fling = Math.sqrt(power), drop = Math.min(1 + 0.15 * (power - 1), 1.5);
+        splashes.push({ x: px, time: time, size: Math.min(power, 3) });
         for (var i = 0; i < (count || 34) && foam.length < 400; i++) {
+          // Each drop flies off at its own angle from straight up, so the
+          // spray fans out into a crown, the steepest drops flying highest
+          var angle = (Math.random() - 0.5) * 1.3;
+          var speed = (16 + Math.random() * 36) * fling * (1 - 0.35 * Math.abs(angle));
           foam.push({
-            x: px + (Math.random() - 0.5) * 6,
+            x: px + (Math.random() - 0.5) * 6 * fling,
             y: WATER - Math.random(),
-            vx: (Math.random() - 0.5 + lean) * 40,
-            vy: -(15 + Math.random() * 35),
-            size: 0.6 + Math.random() * 0.7,
+            vx: Math.sin(angle) * speed + lean * 40 * fling,
+            vy: -Math.cos(angle) * speed,
+            size: (0.6 + Math.random() * 0.7) * drop,
             age: 0,
             life: 3,
             floating: false
@@ -615,6 +704,7 @@ subtitle: Updated Sep 2026
         var style = getComputedStyle(document.documentElement);
         var color = style.getPropertyValue('--muted');
         var under = parseFloat(style.getPropertyValue('--underwater')) || 0.3;
+        hurtColor = style.getPropertyValue('--hurt').trim() || 'red';
         water();
         ctx.clearRect(0, 0, W, H);
 
@@ -652,7 +742,17 @@ subtitle: Updated Sep 2026
           ctx.globalAlpha = band[1];
           ctx.strokeStyle = ctx.fillStyle = color;
           ctx.lineCap = 'round';
+          ctx.save();
           pose();
+          ctx.restore();
+          if (rescue) rescue.divers.forEach(scuba);
+          ctx.lineWidth = 0.6;
+          bubbles.forEach(function (b) {
+            if (b.age < 0) return;
+            ctx.beginPath();
+            ctx.arc(b.x, b.y, b.size, 0, TAU);
+            ctx.stroke();
+          });
           ctx.restore();
         });
 
@@ -720,6 +820,14 @@ subtitle: Updated Sep 2026
             });
           }
         }
+        // The divers' bubbles wobble up and burst at the surface
+        bubbles = bubbles.filter(function (b) {
+          b.age += dt;
+          if (b.age < 0) return true;
+          b.y -= 14 * dt;
+          b.x += 3 * Math.sin(b.age * 8 + b.seed) * dt;
+          return b.y > surfaceAt(b.x) + 0.5;
+        });
         foam = foam.filter(function (bit) {
           bit.age += dt;
           if (bit.floating) {
@@ -784,11 +892,25 @@ subtitle: Updated Sep 2026
           }
           if (clear && reach() >= lift) {
             clear = false;
-            var hard = Math.min(fall[1], 440);
+            // How high it would have had to be dropped from, by the
+            // shoulders, to hit the water this hard
+            var height = fall[1] * fall[1] / (2 * GRAVITY) + reach();
+            injured = height > hurtHeight();
+            // The splash grows with the height of the fall
+            var power = Math.min(Math.max(height / 80, 0.3), 5);
             splash(x - dir * reach() * Math.cos(tilt()) * 0.5,
-                   Math.min(Math.max(fall[0] / 200, -0.4), 0.4), 8 + hard / 5.5);
+                   Math.min(Math.max(fall[0] / 200, -0.4), 0.4),
+                   Math.min(8 + 24 * power, 120), power);
           }
-          if (lift <= 0) {
+          if (lift <= 0 && injured) {
+            entryAngle = tilt();
+            plunging = [-lift, fall[1]];
+            lift = hang = swing = swingV = flail = 0;
+            injured = false;
+            mode = 'hurt';
+            modeTime = 0;
+            rescue = { stage: 'wait', time: 0, divers: [], speed: 0, exit: 1 };
+          } else if (lift <= 0) {
             entryAngle = tilt();
             entrySpeed = Math.min(Math.max(Math.abs(fall[0]) / SPEED, 1), 1.7);
             drift = dir * fall[0] / SPEED;
@@ -798,6 +920,8 @@ subtitle: Updated Sep 2026
             modeTime = 0;
             entering = true;
           }
+        } else if (mode === 'hurt') {
+          hurting(dt);
         } else if (mode === 'swim') {
           phase += dt / CYCLE;
           if (phase >= 1) phase -= 1;
@@ -858,6 +982,77 @@ subtitle: Updated Sep 2026
         }
       }
 
+      // It survives a fall from anywhere below the bio's last line ("Find me
+      // on"), measured as it lands, since that line rewraps as its chip
+      // changes; from any higher, it's hurt
+      function hurtHeight() {
+        var last = document.querySelector('.bio p:last-child');
+        if (!last) return MAX_LIFT * 0.6;
+        return lane.getBoundingClientRect().top - last.getBoundingClientRect().bottom;
+      }
+
+      // Hurt: it sinks a little and bobs back up to float at the surface,
+      // drifting to a stop. A moment later a diver swims in from each side
+      // and they take hold of it, one either side of its middle, then tow it
+      // off out of the nearer side of the pool. Then the pool stays empty
+      // until the page is loaded again.
+      function hurting(dt) {
+        plunging[1] += (PLUNGE_SPRING * PLUNGE_SPRING * (FLOAT - plunging[0]) - 2 * PLUNGE_SPRING * plunging[1]) * dt;
+        plunging[0] = Math.min(plunging[0] + plunging[1] * dt, MAX_PLUNGE);
+        rescue.time += dt;
+        if (rescue.stage === 'carry') {
+          rescue.speed = Math.min(rescue.speed + 300 * dt, 110);
+          x += rescue.exit * rescue.speed * dt;
+        } else if (rescue.stage !== 'gone') {
+          fall[0] *= Math.exp(-1.5 * dt);
+          x = Math.min(Math.max(x + fall[0] * dt, 20 + BODY + LEG), W - 20 - BODY - LEG);
+        }
+        var mid = x - dir * (BODY + LEG) / 2;
+        if (rescue.stage === 'wait' && rescue.time > 0.25) {
+          rescue.stage = 'swim in';
+          rescue.divers = [-1, 1].map(function (side) {
+            return { side: side, x: side < 0 ? -30 : W + 30, depth: 13, facing: -side, kick: Math.random(), breath: 0.5 + Math.random() };
+          });
+        }
+        var arrived = 0;
+        rescue.divers.forEach(function (d) {
+          var to = mid + d.side * 10, gap = to - d.x, speed = 0;
+          if (rescue.stage === 'swim in') {
+            speed = Math.min(DIVER_SPEED, Math.abs(gap) * 8);
+            d.x += Math.sign(gap) * speed * dt;
+            if (Math.abs(gap) > 1) d.facing = Math.sign(gap);
+            else arrived++;
+          } else {
+            d.x = to;
+            speed = rescue.speed;
+          }
+          // Coming up under the swimmer as they get close
+          var depth = Math.abs(gap) < 50 ? 7 : 13;
+          d.depth += (depth - d.depth) * (1 - Math.exp(-12 * dt));
+          d.kick += dt * (0.8 + speed / 30);
+          d.breath -= dt;
+          if (d.breath <= 0) {
+            d.breath = 1.6 + Math.random() * 0.6;
+            for (var i = 0; i < 3; i++) {
+              bubbles.push({ x: d.x + d.facing * 4, y: WATER + d.depth - 1, age: -i * 0.15, size: 0.6 + Math.random() * 0.5, seed: Math.random() * TAU });
+            }
+          }
+        });
+        if (rescue.stage === 'swim in' && arrived === 2) {
+          rescue.stage = 'grip';
+          rescue.time = 0;
+          rescue.divers.forEach(function (d) { d.facing = -d.side; });
+        } else if (rescue.stage === 'grip' && rescue.time > 0.25) {
+          rescue.stage = 'carry';
+          rescue.exit = mid < W / 2 ? -1 : 1;
+          rescue.divers.forEach(function (d) { d.facing = rescue.exit; });
+        } else if (rescue.stage === 'carry' && (rescue.exit < 0 ? mid < -50 : mid > W + 50)) {
+          rescue.stage = 'gone';
+          rescue.time = 0;
+          rescue.divers = [];
+        }
+      }
+
       size();
       // Refitting the pace times a few dozen simulated lengths, so wait for
       // the window to settle rather than doing it on every resize event
@@ -883,7 +1078,8 @@ subtitle: Updated Sep 2026
       // it's being dragged; let go and it swims on from there. Dragging up
       // lifts it clean out of the water, dangling and dripping, and letting go
       // up there drops it back in with a splash. A press turns into a hold
-      // once it's been down a moment or has moved a few pixels.
+      // once it's been down a moment or has moved a few pixels. Dropped from
+      // too high, it's hurt, and can't be picked up again.
       var held = false, press = null, carried = [0, 0];
       function poolX(event) {
         return event.clientX - lane.getBoundingClientRect().left;
@@ -892,7 +1088,10 @@ subtitle: Updated Sep 2026
         return event.clientY - lane.getBoundingClientRect().top;
       }
       function grab() {
+        // Hurt, it's left to the divers
+        if (mode === 'hurt') return;
         held = true;
+        injured = false;
         lane.classList.add('holding');
         // Caught on the way down, it's held from where it is
         if (mode === 'fall') {
@@ -944,6 +1143,13 @@ subtitle: Updated Sep 2026
         press = { x: poolX(event), y: poolY(event), lift: 0, timer: setTimeout(grab, 180) };
         // Keep hearing about the pointer once it strays off the thin strip
         try { lane.setPointerCapture(event.pointerId); } catch (e) {}
+      });
+      // A press here is for the water, not for starting a text selection that
+      // follows the drag across the page
+      lane.addEventListener('mousedown', function (event) {
+        event.preventDefault();
+        var selection = window.getSelection && window.getSelection();
+        if (selection) selection.removeAllRanges();
       });
       lane.addEventListener('pointermove', function (event) {
         if (!press) return;
