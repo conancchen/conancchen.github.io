@@ -320,7 +320,7 @@ permalink: /bookshelf/
     // A fish tank on the lower shelf, left of the crate: a glass box seen
     // like the crate, a little from above, with sand on the bottom, a few
     // plants swaying, and fish swimming back and forth while bubbles rise.
-    // Pressing it turns the light in its hood on or off (the water dims). It's set behind
+    // Pressing it turns its light on or off (the water dims). It's set behind
     // the crate.
     // It stands centered under the books
     var tW = 172, tL = (X0 + booksR) / 2 - (tW + DX * 1.6) / 2, tH = 122, tD = 1.6, tR = tL + tW, tB = LINE2 - 1, tT = tB - tH;
@@ -337,10 +337,12 @@ permalink: /bookshelf/
     el('polygon', { points: waterShape }, wclip);
     var water = el('g', { 'clip-path': 'url(#tank-water)' }, tank);
     el('polygon', { points: waterShape, 'class': 'tank-water' }, water);
-    // sand: its top running back, and its front against the glass
+    // sand: a level bed, its top running back, its front and right side
+    // against the glass
     var sandT = tB - 11;
-    el('polygon', { points: pts([[tL, sandT], [tR, sandT + 2], [tR + tdx, sandT + tdy + 1], [tL + tdx, sandT + tdy]]), 'class': 'tank-sand-top' }, water);
-    el('path', { d: 'M' + tL + ',' + sandT + ' Q' + (tL + tW * 0.3) + ',' + (sandT - 3) + ' ' + (tL + tW * 0.55) + ',' + (sandT + 1) + ' T' + tR + ',' + (sandT + 2) + ' L' + tR + ',' + tB + ' L' + tL + ',' + tB + ' Z', 'class': 'tank-sand' }, water);
+    el('polygon', { points: pts([[tL, sandT], [tR, sandT], [tR + tdx, sandT + tdy], [tL + tdx, sandT + tdy]]), 'class': 'tank-sand-top' }, water);
+    el('polygon', { points: pts([[tR, sandT], [tR + tdx, sandT + tdy], [tR + tdx, tB + tdy], [tR, tB]]), 'class': 'tank-sand-side' }, water);
+    el('rect', { x: tL, y: sandT, width: tW, height: tB - sandT, 'class': 'tank-sand' }, water);
     for (var pb = 0; pb < 26; pb++) {
       el('circle', { cx: tL + 4 + (pb * 37 % (tW - 8)), cy: sandT + 4 + (pb * 13 % 6), r: 0.9 + (pb % 3) * 0.3, 'class': 'tank-pebble' }, water);
     }
@@ -410,12 +412,8 @@ permalink: /bookshelf/
     // the near glass: a faint tint, then the frame
     el('rect', { x: tL, y: tT, width: tW, height: tH, 'class': 'tank-glass' }, tank);
     el('rect', { x: tL, y: tT, width: tW, height: tH, 'class': 'deco-line', style: 'fill:none' }, tank);
-    // the hood on top, with its light along the front
-    var hoodH = 6;
-    el('polygon', { points: pts([[tL - 1, tT - hoodH], [tR + 1, tT - hoodH], [tR + 1 + tdx, tT - hoodH + tdy], [tL - 1 + tdx, tT - hoodH + tdy]]), 'class': 'deco-line tank-hood-top' }, tank);
-    el('polygon', { points: pts([[tR + 1, tT - hoodH], [tR + 1 + tdx, tT - hoodH + tdy], [tR + 1 + tdx, tT + tdy], [tR + 1, tT]]), 'class': 'deco-line tank-hood-side' }, tank);
-    el('rect', { x: tL - 1, y: tT - hoodH, width: tW + 2, height: hoodH, 'class': 'deco-line tank-hood' }, tank);
-    el('rect', { x: tL + 6, y: tT - 2.2, width: tW - 12, height: 1.4, 'class': 'tank-bulb' }, tank);
+    // the open top: the glass's top edges all round
+    el('polygon', { points: pts([[tL, tT], [tL + tdx, tT + tdy], [tR + tdx, tT + tdy], [tR, tT]]), 'class': 'deco-line tank-rim' }, tank);
     // a shade over the water for when the light's off
     el('polygon', { points: waterShape, 'class': 'tank-dark' }, tank);
 
