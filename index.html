@@ -151,13 +151,30 @@ subtitle: Updated Sep 2026
       }
 
       // Hovering a place named in the bio lights up its experience, just as
-      // hovering the experience itself would
+      // hovering the experience itself would, and slides its note open (any
+      // other open one shuts); moving off shuts it again, if the hover opened it
       var section = document.querySelector('.timeline');
       document.querySelectorAll('.bio a[data-exp]').forEach(function (link) {
         var entry = section.querySelector('.entry[data-exp="' + link.dataset.exp + '"]');
         if (!entry) return;
-        function on() { section.classList.add('is-linked'); entry.classList.add('is-hot'); }
-        function off() { section.classList.remove('is-linked'); entry.classList.remove('is-hot'); }
+        function on() {
+          section.classList.add('is-linked');
+          entry.classList.add('is-hot');
+          if (entry.open && !entry.classList.contains('is-closing')) return;
+          entries.forEach(function (other) {
+            if (other !== entry && other.open && !other.classList.contains('is-closing')) slide(other, false);
+          });
+          entry._byLink = true;
+          slide(entry, true);
+        }
+        function off() {
+          section.classList.remove('is-linked');
+          entry.classList.remove('is-hot');
+          if (entry._byLink) {
+            entry._byLink = false;
+            slide(entry, false);
+          }
+        }
         link.addEventListener('mouseenter', on);
         link.addEventListener('mouseleave', off);
         link.addEventListener('focus', on);
@@ -167,6 +184,7 @@ subtitle: Updated Sep 2026
       entries.forEach(function (entry) {
         entry.querySelector('summary').addEventListener('click', function (e) {
           e.preventDefault();
+          entry._byLink = false;
           var opening = !entry.open || entry.classList.contains('is-closing');
           entries.forEach(function (other) {
             if (other !== entry && other.open && !other.classList.contains('is-closing')) slide(other, false);
@@ -187,7 +205,7 @@ subtitle: Updated Sep 2026
       <a href="/strava/" class="row-link">Custom Strava</a>
     </div>
     <div class="row">
-      <a href="/study/" class="row-link">Study With Me</a>
+      <a href="{{ site.baseurl }}/bookshelf/" class="row-link">Bookshelf</a>
     </div>
   </section>
 

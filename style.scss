@@ -124,17 +124,6 @@ a:focus {
   white-space: nowrap;
 }
 
-// The email link goes without an underline, and fades a touch on hover
-.bio .email-link {
-  text-decoration: none;
-  transition: opacity 0.15s ease;
-}
-
-.bio .email-link:hover,
-.bio .email-link:focus {
-  opacity: 0.7;
-}
-
 // In em so the logo follows the chip's text size
 .chip-icon {
   width: 0.93em;
@@ -283,7 +272,7 @@ $reveal: '.subtitle, .header-actions, .bio, .block, .rule, .updated, .webring, .
 /* SECTIONS   */
 /**************/
 .block {
-  margin-top: 48px;
+  margin-top: 24px;
 }
 
 .block-label {
@@ -571,7 +560,7 @@ $dot-center: calc(4px + 20px / 2);
   user-select: none;
   -webkit-user-select: none;
   height: 2px;
-  margin: 48px 0 16px;
+  margin: 40px 0 16px;
 }
 
 // An invisible strip along the water line takes the pointer: a click drops a
@@ -919,3 +908,508 @@ $dot-center: calc(4px + 20px / 2);
 .pc-run {
   --leg: var(--run);
 }
+
+/**************/
+/* BOOKSHELF  */
+/**************/
+// The bookshelf page: what I'm reading now and just finished, standing as
+// blocks on a shelf plank, and the same books listed under it
+.bookshelf {
+  position: relative;
+  margin-top: 48px;
+}
+
+// The card naming a painting, floated under its frame on hover; made like
+// the Ironman card on the home page
+.art-card {
+  position: absolute;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 14px;
+  white-space: nowrap;
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  background: var(--bg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 12px 40px rgba(0, 0, 0, 0.08);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 17px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+  pointer-events: none;
+}
+
+.art-card.is-shown {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+.art-title {
+  color: var(--text);
+  font-size: 13px;
+}
+
+// The painting's frame: light oak on the light page, walnut on the dark one
+:root {
+  --frame-face: #c9a878;
+  --frame-top: #d9bf95;
+  --frame-side: #a8875f;
+  --frame-lip: #e8d6b4;
+}
+
+:root[data-theme="dark"] {
+  --frame-face: #5c4331;
+  --frame-top: #6f5440;
+  --frame-side: #3f2e22;
+  --frame-lip: #8c7150;
+}
+
+.frame-face { fill: var(--frame-face); }
+.frame-top { fill: var(--frame-top); }
+.frame-side { fill: var(--frame-side); }
+.frame-lip { fill: var(--frame-lip); }
+
+// The crate the art prints stand in: pale pine boards, darker down its side
+// and inside, with "Art" on the front
+:root {
+  --crate: #d8b483;
+  --crate-side: #b48c5c;
+  --crate-inside: #7d5f3d;
+  --crate-ink: rgba(70, 45, 20, 0.55);
+}
+
+:root[data-theme="dark"] {
+  --crate: #9b7a52;
+  --crate-side: #765a3a;
+  --crate-inside: #4a3824;
+  --crate-ink: rgba(30, 20, 10, 0.6);
+}
+
+.bin-front { fill: var(--crate); }
+.bin-side { fill: var(--crate-side); }
+.bin-inside { fill: var(--crate-inside); }
+
+.bin-label {
+  fill: var(--crate-ink);
+  font-size: 11px;
+  text-anchor: middle;
+}
+
+// The crate pulls forward a touch when hovered
+.art-bin {
+  cursor: pointer;
+  outline: none;
+}
+
+.bin-body {
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.art-bin.is-open .bin-body {
+  transform: translate(-5px, 4px);
+}
+
+// The Art section, opened from the crate: it slides open above the reading
+// list with the prints large, each with its title and painter under it, the
+// row sized so they come out the same height and fill the width
+.art-section {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
+}
+
+.art-section.is-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.art-section-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.art-row {
+  display: flex;
+  gap: 14px;
+  padding: 14px 0 4px;
+}
+
+.art-fig {
+  flex: var(--aspect) 1 0;
+  min-width: 0;
+  margin: 0;
+}
+
+.art-fig img {
+  display: block;
+  width: 100%;
+  aspect-ratio: var(--aspect);
+  object-fit: cover;
+  border-radius: 3px;
+}
+
+.art-fig figcaption {
+  display: flex;
+  flex-direction: column;
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.art-fig-by {
+  color: var(--muted);
+}
+
+// Four of the twelve months, in a row of their own under the paintings
+.art-scroll-fig {
+  margin: 18px 0 0;
+}
+
+.month-row {
+  display: flex;
+  gap: 10px;
+}
+
+.month-row img {
+  flex: 1 1 0;
+  min-width: 0;
+  height: auto;
+  border-radius: 2px;
+}
+
+.art-scroll-fig > figcaption {
+  display: flex;
+  flex-direction: column;
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+// A painting pressed in the art section, opened large over the page
+.art-section img {
+  cursor: zoom-in;
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(20, 20, 18, 0.82);
+  cursor: zoom-out;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.lightbox.is-open {
+  opacity: 1;
+}
+
+.lightbox:focus {
+  outline: none;
+}
+
+.lightbox[hidden] {
+  display: none;
+}
+
+.lightbox-fig {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  transform: scale(0.97);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.lightbox.is-open .lightbox-fig {
+  transform: none;
+}
+
+.lightbox-row {
+  display: flex;
+  gap: 12px;
+}
+
+.lightbox-row img {
+  display: block;
+  flex: 1 1 0;
+  min-width: 0;
+  width: 100%;
+  height: auto;
+  border-radius: 2px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.lightbox-fig figcaption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 12px;
+  color: #f2f2f0;
+  font-size: 12px;
+  line-height: 16px;
+  text-align: center;
+}
+
+.lightbox-fig .art-fig-by {
+  color: #a8a8a4;
+}
+
+// Narrow screens stack them one above the other
+@media screen and (max-width: 520px) {
+  .art-row {
+    flex-direction: column;
+  }
+}
+
+.shelf-deco[tabindex] {
+  cursor: pointer;
+  outline: none;
+}
+
+.cabinet {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+// The vines hang down over the list under the shelf without getting in the
+// way of hovering it
+.vine {
+  pointer-events: none;
+}
+
+:root {
+  --plank-top: #ebe6dc;
+  --plank-front: #d6cfc1;
+  --plank-end: #c9c1b1;
+  --shelf-ink: #1a1a18;
+}
+
+:root[data-theme="dark"] {
+  --plank-top: #2c2a27;
+  --plank-front: #3a3733;
+  --plank-end: #312e2a;
+  --shelf-ink: #000;  // black outlines on the dark page, rather than gray
+}
+
+.plank-top,
+.plank-front,
+.plank-end {
+  stroke: var(--shelf-ink);
+  stroke-width: 0.7;
+  stroke-linejoin: round;
+}
+
+.plank-top {
+  fill: var(--plank-top);
+}
+
+.plank-front {
+  fill: var(--plank-front);
+}
+
+.plank-end {
+  fill: var(--plank-end);
+}
+
+.shelf-book {
+  cursor: pointer;
+  outline: none;
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.15s ease;
+}
+
+.shelf-book.is-picked {
+  transform: translateY(-8px);
+}
+
+.bookshelf.has-picked .shelf-book:not(.is-picked),
+.bookshelf.has-picked .read:not(.is-picked) {
+  opacity: 0.4;
+}
+
+.book-spine,
+.book-top {
+  stroke: var(--shelf-ink);
+  stroke-width: 0.7;
+  stroke-linejoin: round;
+}
+
+.book-side {
+  stroke: none;
+}
+
+.deco-line {
+  stroke: var(--shelf-ink);
+  stroke-width: 0.7;
+  stroke-linejoin: round;
+}
+
+.stem {
+  fill: none;
+  stroke: #3f6e30;
+  stroke-width: 1;
+  stroke-linecap: round;
+}
+
+// The pothos hangs still until the cursor brushes through it; the script
+// beside the shelf then swings each vine and lets it settle
+.vine,
+.vine .leaf-flutter {
+  transform-box: view-box;
+}
+
+
+.book-far {
+  fill: none;
+  stroke: var(--shelf-ink);
+  stroke-width: 0.7;
+  stroke-dasharray: 2.5 1.8;
+}
+
+.book-title {
+  font-size: 10px;
+  letter-spacing: 0.1px;
+}
+
+// Under the cabinet, the same books as a list: a small cover in the spine's
+// color, the title, and who wrote it in gray
+.cabinet.block,
+.shelf-list.block {
+  margin-top: 0;
+}
+
+// While a book on the shelf is hovered, only it shows in the list
+.shelf-list .read {
+  display: none;
+}
+
+.shelf-list .read.is-shown {
+  display: flex;
+  animation: read-in 0.25s ease;
+}
+
+@keyframes read-in {
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+}
+
+.shelf-label {
+  margin: 28px 0 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--rule);
+  font-size: 14px;
+  font-weight: inherit;
+}
+
+.reads {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.read {
+  display: flex;
+  gap: 14px;
+  padding: 12px 0;
+  outline: none;
+  cursor: default;
+  transition: opacity 0.15s ease;
+}
+
+// The covers in the list are pictures of the books' own covers, each at its
+// own shape (an audiobook's square art stays square)
+.cover {
+  flex: none;
+  align-self: flex-start;
+  width: 46px;
+  height: auto;
+  border-radius: 1px 3px 3px 1px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+}
+
+.read-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.read-by,
+.read-note {
+  color: var(--muted);
+}
+
+.now-tag {
+  color: rgb(55, 135, 240);
+}
+
+// In dark mode, everything on the shelf and the pictures under it give off
+// a faint glow, so they lift off the dark page
+:root[data-theme="dark"] {
+  .shelf-book,
+  .art-bin {
+    filter: drop-shadow(0 0 5px rgba(255, 244, 220, 0.132));
+  }
+
+  .art-fig img,
+  .month-row img,
+  .read .cover {
+    box-shadow: 0 0 14px rgba(255, 244, 220, 0.11);
+  }
+}
+
+// The pothos's pot, a soft white, a little dimmer on the dark page; there its
+// leaves are outlined in dark green rather than the page's gray lines, so
+// they stay rich instead of chalky
+:root {
+  --pot: #f2f0eb;
+  --pot-rim: #f7f6f2;
+}
+
+:root[data-theme="dark"] {
+  --pot: #cfccc4;
+  --pot-rim: #dad7d0;
+
+  .plant .leaf-shape {
+    stroke: #16290f;
+  }
+
+  .plant .stem {
+    stroke: #4f7d3d;
+  }
+
+  .plant .deco-line:not(.leaf-shape) {
+    stroke: #2a2a28;
+  }
+}
+
+// The bookend: the same pale pine as the art crate, its top a little lighter
+:root {
+  --bookend: var(--crate);
+  --bookend-top: #e6c99f;
+  --bookend-side: var(--crate-side);
+}
+
+:root[data-theme="dark"] {
+  --bookend-top: #b08e64;
+}
+
+.bookend-face { fill: var(--bookend); }
+.bookend-top { fill: var(--bookend-top); }
+.bookend-side { fill: var(--bookend-side); }
