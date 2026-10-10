@@ -11,13 +11,13 @@ subtitle: Updated Sep 2026
     Currently, I research humanoid robots in the <a href="https://pvl.cs.princeton.edu/" data-exp="pvl">Princeton Vision &amp; Learning Lab</a>. Previously, I interned at <a href="https://scale.com/" data-exp="scale">Scale AI</a>.
   </p>
   <p>
-    I also compete as a Division I swimmer and recreational triathlete. This summer, I finished my first <span class="preview"><a href="{{ site.baseurl }}/pdfs/im70.3.pdf" aria-describedby="im-card">Ironman 70.3</a><span class="preview-card" id="im-card" role="tooltip">
+    I also compete as a Division I swimmer and recreational triathlete. This summer, I finished my first <span class="preview"><button type="button" class="preview-link" aria-expanded="false" aria-controls="im-card">Ironman 70.3</button><span class="preview-card" id="im-card" role="tooltip">
       <span class="pc-head"><span class="pc-title">Musselman 70.3</span><span class="pc-date">Jul 2026</span></span>
       <span class="pc-total">4:57:16</span>
       <span class="pc-legs">
-        <span class="pc-leg pc-swim"><span class="pc-name">Swim</span><span class="pc-time">27:45</span><span class="pc-pace">1:26 /100m</span></span>
-        <span class="pc-leg pc-bike"><span class="pc-name">Bike</span><span class="pc-time">2:38:56</span><span class="pc-pace">21.1 mph</span></span>
-        <span class="pc-leg pc-run"><span class="pc-name">Run</span><span class="pc-time">1:44:40</span><span class="pc-pace">7:59 /mi</span></span>
+        <span class="pc-leg pc-swim"><span class="pc-name">Swim</span><span class="pc-dist">1.2 mi</span><span class="pc-time">27:45</span><span class="pc-pace">1:19 /100yd</span></span>
+        <span class="pc-leg pc-bike"><span class="pc-name">Bike</span><span class="pc-dist">56 mi</span><span class="pc-time">2:38:56</span><span class="pc-pace">21.1 mph</span></span>
+        <span class="pc-leg pc-run"><span class="pc-name">Run</span><span class="pc-dist">13.1 mi</span><span class="pc-time">1:44:40</span><span class="pc-pace">7:59 /mi</span></span>
       </span>
       <span class="pc-rank">159th of 1,943 overall</span>
     </span></span> in under 5 hours.
@@ -90,6 +90,31 @@ subtitle: Updated Sep 2026
       current = (current + 1) % PROFILES.length;
       show(PROFILES[current]);
     }, HOLD);
+  })();
+
+  // Pressing the Ironman link opens its results card, and pressing it again,
+  // anywhere else, or Esc closes it. On a narrow screen the card shifts left
+  // so it never runs past the edge.
+  (function () {
+    var preview = document.querySelector('.preview');
+    var link = preview.querySelector('.preview-link');
+    var card = preview.querySelector('.preview-card');
+    function toggle(on) {
+      preview.classList.toggle('is-open', on);
+      link.setAttribute('aria-expanded', on);
+      card.style.left = '';
+      if (on) {
+        var over = card.getBoundingClientRect().right - (document.documentElement.clientWidth - 16);
+        if (over > 0) card.style.left = -over + 'px';
+      }
+    }
+    link.addEventListener('click', function () { toggle(!preview.classList.contains('is-open')); });
+    document.addEventListener('click', function (e) {
+      if (!preview.contains(e.target)) toggle(false);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') toggle(false);
+    });
   })();
 
 </script>

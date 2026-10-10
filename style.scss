@@ -755,11 +755,34 @@ $dot-center: calc(4px + 20px / 2);
 /**************/
 /* PREVIEW    */
 /**************/
-// Hovering the Ironman link floats a little results card over it: the total,
-// a bar splitting the race into swim, bike and run by time, and the placings.
-// Only where there's a pointer to hover with; on a phone the link just opens.
+// Pressing the Ironman link (or hovering it, where there's a pointer) floats a
+// little results card over it: the total, a bar splitting the race into swim,
+// bike and run by time, and the placings.
 .preview {
   position: relative;
+}
+
+// A button dressed as one of the bio links
+.bio .preview-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: var(--rule);
+  text-decoration-thickness: 1px;
+  text-decoration-skip-ink: none;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.15s ease;
+}
+
+.bio .preview-link:hover,
+.bio .preview-link:focus-visible,
+.preview.is-open .preview-link {
+  outline: none;
+  text-decoration-color: var(--text);
 }
 
 .preview-card {
@@ -786,6 +809,12 @@ $dot-center: calc(4px + 20px / 2);
   transform: translateY(4px);
   transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
   pointer-events: none;
+}
+
+.preview.is-open .preview-card {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
 }
 
 @media (hover: hover) {
@@ -815,8 +844,8 @@ $dot-center: calc(4px + 20px / 2);
 }
 
 // The race runs down the card like the experiences do: a thin line with a
-// dot for each leg in its sport's color, and the leg's time and pace beside
-// it. Each time the card opens, the dots pop in one after another as the line
+// dot for each leg in its sport's color, and the leg's distance, time and
+// pace beside it. Each time the card opens, the dots pop in one after another as the line
 // draws down to them.
 .pc-legs {
   display: flex;
@@ -827,7 +856,7 @@ $dot-center: calc(4px + 20px / 2);
 .pc-leg {
   position: relative;
   display: grid;
-  grid-template-columns: 40px 1fr auto;
+  grid-template-columns: 40px 52px 1fr auto;
   padding-left: 18px;
 }
 
@@ -859,33 +888,40 @@ $dot-center: calc(4px + 20px / 2);
 
 .preview:hover .pc-leg::before,
 .preview:focus-within .pc-leg::before,
+.preview.is-open .pc-leg::before,
 .preview:hover .pc-leg::after,
-.preview:focus-within .pc-leg::after {
+.preview:focus-within .pc-leg::after,
+.preview.is-open .pc-leg::after {
   transform: none;
 }
 
 .preview:hover .pc-swim::after,
-.preview:focus-within .pc-swim::after {
+.preview:focus-within .pc-swim::after,
+.preview.is-open .pc-swim::after {
   transition-delay: 0.08s;
 }
 
 .preview:hover .pc-swim::before,
-.preview:focus-within .pc-swim::before {
+.preview:focus-within .pc-swim::before,
+.preview.is-open .pc-swim::before {
   transition-delay: 0.16s;
 }
 
 .preview:hover .pc-bike::after,
-.preview:focus-within .pc-bike::after {
+.preview:focus-within .pc-bike::after,
+.preview.is-open .pc-bike::after {
   transition-delay: 0.3s;
 }
 
 .preview:hover .pc-bike::before,
-.preview:focus-within .pc-bike::before {
+.preview:focus-within .pc-bike::before,
+.preview.is-open .pc-bike::before {
   transition-delay: 0.38s;
 }
 
 .preview:hover .pc-run::after,
-.preview:focus-within .pc-run::after {
+.preview:focus-within .pc-run::after,
+.preview.is-open .pc-run::after {
   transition-delay: 0.52s;
 }
 
@@ -1110,10 +1146,25 @@ $dot-center: calc(4px + 20px / 2);
   color: #a8a8a4;
 }
 
-// Narrow screens stack them one above the other
+// Narrow screens put the two upright paintings side by side, their columns
+// split by aspect so they stand the same height, with the wide one beneath
 @media screen and (max-width: 520px) {
   .art-row {
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 0.664fr 0.864fr;
+    row-gap: 18px;
+  }
+
+  .art-fig:nth-child(1) {
+    grid-area: 1 / 1;
+  }
+
+  .art-fig:nth-child(2) {
+    grid-area: 2 / 1 / 3 / 3;
+  }
+
+  .art-fig:nth-child(3) {
+    grid-area: 1 / 2;
   }
 }
 
