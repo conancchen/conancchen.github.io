@@ -3,7 +3,7 @@
 #   color   the spine's color
 #   ink     light or dark text on it
 #   pages   how many pages it has (its thickness on the shelf follows)
-#   height  how tall it stands, px (the top shelf is about 220px high)
+#   height  how tall it stands, px (the top shelf is about 190px high)
 #   current true while I'm still reading it (it gets a pulsing dot)
 #   note    an optional line shown under it in the list
 #   cover   the cover picture shown in the list, in images/books
@@ -13,7 +13,7 @@
   color: "#f4f2ee"
   ink: dark
   pages: 327
-  height: 192
+  height: 163
   current: true
 - title: Flash Boys
   cover: flash-boys.jpg
@@ -21,7 +21,7 @@
   color: "#ed1b2c"
   ink: light
   pages: 274
-  height: 201
+  height: 171
   current: true
 - title: One Hundred Years of Solitude
   cover: one-hundred-years-of-solitude.jpg
@@ -29,25 +29,25 @@
   color: "#46794f"
   ink: light
   pages: 417
-  height: 194
+  height: 165
 - title: South of the Border, West of the Sun
   cover: south-of-the-border-west-of-the-sun.jpg
   author: Haruki Murakami
   color: "#c73532"
   ink: light
   pages: 213
-  height: 184
+  height: 156
 - title: Kafka on the Shore
   cover: kafka-on-the-shore.jpg
   author: Haruki Murakami
   color: "#dbaabb"
   ink: dark
   pages: 467
-  height: 194
+  height: 165
 - title: Going Infinite
   cover: going-infinite.jpg
   author: Michael Lewis
   color: "#f4f3ef"
   ink: dark
   pages: 288
-  height: 201
+  height: 171
