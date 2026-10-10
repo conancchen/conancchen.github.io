@@ -12,25 +12,31 @@
   author: Haruki Murakami
   color: "#f4f2ee"
   ink: dark
-  width: 30
+  width: 36
   height: 140
   current: true
 - title: Flash Boys
   cover: flash-boys.jpg
   author: Michael Lewis
-  color: "#c6352c"
+  color: "#ed1b2c"
   ink: light
-  width: 26
+  width: 31
   height: 146
   current: true
-- title: The Picture of Dorian Gray
-  cover: dorian-gray.jpg
-  author: Oscar Wilde
-  color: "#1f1d1b"
+- title: One Hundred Years of Solitude
+  cover: one-hundred-years-of-solitude.jpg
+  author: Gabriel García Márquez
+  color: "#46794f"
+  ink: light
+  width: 36
+  height: 142
+- title: South of the Border, West of the Sun
+  cover: south-of-the-border-west-of-the-sun.jpg
+  author: Haruki Murakami
+  color: "#c73532"
   ink: light
   width: 24
-  height: 132
-  current: true
+  height: 134
 - title: Kafka on the Shore
   cover: kafka-on-the-shore.jpg
   author: Haruki Murakami
@@ -41,21 +47,7 @@
 - title: Going Infinite
   cover: going-infinite.jpg
   author: Michael Lewis
-  color: "#f5c518"
-  ink: dark
-  width: 26
-  height: 146
-- title: Heart of a Dog
-  cover: heart-of-a-dog.jpg
-  author: Mikhail Bulgakov
-  color: "#d08716"
-  ink: dark
-  width: 16
-  height: 124
-- title: Brave New World
-  cover: brave-new-world.jpg
-  author: Aldous Huxley
   color: "#f4f3ef"
   ink: dark
-  width: 24
-  height: 128
+  width: 31
+  height: 146

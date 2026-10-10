@@ -919,41 +919,6 @@ $dot-center: calc(4px + 20px / 2);
   margin-top: 48px;
 }
 
-// The card naming a painting, floated under its frame on hover; made like
-// the Ironman card on the home page
-.art-card {
-  position: absolute;
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 10px 14px;
-  white-space: nowrap;
-  border: 1px solid var(--rule);
-  border-radius: 14px;
-  background: var(--bg);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 12px 40px rgba(0, 0, 0, 0.08);
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 17px;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(4px);
-  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
-  pointer-events: none;
-}
-
-.art-card.is-shown {
-  opacity: 1;
-  visibility: visible;
-  transform: none;
-}
-
-.art-title {
-  color: var(--text);
-  font-size: 13px;
-}
-
 // The painting's frame: light oak on the light page, walnut on the dark one
 :root {
   --frame-face: #c9a878;
@@ -1058,41 +1023,21 @@ $dot-center: calc(4px + 20px / 2);
   display: flex;
   flex-direction: column;
   margin-top: 8px;
-  font-size: 12px;
-  line-height: 16px;
+  font-size: 11px;
+  line-height: 14px;
+}
+
+// Titles stay on one line, running a little past a narrow painting if need be
+.art-fig .art-fig-title {
+  white-space: nowrap;
 }
 
 .art-fig-by {
   color: var(--muted);
 }
 
-// Four of the twelve months, in a row of their own under the paintings
-.art-scroll-fig {
-  margin: 18px 0 0;
-}
-
-.month-row {
-  display: flex;
-  gap: 10px;
-}
-
-.month-row img {
-  flex: 1 1 0;
-  min-width: 0;
-  height: auto;
-  border-radius: 2px;
-}
-
-.art-scroll-fig > figcaption {
-  display: flex;
-  flex-direction: column;
-  margin-top: 8px;
-  font-size: 12px;
-  line-height: 16px;
-}
-
 // A painting pressed in the art section, opened large over the page
-.art-section img {
+.art-fig img {
   cursor: zoom-in;
 }
 
@@ -1232,24 +1177,55 @@ $dot-center: calc(4px + 20px / 2);
   transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.15s ease;
 }
 
+// A hovered (or pinned) book pops up out of the row
 .shelf-book.is-picked {
-  transform: translateY(-8px);
+  transform: translate(-4px, -14px);
 }
 
-.bookshelf.has-picked .shelf-book:not(.is-picked),
-.bookshelf.has-picked .read:not(.is-picked) {
+// The other books fade back while one is picked or the art is out, over
+// their backings so the shelf behind them stays hidden
+.book-backing {
+  fill: var(--bg);
+}
+
+.book-art {
+  transition: opacity 0.15s ease;
+}
+
+.bookshelf.has-picked .shelf-book:not(.is-picked) .book-art,
+.bookshelf.has-art .shelf-book:not(.is-picked) .book-art {
   opacity: 0.4;
 }
 
+// Books are outlined in solid black, a little heavier than the rest of the
+// shelf, down to the page block framed by the covers on top
 .book-spine,
-.book-top {
-  stroke: var(--shelf-ink);
-  stroke-width: 0.7;
+.book-side,
+.book-edge {
+  stroke: #000;
+  stroke-width: 0.9;
   stroke-linejoin: round;
 }
 
-.book-side {
-  stroke: none;
+// The page block on a book's top: cream, with fine lines for the pages,
+// and the black outline of the top drawn over their ends
+.book-pages {
+  fill: #f3eddf;
+}
+
+.book-edge {
+  fill: none;
+}
+
+// The inside of a cover, where it stands up past the pages
+.book-wall {
+  fill: #cfc4ad;
+}
+
+.book-page-lines {
+  fill: none;
+  stroke: #b7aa90;
+  stroke-width: 0.15;
 }
 
 .deco-line {
@@ -1277,7 +1253,6 @@ $dot-center: calc(4px + 20px / 2);
   fill: none;
   stroke: var(--shelf-ink);
   stroke-width: 0.7;
-  stroke-dasharray: 2.5 1.8;
 }
 
 .book-title {
@@ -1292,7 +1267,7 @@ $dot-center: calc(4px + 20px / 2);
   margin-top: 0;
 }
 
-// While a book on the shelf is hovered, only it shows in the list
+// Only the picked book shows in the list
 .shelf-list .read {
   display: none;
 }
@@ -1312,7 +1287,6 @@ $dot-center: calc(4px + 20px / 2);
 .shelf-label {
   margin: 28px 0 0;
   padding-bottom: 8px;
-  border-bottom: 1px solid var(--rule);
   font-size: 14px;
   font-weight: inherit;
 }
@@ -1355,6 +1329,11 @@ $dot-center: calc(4px + 20px / 2);
   color: var(--muted);
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .shelf-list .read.is-shown { animation: none; }
+  .shelf-book { transition: none; }
+}
+
 .now-tag {
   color: rgb(55, 135, 240);
 }
@@ -1368,7 +1347,6 @@ $dot-center: calc(4px + 20px / 2);
   }
 
   .art-fig img,
-  .month-row img,
   .read .cover {
     box-shadow: 0 0 14px rgba(255, 244, 220, 0.11);
   }

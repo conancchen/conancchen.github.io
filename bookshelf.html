@@ -5,16 +5,16 @@ subtitle: Bookshelf
 permalink: /bookshelf/
 ---
 <section class="bookshelf">
-  <div class="art-card" id="art-card" role="tooltip">
-    <span class="art-title"></span>
-    <span class="art-by"></span>
-  </div>
-  <svg class="cabinet block" id="cabinet" viewBox="0 0 550 210" role="img" aria-label="A shelf of what I'm reading now and just finished"></svg>
+  <svg class="cabinet block" id="cabinet" viewBox="0 0 600 178" role="img" aria-label="A shelf of what I'm reading now and just finished"></svg>
 
   <div class="art-section" id="art-section">
     <div class="art-section-inner">
       <h2 class="shelf-label">Selected art</h2>
       <div class="art-row">
+        <figure class="art-fig" style="--aspect: 0.664">
+          <img src="{{ site.baseurl }}/images/art/zojoji-snow-hasui.jpg" alt="Snow at Zōjō-ji Temple, by Kawase Hasui" loading="lazy">
+          <figcaption><span class="art-fig-title">Snow at Zōjō-ji Temple</span><span class="art-fig-by">Kawase Hasui, 1925</span></figcaption>
+        </figure>
         <figure class="art-fig" style="--aspect: 1.57">
           <img src="{{ site.baseurl }}/images/art/monk-by-the-sea.jpg" alt="The Monk by the Sea, by Caspar David Friedrich" loading="lazy">
           <figcaption><span class="art-fig-title">The Monk by the Sea</span><span class="art-fig-by">Caspar David Friedrich, 1808–10</span></figcaption>
@@ -24,15 +24,6 @@ permalink: /bookshelf/
           <figcaption><span class="art-fig-title">Sisyphus</span><span class="art-fig-by">Titian, 1548–49</span></figcaption>
         </figure>
       </div>
-      <figure class="art-scroll-fig">
-        <div class="month-row">
-          <img src="{{ site.baseurl }}/images/art/twelve-months/01.jpg" alt="" width="500" height="880" loading="lazy">
-          <img src="{{ site.baseurl }}/images/art/twelve-months/05.jpg" alt="" width="500" height="880" loading="lazy">
-          <img src="{{ site.baseurl }}/images/art/twelve-months/08.jpg" alt="" width="500" height="880" loading="lazy">
-          <img src="{{ site.baseurl }}/images/art/twelve-months/12.jpg" alt="" width="500" height="880" loading="lazy">
-        </div>
-        <figcaption><span class="art-fig-title">Activities of the Twelve Lunar Months (selection)</span><span class="art-fig-by">Qing court painters, 18th century</span></figcaption>
-      </figure>
     </div>
   </div>
 
@@ -43,16 +34,16 @@ permalink: /bookshelf/
     </figure>
   </div>
 
-  <div class="block shelf-list" id="shelf-list">
+  <div class="block shelf-list" id="shelf-list" hidden>
   <div class="shelf-list-inner">
   <h2 class="shelf-label">Recent reading</h2>
   <ul class="reads" id="reads">
     {% for book in site.data.books %}
     <li class="read{% if book.current %} is-current{% endif %}" data-i="{{ forloop.index0 }}" tabindex="0">
-      <img class="cover" src="{{ site.baseurl }}/images/books/{{ book.cover }}" alt="" width="46" height="70" loading="lazy">
+      <img class="cover" src="{{ site.baseurl }}/images/books/{{ book.cover }}" alt="Cover of {{ book.title | escape }}" width="46" height="70" loading="lazy">
       <span class="read-text">
         <span class="read-title">{{ book.title }}</span>
-        <span class="read-by">{{ book.author }}{% if book.current %}<span class="now-tag"> · reading now</span>{% endif %}</span>
+        <span class="read-by">{{ book.author }}{% if book.current %}<span class="now-tag"> · currently reading</span>{% endif %}</span>
         {% if book.note %}<span class="read-note">{{ book.note }}</span>{% endif %}
       </span>
     </li>
@@ -65,15 +56,15 @@ permalink: /bookshelf/
 
 <script>
   // Pressing a painting in the art section opens it large over the page, at
-  // up to three quarters of the screen, with its caption (a month scroll
-  // opens all four together); pressing anywhere or Esc closes it
+  // up to three quarters of the screen, with its caption; pressing anywhere
+  // or Esc closes it
   (function () {
     var box = document.getElementById('lightbox');
     var row = box.querySelector('.lightbox-row');
     var title = box.querySelector('.art-fig-title'), by = box.querySelector('.art-fig-by');
     var last = null;
-    // Opens one painting, or a set of them side by side (the month scrolls
-    // all open together), sized together to fit three quarters of the screen
+    // Opens a painting (or several side by side), sized to fit three quarters
+    // of the screen
     function open(pics, t, b) {
       last = document.activeElement;
       row.innerHTML = '';
@@ -98,9 +89,8 @@ permalink: /bookshelf/
       setTimeout(function () { box.hidden = true; }, 200);
       if (last) last.focus();
     }
-    document.querySelectorAll('.art-section img').forEach(function (pic) {
-      var set = pic.closest('.month-row');
-      var pics = set ? Array.prototype.slice.call(set.querySelectorAll('img')) : [pic];
+    document.querySelectorAll('.art-fig img').forEach(function (pic) {
+      var pics = [pic];
       var fig = pic.closest('figure');
       var cap = fig.querySelector(':scope > figcaption');
       pic.tabIndex = 0;
@@ -125,16 +115,16 @@ permalink: /bookshelf/
   // Draws the shelf: a plank seen from a little above and to the left, its
   // top running back and its front edge showing, and the books standing on
   // it side by side as blocks. Each shows its spine (in its own color, the
-  // title running up it), its top, and its right side in a darker shade with
-  // the far edge dashed. Hovering a book (on the shelf or in the list) lifts
-  // it and marks both.
+  // title running up it), its top with the page edges showing between the
+  // covers, and its right side in a darker shade. Hovering a book (on the
+  // shelf or in the list) lifts it and marks both.
   (function () {
     var BOOKS = {{ site.data.books | jsonify }};
     var svg = document.getElementById('cabinet');
     var NS = 'http://www.w3.org/2000/svg';
     // DX, DY: how far back-and-up a book's depth runs on the page
     var BOOK_DEEP = 2;
-    var W = 550, H = 178, LINE = 162, PLANK = 6, GAP = 3, DX = 9, DY = -7, X0 = 4;
+    var W = 600, H = 178, LINE = 162, PLANK = 6, GAP = 3, DX = 9, DY = -7, X0 = 4;
 
     function el(name, attrs, parent) {
       var node = document.createElementNS(NS, name);
@@ -169,15 +159,44 @@ permalink: /bookshelf/
       // A book runs about as deep as the shelf, mostly hidden by its neighbors
       var dx = DX * BOOK_DEEP, dy = DY * BOOK_DEEP;
       var side = [[R, top], [R + dx, top + dy], [R + dx, LINE + dy], [R, LINE]];
-      el('polygon', { points: pts(side), 'class': 'book-side', style: 'fill:' + shade(b.color, 0.72) }, g);
-      el('polygon', { points: pts([[L, top], [R, top], [R + dx, top + dy], [L + dx, top + dy]]), 'class': 'book-top', style: 'fill:' + shade(b.color, 1.18) }, g);
-      el('polyline', { points: pts([[L + dx, top + dy], [R + dx, top + dy], [R + dx, LINE + dy]]), 'class': 'book-far' }, g);
-      var spine = el('rect', { x: L, y: top, width: w, height: h, 'class': 'book-spine' }, g);
+      // A backing in the page's color fills the book's outline, so when the
+      // drawing over it fades back, nothing behind shows through
+      el('polygon', { points: pts([[L, LINE], [L, top], [L + dx, top + dy], [R + dx, top + dy], [R + dx, LINE + dy], [R, LINE]]), 'class': 'book-backing' }, g);
+      var art = el('g', { 'class': 'book-art' }, g);
+      el('polygon', { points: pts(side), 'class': 'book-side', style: 'fill:' + shade(b.color, 0.72) }, art);
+      // Its top: the page block, sitting a little down inside the two cover
+      // boards and the spine's edge, which stand up around it in a lighter
+      // shade
+      function at(across, depth) { return [L + across + dx * depth, top + dy * depth]; }
+      function line(list) { return 'M' + pts(list).replace(/ /g, ' L'); }
+      // The covers and the spine's edge come out equally thick, measured
+      // square to each band: the covers run back along the depth, the
+      // spine's edge across
+      var thick = 1.8, len = Math.sqrt(dx * dx + dy * dy);
+      var board = thick * len / -dy, near = thick / -dy;
+      // How far down the pages sit; less than the boards are thick, so the
+      // boards hide the pages' near and right edges
+      var sink = 1.5;
+      function down(q) { return [q[0], q[1] + sink]; }
+      var block = [at(board, near), at(w - board, near), at(w - board, 1), at(board, 1)];
+      el('polygon', { points: pts(block.map(down)), 'class': 'book-pages' }, art);
+      // ruled with the edges of the pages, and a faint line along their back
+      var lines = line([at(board, 1), at(w - board, 1)].map(down));
+      for (var p = board + 0.8; p < w - board; p += 0.8) lines += line([at(p, near), at(p, 1)].map(down));
+      el('path', { d: lines, 'class': 'book-page-lines' }, art);
+      // The inside of the near cover shows above the pages, in shadow
+      el('polygon', { points: pts([at(board, near), at(board, 1), down(at(board, 1)), down(at(board, near))]), 'class': 'book-wall' }, art);
+      // The boards: a U around the pages, open at the back
+      var boards = [at(0, 0), at(w, 0), at(w, 1), at(w - board, 1), at(w - board, near), at(board, near), at(board, 1), at(0, 1)];
+      el('polygon', { points: pts(boards), 'class': 'book-top', style: 'fill:' + shade(b.color, 1.18) }, art);
+      // Outlined in black all round but the back, between the ends of the covers
+      el('path', { d: line([at(board, 1), at(0, 1), at(0, 0)]) + ' ' + line([at(board, 1), at(board, near), at(w - board, near), at(w - board, 1), at(w, 1)]), 'class': 'book-edge' }, art);
+      var spine = el('rect', { x: L, y: top, width: w, height: h, 'class': 'book-spine' }, art);
       spine.style.fill = b.color;
       // The title runs up the spine, shrinking if it's too long for it
-      var clip = el('clipPath', { id: 'spine-' + i }, g);
+      var clip = el('clipPath', { id: 'spine-' + i }, art);
       el('rect', { x: L, y: top + 5, width: w, height: h - 10 }, clip);
-      var holder = el('g', { 'clip-path': 'url(#spine-' + i + ')' }, g);
+      var holder = el('g', { 'clip-path': 'url(#spine-' + i + ')' }, art);
       var title = el('text', {
         x: 0, y: 0, 'class': 'book-title',
         transform: 'translate(' + (L + w / 2 + 3.2) + ',' + (LINE - 7) + ') rotate(-90)'
@@ -219,72 +238,64 @@ permalink: /bookshelf/
       el('rect', { x: L, y: T, width: w, height: h, 'class': 'deco-line', style: 'fill:' + front }, parent);
     }
 
-    // A print, unframed and flat.
-    // Hovering (or tapping) one floats a little card under it naming it.
-    function print(L, w, h, src, title, by, base, parent) {
-      var T = base - h, R = L + w, B = base;
-      var g = el('g', { 'class': 'shelf-deco print', tabindex: 0 }, parent);
-      el('image', { href: src, x: L, y: T, width: w, height: h, preserveAspectRatio: 'xMidYMid slice' }, g);
-      function show(on) {
-        if (on) {
-          cardTitle.textContent = title;
-          cardBy.textContent = by;
-          var at = g.getBoundingClientRect(), box = shelf.getBoundingClientRect();
-          card.style.left = Math.max(0, Math.min(at.left - box.left, box.width - card.offsetWidth)) + 'px';
-          card.style.top = at.bottom - box.top + 10 + 'px';
-        }
-        card.classList.toggle('is-shown', on);
-      }
-      g.addEventListener('mouseenter', function () { show(true); });
-      g.addEventListener('mouseleave', function () { show(false); });
-      g.addEventListener('focus', function () { show(true); });
-      g.addEventListener('blur', function () { show(false); });
-      return g;
+    // A print, unframed and flat
+    function print(L, w, h, src, base, parent) {
+      el('image', { href: src, x: L, y: base - h, width: w, height: h, preserveAspectRatio: 'xMidYMid slice', 'class': 'shelf-deco print' }, parent);
     }
 
     // The art bin: an open wooden crate past the books, its inside in shadow, with
-    // three prints standing in it. Hovering it pulls the crate forward a
-    // little.
+    // three prints standing in it. Opening it pulls the crate forward a little.
     // centered in the open stretch between the bookend and the plant (whose
     // leaves spread about 24px left of its pot's middle)
-    var binW = 120, binH = 36, plantLeft = W - DX * 2.2 - 46 - 24;
+    var binW = 150, binH = 40, plantLeft = W - DX * 2.2 - 46 - 24;
     var binL = (x + plantLeft - binW - DX * 1.6) / 2, binT = LINE - binH;
-    var bin = el('g', { 'class': 'art-bin', tabindex: 0, role: 'button', 'aria-expanded': 'false', 'aria-controls': 'art-section', 'aria-label': 'Art: show the paintings' });
+    var bin = el('g', { 'class': 'art-bin', tabindex: 0, role: 'button', 'aria-expanded': 'false', 'aria-controls': 'art-section', 'aria-label': 'Art: show the paintings', 'aria-pressed': 'false' });
     var body = el('g', { 'class': 'bin-body' }, bin);
     el('polygon', { points: pts([[binL, binT], [binL + binW, binT], [binL + binW + DX * 1.6, binT + DY * 1.6], [binL + DX * 1.6, binT + DY * 1.6]]), 'class': 'deco-line bin-inside' }, body);
-    // [picture, width, height, left in the crate, title, painter, how far back]
+    // [picture, width, height, left in the crate, how far back]
     var prints = [
-      ['monk-by-the-sea.jpg', 96, 61, 18, 'The Monk by the Sea', 'Caspar David Friedrich, 1808–10', 1.2],
-      ['twelve-months/01.jpg', 37, 65, 5, 'Activities of the Twelve Lunar Months', 'Qing court painters, 18th century', 0.6],
-      ['sisyphus-titian.jpg', 44, 51, 62, 'Sisyphus', 'Titian, 1548–49', 0.35]
+      ['monk-by-the-sea.jpg', 122, 78, 20, 1.2],
+      ['zojoji-snow-hasui.jpg', 50, 75, 6, 0.6],
+      ['sisyphus-titian.jpg', 58, 67, 80, 0.35]
     ];
-    prints.forEach(function (p, k) {
-      var back = p[6], L = binL + p[3] + DX * back, base = LINE - 6 + DY * back;
-      print(L, p[1], p[2], '{{ site.baseurl }}/images/art/' + p[0], p[4], p[5], base, body);
+    prints.forEach(function (p) {
+      var back = p[4], L = binL + p[3] + DX * back, base = LINE - 6 + DY * back;
+      print(L, p[1], p[2], '{{ site.baseurl }}/images/art/' + p[0], base, body);
     });
     el('polygon', { points: pts([[binL + binW, binT], [binL + binW + DX * 1.6, binT + DY * 1.6], [binL + binW + DX * 1.6, LINE + DY * 1.6], [binL + binW, LINE]]), 'class': 'deco-line bin-side' }, body);
     el('rect', { x: binL, y: binT, width: binW, height: binH, 'class': 'deco-line bin-front' }, body);
     var label = el('text', { x: binL + binW / 2, y: binT + binH / 2 + 4, 'class': 'bin-label' }, body);
     label.textContent = 'Art';
-    function openBin(on) {
-      bin.classList.toggle('is-open', on);
-      if (!on) card.classList.remove('is-shown');
-    }
-    bin.addEventListener('mouseenter', function () { openBin(true); });
-    bin.addEventListener('mouseleave', function () { openBin(false); });
-    bin.addEventListener('focus', function () { openBin(true); });
-    bin.addEventListener('blur', function (e) { if (!bin.contains(e.relatedTarget)) openBin(false); });
-    // Pressing the crate opens (or closes) the Art section above the reading
-    // list, where the prints are shown large
+    // Like a book, hovering (or focusing) the crate pulls it forward and opens
+    // the Art section above the reading list, where the prints are shown
+    // large; pressing it pins the section open, so the prints can be pressed
+    // in turn, until it's pressed again or Esc
     var artSection = document.getElementById('art-section');
-    bin.addEventListener('click', function () {
-      var open = !artSection.classList.contains('is-open');
-      artSection.classList.toggle('is-open', open);
-      bin.setAttribute('aria-expanded', open);
-      openBin(open);
-    });
+    var artPinned = false;
+    function showArt(on) {
+      on = on || artPinned;
+      artSection.classList.toggle('is-open', on);
+      bin.classList.toggle('is-open', on);
+      bin.setAttribute('aria-expanded', on);
+      bin.setAttribute('aria-pressed', artPinned);
+      // the books fade back while the art is out, as they do for a picked book
+      document.querySelector('.bookshelf').classList.toggle('has-art', on);
+    }
+    function pinArt() {
+      artPinned = !artPinned;
+      showArt(false);
+    }
+    bin.addEventListener('mouseenter', function () { showArt(true); });
+    bin.addEventListener('focus', function () { showArt(true); });
+    bin.addEventListener('mouseleave', function () { showArt(false); });
+    bin.addEventListener('blur', function () { showArt(false); });
+    bin.addEventListener('click', pinArt);
     bin.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); bin.dispatchEvent(new Event('click')); }
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pinArt(); }
+    });
+    document.addEventListener('keydown', function (e) {
+      // Esc closes an open painting first
+      if (e.key === 'Escape' && artPinned && document.getElementById('lightbox').hidden) { artPinned = false; showArt(false); }
     });
 
     // Round things (the pot) are drawn from a profile: half-widths
@@ -415,39 +426,44 @@ permalink: /bookshelf/
       }
     });
 
-    // Hovering either the book on the shelf or its line in the list marks both
+    // The reading list stays hidden until a book is picked. Hovering (or
+    // focusing) a book on the shelf pops it up and shows just its line in the
+    // list; pressing a book pins it that way until it's pressed again or Esc.
+    // On a touch screen, pressing is how a book is picked.
     var reads = document.querySelectorAll('.read');
-    function mark(i) {
-      groups.forEach(function (g, j) { g.classList.toggle('is-picked', j === i); });
-      reads.forEach(function (r, j) { r.classList.toggle('is-picked', j === i); });
-      document.querySelector('.bookshelf').classList.toggle('has-picked', i !== null);
-    }
-    // The reading list shows every book, until a book on the shelf is
-    // hovered: then it narrows to just that one, and goes back to the whole
-    // list once the cursor is off the books. On a touch screen, a tap on a
-    // book narrows it, and a second tap on that book shows them all again.
     var list = document.getElementById('shelf-list');
-    var showing = null;
-    function show(i) {
-      showing = i;
-      reads.forEach(function (r, j) { r.classList.toggle('is-shown', i === null || j === i); });
-    }
-    show(null);
-    groups.forEach(function (g, i) {
-      g.addEventListener('mouseenter', function () { show(i); });
-      g.addEventListener('mouseleave', function () { show(null); });
-      g.addEventListener('focus', function () { show(i); });
-      g.addEventListener('blur', function () { show(null); });
-      g.addEventListener('pointerup', function (e) {
-        if (e.pointerType !== 'mouse') show(showing === i ? null : i);
+    var shelf = document.querySelector('.bookshelf');
+    var pinned = null;
+    function mark(i) {
+      if (pinned !== null) i = pinned;
+      groups.forEach(function (g, j) {
+        g.classList.toggle('is-picked', j === i);
+        g.setAttribute('aria-pressed', j === pinned);
       });
+      reads.forEach(function (r, j) { r.classList.toggle('is-shown', j === i); });
+      list.hidden = i === null;
+      shelf.classList.toggle('has-picked', i !== null);
+    }
+    function pin(i) {
+      pinned = pinned === i ? null : i;
+      mark(null);
+    }
+    mark(null);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && pinned !== null) pin(pinned);
     });
-    groups.concat(Array.prototype.slice.call(reads)).forEach(function (node) {
-      var i = +node.getAttribute('data-i');
-      node.addEventListener('mouseenter', function () { mark(i); });
-      node.addEventListener('focus', function () { mark(i); });
-      node.addEventListener('mouseleave', function () { mark(null); });
-      node.addEventListener('blur', function () { mark(null); });
+    groups.forEach(function (g, i) {
+      g.setAttribute('role', 'button');
+      g.setAttribute('aria-label', BOOKS[i].title + ', ' + BOOKS[i].author);
+      g.setAttribute('aria-controls', 'shelf-list');
+      g.addEventListener('mouseenter', function () { mark(i); });
+      g.addEventListener('focus', function () { mark(i); });
+      g.addEventListener('mouseleave', function () { mark(null); });
+      g.addEventListener('blur', function () { mark(null); });
+      g.addEventListener('click', function () { pin(i); });
+      g.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pin(i); }
+      });
     });
   })();
 </script>
