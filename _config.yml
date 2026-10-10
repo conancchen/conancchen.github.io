@@ -1,0 +1,7 @@
+# Name of your site (displayed in the header)
+name: Conan Chen
+
+url: "https://conancchen.github.io"
+
+# Keeps the "Updated" date on Princeton time
+timezone: America/New_York

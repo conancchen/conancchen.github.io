@@ -1,0 +1,921 @@
+---
+---
+
+/**************/
+/* THEME      */
+/**************/
+// Light is the default; the toggle opts into dark and remembers the choice
+:root {
+  color-scheme: light;
+  --bg: #fff;
+  --text: #16150f;
+  --muted: #8a8a8a;
+  --rule: #e0dfdb;
+  --link: #6f6e6a;
+  --underline: #d3d2ce;
+  --swim: #2a78d6;  // the sports' colors, as on /strava
+  --bike: #006e00;
+  --run: #e8605f;
+  --toast-bg: #3a3a38;
+  --toast-text: #f7f6f3;
+  --lane: #adc3da;  // the water line
+  --foam: #94aecb;  // spray and foam off the swimmer
+  --hurt: #d93025;  // the swimmer, hurt from a fall
+  --underwater: 0.6;  // how strongly the swimmer shows below the surface
+  --glow: rgba(55, 135, 240, 0.22);  // the water's tint just under the surface
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #121212;
+  --text: #f2f2f0;
+  --muted: #8a8a8a;
+  --rule: #3a3a3a;
+  --link: #9a9a98;
+  --underline: #55554f;
+  --swim: #3987e5;
+  --bike: #008300;
+  --run: #e66767;
+  --toast-bg: #f2f2f0;
+  --toast-text: #121212;
+  --lane: #3a5a78;
+  --foam: #e6e6e4;
+  --hurt: #ff5a4f;
+  --underwater: 0.35;
+  --glow: rgba(60, 160, 250, 0.3);
+}
+
+
+
+/**************/
+/* BASE       */
+/**************/
+* {
+  box-sizing: border-box;
+}
+
+// Mobile browsers otherwise inflate long paragraphs (the bio) but not short
+// lines (the heading), so the two stop matching on phones
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  // Inter's variable weight sits just above regular, on a 20px line, a hair
+  // tight, matching chanbin.xyz
+  font-weight: 436;
+  line-height: calc(20 / 14);
+  letter-spacing: -0.09px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+// Buttons and fields take the page's type rather than the browser's
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+a {
+  color: var(--link);
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+a:hover,
+a:focus {
+  opacity: 0.7;
+}
+
+// Bio links read as body text with a faint underline that darkens on hover
+.bio a {
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-color: var(--rule);
+  text-decoration-thickness: 1px;
+  text-decoration-skip-ink: none;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.15s ease;
+}
+
+.bio a:hover,
+.bio a:focus {
+  opacity: 1;
+  text-decoration-color: var(--text);
+}
+
+// The LinkedIn and email links keep a small logo in front, inline with the
+// text; like the other bio links, only the words take the underline
+.bio .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  vertical-align: -2px;
+  white-space: nowrap;
+}
+
+// The email link goes without an underline, and fades a touch on hover
+.bio .email-link {
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.bio .email-link:hover,
+.bio .email-link:focus {
+  opacity: 0.7;
+}
+
+// In em so the logo follows the chip's text size
+.chip-icon {
+  width: 0.93em;
+  height: 0.93em;
+  flex: none;
+}
+
+// The social chip cycles between profiles; its width eases to fit each name,
+// and the scrambling letters are clipped to it while they settle
+.bio .chip-rotating {
+  overflow: hidden;
+  transition: text-decoration-color 0.15s ease, width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.chip-icon-slot {
+  display: inline-flex;
+  flex: none;
+}
+
+// The page comes in piece by piece, each one coming into focus a beat after the last.
+// The layout's script numbers the pieces (--i) and swaps anim-hide for anim-play.
+// The name in the header isn't one of them: it holds still, so moving between
+// here, /strava and /study only changes what's under it
+$reveal: '.subtitle, .header-actions, .bio, .block, .rule, .updated, .webring, .term';
+
+.anim-hide {
+  #{$reveal} {
+    opacity: 0;
+  }
+}
+
+.anim-play {
+  #{$reveal} {
+    animation: blur-in 1.35s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    animation-delay: calc(var(--i, 0) * 70ms);
+  }
+}
+
+@keyframes blur-in {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(4px);
+  }
+}
+
+/**************/
+/* LAYOUT     */
+/**************/
+.page {
+  width: 100%;
+  max-width: 582px;  // a 550px text column plus the 16px gutters, matching /strava and /study
+  margin: 0 auto;
+  padding: 80px 16px 40px;
+}
+
+.header {
+  padding-bottom: 8px;
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.header h1 {
+  font-size: 14px;
+  font-weight: 474;
+  margin: 0;
+}
+
+// A click shouldn't leave a focus ring behind; a keyboard tab still should
+.icon-button:focus:not(:focus-visible),
+.entry > summary:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  margin-left: auto;  // stays on the right on pages without a title
+  // The buttons' padding and the moon's inset inside its icon would leave it
+  // short of the column's right edge; this pulls its rim onto that edge
+  margin-right: -5.5px;
+  // The 26px buttons would stretch the title's 20px line and push the
+  // subtitle down, so they overhang it instead
+  margin-top: -3px;
+  margin-bottom: -3px;
+}
+
+.icon-button {
+  display: inline-flex;
+  background: transparent;
+  border: none;
+  padding: 4px;
+  margin: 0;
+  line-height: 0;
+  color: var(--muted);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.icon-button:hover {
+  color: var(--text);
+}
+
+// The theme toggle shows a moon on the light page and a sun on the dark one,
+// matching /strava and /study
+.icon-theme .icon-sun,
+:root[data-theme="dark"] .icon-theme .icon-moon {
+  display: none;
+}
+
+:root[data-theme="dark"] .icon-theme .icon-sun {
+  display: inline;
+}
+
+// Moving between pages on this site (and /strava, /study) keeps the name in
+// place while the rest swaps
+@view-transition {
+  navigation: auto;
+}
+
+.header h1 {
+  view-transition-name: site-name;
+}
+
+.bio {
+  padding-top: 16px;
+}
+
+.bio p {
+  margin: 0 0 14.4px;
+  text-wrap: pretty;
+}
+
+.bio p:last-child {
+  margin-bottom: 0;
+}
+
+/**************/
+/* SECTIONS   */
+/**************/
+.block {
+  margin-top: 48px;
+}
+
+.block-label {
+  font-size: 14px;
+  font-weight: inherit;
+  color: var(--muted);
+  margin: 0 0 8px;
+}
+
+.block-label-plain {
+  font-weight: inherit;
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+// Hovering a row dims the others in its list, so the one under the pointer
+// stands out
+.block .row {
+  transition: opacity 0.1s ease-in-out;
+}
+
+.block:not(.timeline):has(.row:hover) .row:not(:hover) {
+  opacity: 0.4;
+}
+
+// Each experience stays on one line, logo and year included; a name too
+// long for the screen trails off instead of wrapping
+.row-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// A small logo ahead of each experience, sat on the text's baseline
+.row-icon {
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  vertical-align: -2px;
+  border-radius: 3px;
+}
+
+// Logos drawn in plain black are flipped to white on the dark page
+:root[data-theme="dark"] .row-icon-mono {
+  filter: invert(1);
+}
+
+.row-year {
+  color: var(--muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+// An entry opens a note about itself when pressed
+.entry > summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.entry > summary::-webkit-details-marker {
+  display: none;
+}
+
+// A link inside a note is invisible until you hover it
+.row-note a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.row-note a:hover,
+.row-note a:focus {
+  opacity: 1;
+  color: var(--text);
+}
+
+.row-note {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0;
+  padding: 0 0 8px;
+  max-width: 60ch;
+}
+
+
+// The experiences hang off a thin rail, one dot per entry, centred on its
+// first line: where I am now pulses in the pool's blue, what's coming is a
+// hollow dot on a dashed stretch of rail, and what's done is filled and muted
+$dot: 7px;
+$dot-center: calc(4px + 20px / 2);
+
+.timeline .entry {
+  position: relative;
+  padding-left: 20px;
+}
+
+.timeline .entry::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 0;
+  bottom: 0;
+  border-left: 1px solid var(--rule);
+}
+
+.timeline .entry:first-of-type::before {
+  top: $dot-center;
+}
+
+.timeline .entry:last-of-type::before {
+  bottom: auto;
+  height: $dot-center;
+}
+
+// The rail on to what's coming is a row of round dots
+.timeline .entry.is-next::before {
+  left: 2.5px;
+  width: 2px;
+  border-left: 0;
+  top: calc(#{$dot-center} + #{$dot} / 2 + 2px);
+  bottom: calc(#{$dot} / 2 + 2px - #{$dot-center});
+  background: radial-gradient(circle, var(--muted) 1px, transparent 1px) center top / 2px 5px;
+  background-repeat: no-repeat space;
+}
+
+// The dots run all the way to the next dot, so its own solid rail starts
+// from there
+.timeline .entry.is-next + .entry::before {
+  top: $dot-center;
+}
+
+.timeline .entry::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: calc(#{$dot-center} - #{$dot} / 2);
+  width: $dot;
+  height: $dot;
+  border-radius: 50%;
+  background: var(--muted);
+  transition: transform 0.18s ease, opacity 0.1s ease-in-out;
+}
+
+// What's done is green, like a finished task
+.timeline .entry.is-past::after {
+  background: rgb(52, 168, 83);
+}
+
+.timeline .entry.is-next::after {
+  background: var(--bg);
+  box-shadow: inset 0 0 0 1px var(--muted);
+}
+
+.timeline .entry.is-now::after {
+  background: rgb(55, 135, 240);
+  animation: now-pulse 2.4s ease-out infinite;
+}
+
+// An open entry's dot swells a touch
+.timeline .entry[open]:not(.is-closing)::after {
+  transform: scale(1.3);
+}
+
+// Hovering anywhere in an experience, its note included, dims every other
+// one: name, year, note and dot. The rail stays put, so the line never breaks.
+// Hovering its name in the bio does the same (the script marks it hot).
+.timeline .entry > * {
+  transition: opacity 0.1s ease-in-out;
+}
+
+.timeline:has(.entry:hover) .entry:not(:hover) > *,
+.timeline:has(.entry:hover) .entry:not(:hover)::after,
+.timeline.is-linked .entry:not(.is-hot) > *,
+.timeline.is-linked .entry:not(.is-hot)::after {
+  opacity: 0.4;
+}
+
+// As the page comes in, the experiences arrive one by one from the top down,
+// the rail drawing itself downward from each to the next: the hollow dot pops
+// in, the dots run down to the blue dot, which pops in and starts to pulse,
+// and the line carries on down to the green one. Each piece of rail grows
+// from its top end, and each experience comes in as the rail reaches its dot.
+@keyframes entry-in {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes rail-draw {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes dot-pop {
+  from {
+    transform: scale(0);
+  }
+  60% {
+    transform: scale(1.35);
+  }
+}
+
+.anim-play .timeline .entry > summary {
+  animation: entry-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.anim-play .timeline .entry::before {
+  transform-origin: top;
+  animation: rail-draw 0.3s linear backwards;
+}
+
+.anim-play .timeline .entry::after {
+  animation: dot-pop 0.3s ease-out backwards;
+}
+
+// Next: first in, at the top
+.anim-play .timeline .entry.is-next > summary,
+.anim-play .timeline .entry.is-next::after {
+  animation-delay: 0.4s;
+}
+
+.anim-play .timeline .entry.is-next::before {
+  animation-duration: 0.25s;
+  animation-delay: 0.48s;
+}
+
+// Now: as the dots reach it
+.anim-play .timeline .entry.is-now > summary {
+  animation-delay: 0.73s;
+}
+
+.anim-play .timeline .entry.is-now::after {
+  animation: dot-pop 0.3s ease-out 0.73s backwards, now-pulse 2.4s ease-out 1.1s infinite;
+}
+
+.anim-play .timeline .entry.is-now::before {
+  animation-duration: 0.15s;
+  animation-delay: 0.8s;
+}
+
+// Done: last, as the line comes down to it
+.anim-play .timeline .entry.is-past::before {
+  animation-duration: 0.15s;
+  animation-delay: 0.95s;
+}
+
+.anim-play .timeline .entry.is-past > summary,
+.anim-play .timeline .entry.is-past::after {
+  animation-delay: 1.1s;
+}
+
+@keyframes now-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(55, 135, 240, 0.5);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 6px rgba(55, 135, 240, 0);
+  }
+}
+
+.row-link {
+  color: var(--text);
+}
+
+// The divider above the clock is the surface of a pool, drawn with its
+// swimmer on a canvas by the script in index.html. The lane itself sits above
+// the page, not just its canvas: while the reveal animates it, the lane
+// becomes its own layer, and the canvas's z-index alone would then only lift
+// it within the lane, leaving it under the text animating in around it
+.lane {
+  position: relative;
+  z-index: 1;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  height: 2px;
+  margin: 48px 0 16px;
+}
+
+// An invisible strip along the water line takes the pointer: a click drops a
+// splash, and a press and drag carries the swimmer, or lifts it out. The canvas itself never
+// takes the pointer, so the text around it stays clickable. A drag on a phone
+// moves the swimmer rather than scrolling the page.
+.lane::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -8px;
+  height: 18px;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.lane.holding::before {
+  cursor: grabbing;
+}
+
+// While a press on the water is down, nothing on the page selects, so
+// dragging the swimmer (or a long press on a phone) can't highlight the
+// text around the pool
+.pool-pressed,
+.pool-pressed * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
+}
+
+// The canvas's waterline sits where the line is (the script sets its top, as
+// the canvas reaches up to the header)
+.swimmer {
+  position: absolute;
+  left: 0;
+  top: -60px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.updated {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+// The clock and the Princeton webring share the last line: clock on the
+// left, the ring's prev / home / next links on the right
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+// Kept on the page for the ring's widget, but shrunk to a few pixels and
+// made fully transparent
+.webring {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  font-size: 2px;
+  line-height: 1;
+  opacity: 0;
+
+  a {
+    display: flex;
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--text);
+  }
+
+  img {
+    width: 2px;
+    height: 2px;
+    image-rendering: pixelated;
+  }
+}
+
+// Sits under the title at the same size (body size), in muted gray
+.subtitle {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: inherit;
+  margin: 4px 0 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.clock-place {
+  font: inherit;
+  color: inherit;
+  margin: 0;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline dotted;
+  text-decoration-thickness: 1.25px;
+  text-decoration-skip-ink: none;
+  text-underline-offset: 3px;
+}
+
+.clock-place:hover {
+  color: var(--text);
+}
+
+/**************/
+/* COURSEWORK */
+/**************/
+// Each term is a row: its name in a gutter on the left, its courses stacked
+// beside it. The rule above a term spans both columns; courses inside a term
+// are separated by space alone.
+.courses {
+  margin-top: 16px;
+}
+
+.term {
+  display: grid;
+  grid-template-columns: 108px 1fr;
+  gap: 8px;
+  align-items: start;
+  padding: 12px 0;
+}
+
+// A thin rule between one semester and the next
+.term + .term {
+  border-top: 1px solid var(--rule);
+}
+
+.term-name {
+  color: var(--muted);
+  padding: 4px 0;
+}
+
+.course {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.course-title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.course-code {
+  color: var(--muted);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+#copy-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 32px;
+  transform: translateX(-50%);
+  background: var(--toast-bg);
+  color: var(--toast-text);
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 5px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  z-index: 1000;
+}
+
+@media screen and (max-width: 639px) {
+  .page {
+    padding: 32px 24px 40px;
+  }
+
+  // No room for a gutter, so the term name sits above its courses
+  .term {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .term-name {
+    padding-bottom: 2px;
+  }
+}
+
+/**************/
+/* PREVIEW    */
+/**************/
+// Hovering the Ironman link floats a little results card over it: the total,
+// a bar splitting the race into swim, bike and run by time, and the placings.
+// Only where there's a pointer to hover with; on a phone the link just opens.
+.preview {
+  position: relative;
+}
+
+.preview-card {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 10px);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 296px;
+  padding: 16px 18px;
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  background: var(--bg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 12px 40px rgba(0, 0, 0, 0.08);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 16px;
+  font-variant-numeric: tabular-nums;
+  white-space: normal;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+  pointer-events: none;
+}
+
+@media (hover: hover) {
+  .preview:hover .preview-card,
+  .preview:focus-within .preview-card {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+}
+
+.pc-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.pc-title {
+  color: var(--text);
+}
+
+.pc-total {
+  color: var(--text);
+  font-size: 26px;
+  line-height: 30px;
+  letter-spacing: -0.5px;
+}
+
+// The race runs down the card like the experiences do: a thin line with a
+// dot for each leg in its sport's color, and the leg's time and pace beside
+// it. Each time the card opens, the dots pop in one after another as the line
+// draws down to them.
+.pc-legs {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pc-leg {
+  position: relative;
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  padding-left: 18px;
+}
+
+// The line on down to the next leg's dot
+.pc-leg:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 8px;
+  bottom: -14px;
+  border-left: 1px solid var(--rule);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.18s linear;
+}
+
+.pc-leg::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 4.5px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--leg);
+  transform: scale(0);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.preview:hover .pc-leg::before,
+.preview:focus-within .pc-leg::before,
+.preview:hover .pc-leg::after,
+.preview:focus-within .pc-leg::after {
+  transform: none;
+}
+
+.preview:hover .pc-swim::after,
+.preview:focus-within .pc-swim::after {
+  transition-delay: 0.08s;
+}
+
+.preview:hover .pc-swim::before,
+.preview:focus-within .pc-swim::before {
+  transition-delay: 0.16s;
+}
+
+.preview:hover .pc-bike::after,
+.preview:focus-within .pc-bike::after {
+  transition-delay: 0.3s;
+}
+
+.preview:hover .pc-bike::before,
+.preview:focus-within .pc-bike::before {
+  transition-delay: 0.38s;
+}
+
+.preview:hover .pc-run::after,
+.preview:focus-within .pc-run::after {
+  transition-delay: 0.52s;
+}
+
+.pc-time {
+  color: var(--text);
+}
+
+.pc-pace {
+  text-align: right;
+}
+
+.pc-swim {
+  --leg: var(--swim);
+}
+
+.pc-bike {
+  --leg: var(--bike);
+}
+
+.pc-run {
+  --leg: var(--run);
+}

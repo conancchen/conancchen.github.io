@@ -1,0 +1,2111 @@
+---
+layout: default
+home: true
+subtitle: Updated Sep 2026
+---
+<section class="bio">
+  <p>
+    I’m a junior at Princeton studying applied math.
+  </p>
+  <p>
+    Currently, I research humanoid robots in the <a href="https://pvl.cs.princeton.edu/" data-exp="pvl">Princeton Vision &amp; Learning Lab</a>. Previously, I interned at <a href="https://scale.com/" data-exp="scale">Scale AI</a>.
+  </p>
+  <p>
+    I also compete as a Division I swimmer and recreational triathlete. This summer, I finished my first <span class="preview"><a href="{{ site.baseurl }}/pdfs/im70.3.pdf" aria-describedby="im-card">Ironman 70.3</a><span class="preview-card" id="im-card" role="tooltip">
+      <span class="pc-head"><span class="pc-title">Musselman 70.3</span><span class="pc-date">Jul 2026</span></span>
+      <span class="pc-total">4:57:16</span>
+      <span class="pc-legs">
+        <span class="pc-leg pc-swim"><span class="pc-name">Swim</span><span class="pc-time">27:45</span><span class="pc-pace">1:26 /100m</span></span>
+        <span class="pc-leg pc-bike"><span class="pc-name">Bike</span><span class="pc-time">2:38:56</span><span class="pc-pace">21.1 mph</span></span>
+        <span class="pc-leg pc-run"><span class="pc-name">Run</span><span class="pc-time">1:44:40</span><span class="pc-pace">7:59 /mi</span></span>
+      </span>
+      <span class="pc-rank">159th of 1,943 overall</span>
+    </span></span> in under 5 hours.
+  </p>
+  <p>
+    Find me on <a class="chip chip-rotating" id="social-link" href="https://www.linkedin.com/in/conan-chen"><span class="chip-icon-slot" id="social-icon"><svg class="chip-icon" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="3" fill="#0a66c2"/><path fill="#fff" d="M5.3 9.2h3v9.6h-3zM6.8 4.4a1.7 1.7 0 1 1 0 3.5 1.7 1.7 0 0 1 0-3.5zM10.2 9.2h2.9v1.3c.4-.8 1.4-1.6 2.9-1.6 3.1 0 3.6 2 3.6 4.6v5.3h-3v-4.7c0-1.1 0-2.6-1.6-2.6s-1.8 1.2-1.8 2.5v4.8h-3z"/></svg></span><span id="social-text">LinkedIn</span></a> or reach me <a class="chip email-link" href="#" id="email-link" onclick="copyEmail(event)"><svg class="chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span id="email-text">by email</span></a>.
+  </p>
+</section>
+
+<script>
+  // The "Find me on" chip turns over every few seconds between the places I
+  // can be found: the label scrambles into the next name while the icon pops
+  // in and the chip eases to its new width. It holds still while hovered or
+  // focused, so it never changes under a click, and stays on LinkedIn for
+  // anyone who prefers reduced motion.
+  (function () {
+    var LINKEDIN_ICON = document.getElementById('social-icon').innerHTML;
+    var PROFILES = [
+      { label: 'LinkedIn', href: 'https://www.linkedin.com/in/conan-chen', icon: LINKEDIN_ICON },
+      {
+        label: 'GitHub',
+        href: 'https://github.com/conancchen',
+        icon: '<svg class="chip-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>'
+      },
+      {
+        label: 'Strava',
+        href: 'https://www.strava.com/athletes/42953307',
+        icon: '<svg class="chip-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="#fc4c02" transform="translate(.96 .96) scale(.92)" d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>'
+      }
+    ];
+    var HOLD = 3000;      // ms each profile stays up
+    var SCRAMBLE = 450;   // ms for the label to settle
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    var chip = document.getElementById('social-link');
+    var icon = document.getElementById('social-icon');
+    var text = document.getElementById('social-text');
+    var current = 0;
+    var paused = false;
+
+    function show(profile) {
+      // Pin the current width, measure the new one, then ease between them
+      var from = chip.offsetWidth;
+      chip.style.width = '';
+      text.textContent = profile.label;
+      icon.innerHTML = profile.icon;
+      var to = chip.offsetWidth;
+      chip.style.width = from + 'px';
+      chip.offsetWidth;  // commit the starting width before transitioning
+      chip.style.width = to + 'px';
+
+      chip.href = profile.href;
+      icon.animate(
+        [{ opacity: 0, transform: 'scale(0.5)' }, { opacity: 1, transform: 'scale(1)' }],
+        { duration: 300, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)' }
+      );
+      scrambleSwap([[text, profile.label]], SCRAMBLE);
+    }
+
+    ['mouseenter', 'focus'].forEach(function (type) {
+      chip.addEventListener(type, function () { paused = true; });
+    });
+    ['mouseleave', 'blur'].forEach(function (type) {
+      chip.addEventListener(type, function () { paused = false; });
+    });
+
+    setInterval(function () {
+      if (paused || document.hidden) return;
+      current = (current + 1) % PROFILES.length;
+      show(PROFILES[current]);
+    }, HOLD);
+  })();
+
+</script>
+
+<div>
+  <section class="block timeline">
+    <h2 class="block-label block-label-plain">Experiences</h2>
+
+    <details class="entry is-next">
+      <summary class="row">
+        <span class="row-label"><img class="row-icon" src="{{ site.baseurl }}/images/logos/citadel.png" alt="" width="14" height="14">Citadel Securities</span>
+        <span class="row-year">2027</span>
+      </summary>
+      <p class="row-note">Incoming Quantitative Trading Intern</p>
+    </details>
+    <details class="entry is-now" data-exp="pvl">
+      <summary class="row">
+        <span class="row-label"><img class="row-icon" src="{{ site.baseurl }}/images/logos/pvl.png" alt="" width="14" height="14">Princeton Vision &amp; Learning Lab</span>
+        <span class="row-year">2026</span>
+      </summary>
+      <p class="row-note">Fall 2026 IW, <a href="https://orfe.princeton.edu/undergraduate/eric-fs-pai-83-fund">ORFE Eric Pai Summer Research Grant</a><br>Mentor: Erich Liang, PI: Jia Deng</p>
+    </details>
+    <details class="entry is-past" data-exp="scale">
+      <summary class="row">
+        <span class="row-label"><img class="row-icon row-icon-mono" src="{{ site.baseurl }}/images/logos/scale.png" alt="" width="14" height="14">Scale AI</span>
+        <span class="row-year">2025</span>
+      </summary>
+      <p class="row-note">Technical Advisor Intern (GenAI)</p>
+    </details>
+  </section>
+  <script>
+    // An experience's note slides open and shut rather than popping, and
+    // opening one slides shut whichever was open. Under reduced motion, or
+    // where the browser can't animate, it just opens and closes.
+    (function () {
+      var entries = Array.prototype.slice.call(document.querySelectorAll('.timeline .entry'));
+      var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
+      var MS = 260;
+
+      function slide(entry, opening) {
+        var note = entry.querySelector('.row-note');
+        if (entry._anim) entry._anim.cancel();
+        if (reduceMotion || !note.animate) { entry.open = opening; return; }
+        entry.open = true;
+        var full = note.offsetHeight + 'px';
+        var pad = getComputedStyle(note).paddingBottom;
+        var shut = { height: '0px', paddingBottom: '0px', opacity: 0 };
+        var open = { height: full, paddingBottom: pad, opacity: 1 };
+        entry.classList.toggle('is-closing', !opening);
+        note.style.overflow = 'hidden';
+        entry._anim = note.animate(opening ? [shut, open] : [open, shut], { duration: MS, easing: EASE });
+        entry._anim.onfinish = function () {
+          note.style.overflow = '';
+          entry.classList.remove('is-closing');
+          entry.open = opening;
+          entry._anim = null;
+        };
+      }
+
+      // Hovering a place named in the bio lights up its experience, just as
+      // hovering the experience itself would
+      var section = document.querySelector('.timeline');
+      document.querySelectorAll('.bio a[data-exp]').forEach(function (link) {
+        var entry = section.querySelector('.entry[data-exp="' + link.dataset.exp + '"]');
+        if (!entry) return;
+        function on() { section.classList.add('is-linked'); entry.classList.add('is-hot'); }
+        function off() { section.classList.remove('is-linked'); entry.classList.remove('is-hot'); }
+        link.addEventListener('mouseenter', on);
+        link.addEventListener('mouseleave', off);
+        link.addEventListener('focus', on);
+        link.addEventListener('blur', off);
+      });
+
+      entries.forEach(function (entry) {
+        entry.querySelector('summary').addEventListener('click', function (e) {
+          e.preventDefault();
+          var opening = !entry.open || entry.classList.contains('is-closing');
+          entries.forEach(function (other) {
+            if (other !== entry && other.open && !other.classList.contains('is-closing')) slide(other, false);
+          });
+          slide(entry, opening);
+        });
+      });
+    })();
+  </script>
+
+  <section class="block">
+    <h2 class="block-label block-label-plain">More</h2>
+
+    <div class="row">
+      <a href="{{ site.baseurl }}/coursework/" class="row-link">Coursework</a>
+    </div>
+    <div class="row">
+      <a href="/strava/" class="row-link">Custom Strava</a>
+    </div>
+    <div class="row">
+      <a href="/study/" class="row-link">Study With Me</a>
+    </div>
+  </section>
+
+  <div class="rule lane" id="lane" aria-hidden="true"></div>
+  <script>
+    // The divider is the surface of a pool, seen from the side: a line that
+    // rolls with a couple of slow swells, with a swimmer doing freestyle laps
+    // in it who kicks up a bow wave ahead and a wake behind. The surface is
+    // the waterline: whatever is above it is drawn solid and whatever is below
+    // it faint, so the arms come out of the water on the recovery and
+    // disappear into it on the pull. Each arm swings around the shoulder with
+    // a high, bent elbow over the water, reaches out ahead and holds there
+    // while the body glides, waiting for the other arm to come back over
+    // before it pulls long under the body. The legs flutter six kicks to a
+    // stroke cycle, throwing up white water; the body has momentum, speeding
+    // up through each pull and coasting between them; and the head rolls to
+    // the side to breathe once a cycle. It comes into view mid-dive from the
+    // left and goes in with a splash. At each wall it flip-turns (tucks
+    // and somersaults underwater), glides off the wall in a streamline, takes
+    // five dolphin kicks underwater, and surfaces swimming the other way.
+    // Dropped from too high, it's hurt: it floats limp, face down, until a
+    // scuba diver swims in from the far side and pushes it out of the nearer
+    // side of the pool; after that the pool is left empty.
+    (function () {
+      var lane = document.getElementById('lane');
+      var canvas = document.createElement('canvas');
+      canvas.className = 'swimmer';
+      lane.appendChild(canvas);
+      var ctx = canvas.getContext('2d');
+
+      // Canvas height and waterline, px. The canvas reaches all the way up to
+      // the header, so the swimmer can be lifted that high; size() measures it
+      var H = 81, WATER = 60, DEPTH_BELOW = 36;
+      var MAX_LIFT = WATER - 16;   // px: shoulders as high as the canvas has room for
+      var LAP = 10;                // s for one length, turn included
+      var CYCLE = 1.9;             // s per stroke cycle (both arms)
+      var RECOVERY = 0.26;         // share of each arm's cycle spent over the water
+      // Each arm waits out front until the other has come back up nearly to
+      // the top of its recovery before it starts to pull; the arms run half
+      // a cycle apart
+      var WAIT = 0.45;             // share of the other arm's recovery
+      var PULL = 0.5 - WAIT * RECOVERY;
+      var REACH = 1 - PULL - RECOVERY;   // share spent stretched out ahead
+      // The body has momentum: the pulls and the kick push it along and the
+      // water drags it back, harder the faster it goes, so it speeds up
+      // through each pull and coasts down between them rather than jumping
+      var KICK_PUSH = 0.25;        // share of the push that comes from the legs
+      var KICK_SWING = 0.27;       // radians each leg sweeps up and down
+      var PULL_POWER = 1.2;        // how much harder the arms pull than it takes to hold pace
+      var DRAG = 0.7;              // how quickly the water bleeds off speed
+      var BODY = 13, ARM = 9.35, LEG = 7.7, HEAD = 2.1;
+      var FLIP = 0.75;             // s for the somersault
+      var PUSH = 0.21;             // s gliding off the wall before kicking
+      var KICKS = 5, KICK = 0.36;  // underwater dolphin kicks, s each
+      var DEPTH = 9;               // px below the surface it pushes off and kicks at
+      // Dropped in, it carries on down at the speed it hit the water and is
+      // pulled back to kicking depth as by a spring, so the harder it hits,
+      // the further it overshoots before floating back up: never deeper than
+      // MAX_PLUNGE, though
+      var MAX_PLUNGE = 24, PLUNGE_SPRING = 6;   // px; 1/s
+      var plunging = [0, 0];       // px below the surface and px/s down, dropped in
+      var drift = 0;               // speed across going in, as a multiple of SPEED
+      var flail = 0;               // how hard it's waving its arms and legs about
+      var BREAKOUT = 0.5;          // s to ease from the streamline into the stroke
+      // The start: the swimmer comes into the frame from the left already
+      // mid-dive, high over the water and stretched out, and falls in an arc
+      // to go in hands first a little way down the lane
+      var FLIGHT = 0.9;            // s from coming into view to hitting the water
+      var DIVE_FROM = [-6, -28];   // px: shoulders where it comes into view, from the waterline
+      var ENTRY_X = 115;           // px down the lane where the shoulders go in
+      var UNDER = PUSH + KICKS * KICK;
+      var DOLPHIN_SWING = 0.32;    // radians the legs sweep in the dolphin kick
+      // Where the legs are when the last dolphin kick ends, for the flutter
+      // kick to ease out of
+      var DOLPHIN_END = DOLPHIN_SWING * Math.sin(2 * Math.PI * KICKS - 2.6);
+      var TAU = 2 * Math.PI;
+
+      var SPEED = 30;              // px/s swimming pace, fitted to LAP in size()
+      var W = 0, x = ENTRY_X, dir = 1, mode = 'dive', modeTime = 0, phase = 0, pivot = 0;
+      var entering = false;        // still sinking from the dive into the glide
+      var splashed = false;        // the hands have hit the water on the dive
+      var splashes = [];           // where the water was hit, and when, for ripples
+      var pace = 1;                // current speed, as a multiple of SPEED
+      var holdFar = false;         // far arm still out front from the breakout
+      // Lifted out of the water: how high the shoulders are over the surface,
+      // how far the body has swung from lying flat to hanging straight down,
+      // and how far it swings like a pendulum as it's carried about
+      var lift = 0, hang = 0, swing = 0, swingV = 0;
+      var fall = [0, 0];           // px/s across and down once let go
+      // Let go from high enough, it pulls into a cannonball and somersaults
+      // on the way down, as many turns as fit before it reaches the water,
+      // and goes in still balled up. Under the water it keeps turning a
+      // last quarter while it unfurls, coming out flat and facing ahead
+      // into the glide.
+      var flip = 0, flipTo = 0;    // radians turned so far, and in the air
+      var balled = false;          // falling as a cannonball
+      var unfurl = null;           // under the water, opening out: time and turn
+      var FLIP_TIME = 0.45;        // s each flip takes, at the least
+      var BALL = 10;               // px the ball reaches below the shoulders
+      var UNFURL = 0.45;           // s to open out under the water
+      // Opened out under the water, it frog kicks back up to the surface
+      // breaststroke style, arms out ahead, before breaking out into the
+      // crawl
+      var breast = false;          // kicking back up after a cannonball
+      var FROG = 0.7;              // s each breaststroke kick takes
+      var clear = false;           // the feet are out of the water
+      var wet = 0;                 // still dripping, 1 fresh out of the water
+      var entryAngle = 0;          // body angle going into the glide
+      var entrySpeed = 0;          // speed going in, as a multiple of SPEED (0: off the dive)
+      var injured = false;         // going to be hurt when it goes under
+      var FLOAT = 1;               // px below the surface it floats, hurt
+      var DIVER_SPEED = 98;        // px/s the rescue diver swims in at
+      var rescue = null;           // the rescue under way: its stage and diver
+      var bubbles = [];            // the diver's breath, rising to the surface
+      var hurtColor = 'red';       // the swimmer's color while hurt, from --hurt
+      var GRAVITY = 300;           // px/s/s: about twice real for its size, as true to scale looks floaty
+      var UNDER_DIST = 0;          // swimming-pace seconds the glide and kicks carry it
+      var time = 0, surface = [];
+
+      function size() {
+        var scale = window.devicePixelRatio || 1;
+        W = lane.clientWidth;
+        var header = document.querySelector('.header h1');
+        var room = header ? lane.getBoundingClientRect().top - header.getBoundingClientRect().bottom : 0;
+        WATER = Math.max(60, Math.round(room));
+        H = WATER + DEPTH_BELOW;
+        // Arms up, it reaches about ARM over its shoulders; a few px spare
+        // too, as the header settles a few px during the page's fade-in
+        MAX_LIFT = WATER - ARM - 6;
+        lift = Math.min(lift, MAX_LIFT);
+        canvas.style.top = -WATER + 'px';
+        canvas.width = W * scale;
+        canvas.height = H * scale;
+        canvas.style.width = W + 'px';
+        canvas.style.height = H + 'px';
+        ctx.setTransform(scale, 0, 0, scale, 0, 0);
+        // (Not while it's being towed out, partly past the side already)
+        if (mode !== 'hurt') x = Math.min(Math.max(x, 20), W - 20);
+        // Pace the swimming so a whole length takes LAP seconds: the turn and
+        // the underwater kicks cover a fixed number of swimming-pace seconds'
+        // worth of distance, and the stroking makes up the rest
+        var under = 0;
+        for (var t = 0; t < UNDER; t += 0.01) under += underwater(t) * 0.01;
+        UNDER_DIST = under;
+        var drift = 0.9 * FLIP / 2;
+        // (The length runs from 16px off one wall to 16px off the other, and
+        // the somersault itself sets the shoulders back a body length.)
+        SPEED = (W - 32 + BODY) / (drift + under + LAP - FLIP - UNDER);
+        // That estimate ignores where in the stroke each length starts and
+        // ends, which the uneven pulls of the gallop make matter, so search
+        // around it, timing a simulated length at each pace, for the pace
+        // that comes out right
+        var slow = SPEED / 2, fast = SPEED * 2;
+        for (var i = 0; i < 14; i++) {
+          SPEED = (slow + fast) / 2;
+          if (timeLength() > LAP) slow = SPEED;
+          else fast = SPEED;
+        }
+      }
+
+      // Swims a length off-screen, from one turn to the next, and returns how
+      // long it took; the swimmer is put back where it was afterwards
+      function timeLength() {
+        var saved = [x, dir, mode, modeTime, phase, pivot, time, pace, entering];
+        x = W / 2; dir = 1; mode = 'swim'; modeTime = 0; phase = 0; pace = 1; entering = false;
+        var flips = [], clock = 0, was = mode;
+        while (flips.length < 2 && clock < 120) {
+          step(1 / 120);
+          clock += 1 / 120;
+          if (mode === 'flip' && was !== 'flip') flips.push(clock);
+          was = mode;
+        }
+        x = saved[0]; dir = saved[1]; mode = saved[2]; modeTime = saved[3];
+        phase = saved[4]; pivot = saved[5]; time = saved[6]; pace = saved[7]; entering = saved[8];
+        return flips.length < 2 ? LAP : flips[1] - flips[0];
+      }
+
+      // Speed off the wall, as a multiple of swimming pace, t seconds after
+      // the push: fast and slowing, then a surge on each downkick, all quicker
+      // than swimming, settling to swimming pace as it breaks out
+      function underwater(t) {
+        var v = t < PUSH
+          ? 3 - 1.2 * t / PUSH
+          : 1.6 + 0.5 * Math.max(0, Math.sin(TAU * (t - PUSH) / KICK));
+        var breakout = Math.min(Math.max((UNDER - t) / KICK, 0), 1);
+        return 1 + (v - 1) * breakout;
+      }
+
+      function line(x1, y1, x2, y2, width) {
+        ctx.lineWidth = width;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+      }
+
+      // One arm, drawn from the shoulder: p runs 0..1 through its cycle
+      function arm(p, sy, held) {
+        var angle, bend;
+        if (held) {
+          // Kept out ahead from the streamline until its turn comes round
+          angle = TAU;
+          bend = 0;
+        } else if (p < RECOVERY) {
+          // Out at the hip, up and over the water, elbow high and forearm hanging
+          var r = p / RECOVERY;
+          r = r * r * (3 - 2 * r);
+          angle = Math.PI + Math.PI * r;
+          bend = 2.0 * Math.sin(Math.PI * r);
+        } else if (p < RECOVERY + REACH) {
+          // In ahead of the head and held there, long and sinking slightly,
+          // while the body glides over it
+          var g = (p - RECOVERY) / REACH;
+          angle = TAU + 0.18 * g;
+          bend = 0.1 * g;
+        } else {
+          // Then a long pull back under the body
+          var q = (p - RECOVERY - REACH) / PULL;
+          angle = TAU + 0.18 + (Math.PI - 0.18) * q;
+          bend = 0.1 + 0.4 * Math.sin(Math.PI * q);
+        }
+        var ex = Math.cos(angle) * ARM / 2, ey = sy + Math.sin(angle) * ARM / 2;
+        line(0, sy, ex, ey, 1.5);
+        line(ex, ey, ex + Math.cos(angle + bend) * ARM / 2, ey + Math.sin(angle + bend) * ARM / 2, 1.4);
+      }
+
+      // How hard the arms are pulling at a point in the stroke: each pull
+      // builds up through the catch, peaks as the hand pushes past the hip,
+      // and lets go
+      function pulling(at) {
+        var total = 0;
+        [at % 1, (at + 0.5) % 1].forEach(function (p) {
+          if (p >= RECOVERY + REACH) total += Math.sin(Math.PI * Math.pow((p - RECOVERY - REACH) / PULL, 1.4));
+        });
+        return total;
+      }
+
+      // Scaled so that, with the steady flutter kick on top, the push
+      // averages out to holding swimming pace, then made PULL_POWER times
+      // stronger, so each pull surges the body on harder (the pace is refitted
+      // in size(), so a length still takes LAP seconds)
+      var ARMS_PUSH = 0;
+      for (var at = 0; at < 1; at += 0.001) ARMS_PUSH += pulling(at) * 0.001;
+      ARMS_PUSH = PULL_POWER * (1 - KICK_PUSH) / ARMS_PUSH;
+
+      function push() {
+        return ARMS_PUSH * pulling(phase) + KICK_PUSH * (1 + 0.25 * Math.sin(3 * TAU * phase));
+      }
+
+      // The swimmer stroking, in its own frame: shoulders at the origin,
+      // facing +x, y measured down from the waterline
+      function stroking() {
+        // Riding a little higher in the water when moving faster
+        var by = 1.3 - 0.8 * (pace - 1);
+        // Coming out of the streamline: the head rises from between the arms
+        // and the legs ease from the dolphin kick into the flutter over the
+        // first half second, and there's no breath on the breakout stroke
+        var e = Math.min(modeTime / BREAKOUT, 1);
+        e = e * e * (3 - 2 * e);
+        // A breath each cycle: as the far arm finishes its pull and comes
+        // over, the head rolls to the side with the body rather than lifting,
+        // so it stays low in the water and only the mouth breaks the surface,
+        // opening just above the waterline
+        var b = (phase + 1 - 0.44) % 1;
+        var breath = b < 0.4 && modeTime > CYCLE / 2 ? Math.sin(Math.PI * b / 0.4) : 0;
+        var hx = 2.2 + 1.1 * e;
+        var hy = (1 - e) * 0.7 + e * (by - 1.4) - 0.3 * breath;
+        // The far arm goes in first and fainter, behind the body, so the two
+        // arms read as taking turns rather than as one arm stroking twice
+        var alpha = ctx.globalAlpha;
+        ctx.globalAlpha = alpha * 0.45;
+        var far = (phase + 0.5) % 1;
+        if (holdFar && far >= RECOVERY && far < RECOVERY + REACH) holdFar = false;
+        arm(far, by - 0.5, holdFar);
+        ctx.globalAlpha = alpha;
+        line(-BODY, by + 0.2, 0, by, 2.6);
+        var face = -0.25 * breath, mouth = 0.6 * breath;
+        ctx.beginPath();
+        ctx.moveTo(hx, hy);
+        ctx.arc(hx, hy, HEAD, face + mouth, face - mouth + TAU);
+        ctx.closePath();
+        ctx.fill();
+        arm(phase % 1, by);
+        for (var k = 0; k < 2; k++) {
+          var kick = e * KICK_SWING * Math.sin(3 * TAU * phase + k * Math.PI) + (1 - e) * DOLPHIN_END;
+          line(-BODY, by + 0.2, -BODY - Math.cos(kick) * LEG, by + 0.2 + Math.sin(kick) * LEG, 1.8);
+        }
+      }
+
+      // Arms together past the head, legs together, dolphin kicking once it
+      // is clear of the wall (t is time since the push-off). The kick is a
+      // wave running from the chest down through the hips to the feet,
+      // growing as it goes, so the whole body undulates and the hands barely
+      // move.
+      function streamline(t) {
+        var kicking = Math.min(Math.max((t - PUSH) / KICK, 0), 1);
+        var wave = TAU * Math.max(t - PUSH, 0) / KICK;
+        function bob(lag, size) { return kicking * size * Math.sin(wave - lag); }
+        var shoulders = bob(0.6, 0.35), middle = bob(1.2, 0.7), hips = bob(1.8, 1.1);
+        ctx.lineWidth = 2.6;
+        ctx.beginPath();
+        ctx.moveTo(0, shoulders);
+        ctx.quadraticCurveTo(-BODY / 2, 2 * middle - (shoulders + hips) / 2, -BODY, hips);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(2.2, shoulders - 0.6, HEAD, 0, TAU);
+        ctx.fill();
+        line(0, shoulders - 1.6, ARM + 1.5, bob(0, 0.15) - 0.8, 1.5);
+        var kick = kicking * DOLPHIN_SWING * Math.sin(wave - 2.6);
+        // Dropped in, the flailing it hit the water with settles into the
+        // streamline: the legs come together and the arms in line
+        var a = 0.3 * flail * Math.sin(time * 9);
+        if (flail > 0.01) {
+          var alpha = ctx.globalAlpha;
+          ctx.globalAlpha = alpha * 0.45;
+          line(0, shoulders - 1.6, Math.cos(-a) * (ARM + 1.5), shoulders - 1.6 + Math.sin(-a) * (ARM + 1.5), 1.5);
+          ctx.globalAlpha = alpha;
+        }
+        for (var k = 0; k < (flail > 0.01 ? 2 : 1); k++) {
+          var leg = kick + 0.5 * flail * Math.sin(time * 17 + k * Math.PI);
+          line(-BODY, hips, -BODY - Math.cos(leg) * LEG, hips + Math.sin(leg) * LEG, 1.8);
+        }
+      }
+
+      // Partway through the somersault, u running 0..1: the head ducks, the
+      // knees fold up to the chest and open out again, and the arms sweep
+      // from the sides round past the head into the streamline for the push
+      function flipping(u) {
+        var tuck = Math.sin(Math.PI * Math.min(u / 0.85, 1));
+        var hips = -BODY * (1 - 0.35 * tuck);
+        line(hips, 0, 0, 0, 2.6);
+        ctx.beginPath();
+        ctx.arc(3.3 - 1.2 * tuck, -0.6 + 2.2 * tuck, HEAD, 0, TAU);
+        ctx.fill();
+        var thigh = Math.PI - 1.9 * tuck, shin = thigh - 1.5 * tuck;
+        var kx = hips + Math.cos(thigh) * LEG / 2, ky = Math.sin(thigh) * LEG / 2;
+        line(hips, 0, kx, ky, 1.8);
+        line(kx, ky, kx + Math.cos(shin) * LEG / 2, ky + Math.sin(shin) * LEG / 2, 1.8);
+        var a = Math.max(0, (u - 0.45) / 0.55);
+        var sweep = Math.PI * (1 - a * a * (3 - 2 * a));
+        line(0, -0.8, Math.cos(sweep) * (ARM + 1), -0.8 + Math.sin(sweep) * 0.6, 1.5);
+      }
+
+      // Laid out straight in the air: arms out past the head, legs together
+      function diving() {
+        line(-BODY, 0, 0, 0, 2.6);
+        ctx.beginPath();
+        ctx.arc(2.6, -0.6, HEAD, 0, TAU);
+        ctx.fill();
+        line(0, -0.5, ARM, -0.5, 1.5);
+        line(-BODY, 0, -BODY - LEG, 0, 1.8);
+      }
+
+      // The diver t seconds into the start: shoulders and body angle. It comes
+      // in at the top of its arc and falls like a thrown thing, steady across
+      // and speeding up downward, the body tilting to follow its path, so it
+      // is nose down by the time it reaches the water.
+      var DIVE_SPEED = (ENTRY_X - DIVE_FROM[0]) / FLIGHT;  // px/s across
+      function diver(t) {
+        var u = Math.min(t / FLIGHT, 1);
+        var drop = 2 - DIVE_FROM[1];
+        return [
+          DIVE_FROM[0] + DIVE_SPEED * u * FLIGHT,
+          WATER + DIVE_FROM[1] + drop * u * u,
+          Math.atan2(2 * drop * u / FLIGHT, DIVE_SPEED)
+        ];
+      }
+
+      // Held up by the shoulders out of the water, or falling back in: arms
+      // up over the head, legs kicking wildly
+      function dangling() {
+        var wave = 0.3 * flail * Math.sin(time * 9);
+        var alpha = ctx.globalAlpha;
+        ctx.globalAlpha = alpha * 0.45;
+        line(0, -0.5, Math.cos(-wave) * ARM, -0.5 + Math.sin(-wave) * ARM, 1.5);
+        ctx.globalAlpha = alpha;
+        line(-BODY, 0, 0, 0, 2.6);
+        ctx.beginPath();
+        ctx.arc(2.6, -0.6, HEAD, 0, TAU);
+        ctx.fill();
+        line(0, -0.5, Math.cos(wave) * ARM, -0.5 + Math.sin(wave) * ARM, 1.5);
+        for (var k = 0; k < 2; k++) {
+          var kick = 0.5 * flail * Math.sin(time * 17 + k * Math.PI);
+          line(-BODY, 0, -BODY - Math.cos(kick) * LEG, Math.sin(kick) * LEG, 1.8);
+        }
+      }
+
+      // Somersaulting on the way down, tucked into a ball like a diver,
+      // tuck running 0..1: the knees come up to the chest, the heels fold in
+      // to the seat, the chin drops and the hands come down from overhead to
+      // hug the shins. Untucked, it's stretched out as it was held.
+      function tumbling(tuck) {
+        var hips = -BODY * (1 - 0.3 * tuck);
+        line(hips, 0, 0, 0, 2.6);
+        ctx.beginPath();
+        ctx.arc(2.6 - 1.2 * tuck, -0.6 + 2.4 * tuck, HEAD, 0, TAU);
+        ctx.fill();
+        var thigh = Math.PI - 2.2 * tuck, shin = thigh + 1.9 * tuck;
+        var kx = hips + Math.cos(thigh) * LEG / 2, ky = Math.sin(thigh) * LEG / 2;
+        var fx = kx + Math.cos(shin) * LEG / 2, fy = ky + Math.sin(shin) * LEG / 2;
+        line(hips, 0, kx, ky, 1.8);
+        line(kx, ky, fx, fy, 1.8);
+        // Hands from straight up overhead to halfway down the shins
+        var hx = ARM + ((kx + fx) / 2 - ARM) * tuck;
+        var hy = -0.5 + ((ky + fy) / 2 + 0.5) * tuck;
+        var far = Math.min(ARM / Math.hypot(hx, hy + 0.5), 1);
+        line(0, -0.5, hx * far, -0.5 + (hy + 0.5) * far, 1.5);
+      }
+
+      // How far the knees are bent through a breaststroke kick, c running
+      // 0..1 over the cycle: the heels draw up slowly, easing in and out,
+      // hang there a beat at the top, then whip back and snap together
+      // fast, and the legs stay straight for the glide.
+      var FROG_UP = 0.5, FROG_HOLD = 0.6, FROG_SNAP = 0.72;
+      function frogBend(c) {
+        if (c < FROG_UP) {
+          var u = c / FROG_UP;
+          return u * u * (3 - 2 * u);
+        }
+        if (c < FROG_HOLD) return 1;
+        if (c < FROG_SNAP) return Math.cos(Math.PI / 2 * (c - FROG_HOLD) / (FROG_SNAP - FROG_HOLD));
+        return 0;
+      }
+
+      // Kicking back up after a cannonball, t seconds in: arms together out
+      // ahead, and a breaststroke kick each FROG seconds. The heels draw up
+      // to the seat with the knees dropping, then the feet whip back and
+      // snap together, and it glides on that before the next.
+      function frogging(t) {
+        var c = (t / FROG) % 1;
+        var bend = frogBend(c);
+        line(-BODY, 0, 0, 0, 2.6);
+        ctx.beginPath();
+        ctx.arc(2.2, -0.6, HEAD, 0, TAU);
+        ctx.fill();
+        line(0, -1.6, ARM + 1.5, -0.8, 1.5);
+        var thigh = 0.9 * bend, shin = thigh - 2.6 * bend;
+        var kx = -BODY - Math.cos(thigh) * LEG / 2, ky = Math.sin(thigh) * LEG / 2;
+        line(-BODY, 0, kx, ky, 1.8);
+        line(kx, ky, kx - Math.cos(shin) * LEG / 2, ky + Math.sin(shin) * LEG / 2, 1.8);
+      }
+
+      // Hurt, floating face down at the surface and turned red to show it's in
+      // a bad way: head hanging, arms and legs dangling and swaying with the water
+      function limp() {
+        var sway = 0.15 * Math.sin(time * 1.7);
+        var alpha = ctx.globalAlpha;
+        ctx.globalAlpha = alpha * 0.45;
+        line(0, 0.3, Math.cos(1.4 - sway) * ARM, 0.3 + Math.sin(1.4 - sway) * ARM, 1.5);
+        line(-BODY, 0.8, -BODY - Math.cos(0.45) * LEG, 0.8 + Math.sin(0.45) * LEG, 1.8);
+        ctx.globalAlpha = alpha;
+        line(-BODY, 0.8, 0, 0, 2.6);
+        ctx.beginPath();
+        ctx.arc(2.3, 1.1, HEAD, 0, TAU);
+        ctx.fill();
+        line(0, 0.3, Math.cos(1.15 + sway) * ARM, 0.3 + Math.sin(1.15 + sway) * ARM, 1.5);
+        line(-BODY, 0.8, -BODY - Math.cos(0.3 + sway) * LEG, 0.8 + Math.sin(0.3 + sway) * LEG, 1.8);
+      }
+
+      // Where the diver takes hold of the hurt swimmer: just behind its
+      // middle, on the side it's pushed from
+      function holdAt(d) {
+        return [x - dir * (BODY + LEG) / 2 + d.side * 4, WATER + plunging[0] + 0.8];
+      }
+
+      // A rescue diver, lying flat and facing the way it swims: a tank on its
+      // back with a hose round to the mouth, a mask, and fins flapping slowly
+      // on the ends of its legs. Swimming in, its arms are tucked at its
+      // sides; once there, one reaches out to hold on to the swimmer.
+      function scuba(d) {
+        ctx.save();
+        ctx.translate(d.x, WATER + d.depth);
+        ctx.scale(d.facing, 1);
+        line(-10, -3, -2.5, -3, 2.4);
+        line(-BODY, 0, 0, 0, 2.6);
+        ctx.beginPath();
+        ctx.arc(2.6, -0.2, HEAD, 0, TAU);
+        ctx.fill();
+        ctx.lineWidth = 0.6;
+        ctx.beginPath();
+        ctx.moveTo(-2.5, -3.4);
+        ctx.quadraticCurveTo(3, -5.5, 4.4, 0.9);
+        ctx.stroke();
+        for (var k = 0; k < 2; k++) {
+          var kick = 0.3 * Math.sin(TAU * d.kick + k * Math.PI);
+          var fx = -BODY - Math.cos(kick) * LEG, fy = Math.sin(kick) * LEG;
+          var fin = kick - 0.35 * Math.cos(TAU * d.kick + k * Math.PI);
+          line(-BODY, 0, fx, fy, 1.8);
+          line(fx, fy, fx - Math.cos(fin) * 4.5, fy + Math.sin(fin) * 4.5, 1.3);
+        }
+        if (rescue.stage === 'swim in') {
+          line(0, 0.3, -5.5, 1.6, 1.4);
+        } else {
+          var hand = holdAt(d);
+          var hx = (hand[0] - d.x) * d.facing, hy = hand[1] - WATER - d.depth;
+          var far = Math.min(ARM / Math.hypot(hx, hy - 0.3), 1);
+          line(0, 0.3, hx * far, 0.3 + (hy - 0.3) * far, 1.4);
+        }
+        // The mask's lens, cut out of the head
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.fillRect(3.3, -1.3, 1.3, 1.5);
+        ctx.restore();
+      }
+
+      // The body's angle out of the water, in the swimmer's own frame: tipped
+      // from flat to hanging feet down, plus the swing
+      function tilt() {
+        return -hang * Math.PI / 2 + dir * swing;
+      }
+      function aloft() {
+        return mode === 'fall' || (mode === 'swim' && lift > 0.5);
+      }
+      // How far below the shoulders the feet hang
+      function reach() {
+        return (BODY + LEG) * Math.max(0, -Math.sin(tilt()));
+      }
+      // How far below the shoulders the lowest part of it is
+      function lowest() {
+        return balled ? BALL : reach();
+      }
+      // How tucked the cannonball is: pulling in as it's let go, opening
+      // out again under the water
+      function ballTuck() {
+        if (!balled) return 0;
+        var u = unfurl ? 1 - Math.min(unfurl.time / UNFURL, 1) : Math.min(modeTime / 0.2, 1);
+        return u * u * (3 - 2 * u);
+      }
+      // Where the shoulders really are, relative to (x, WATER - lift), once
+      // the somersault about the body's middle has carried them round
+      function shoulders(tuck) {
+        var m = -(BODY + LEG) / 2 * (1 - 0.6 * tuck), t = tilt();
+        var a = m - m * Math.cos(flip), b = m * Math.sin(flip);
+        return [dir * (a * Math.cos(t) - b * Math.sin(t)), a * Math.sin(t) + b * Math.cos(t)];
+      }
+      // Falling, seconds until it reaches the water
+      function toWater() {
+        var h = lift - lowest(), v = fall[1];
+        if (h <= 0) return 0;
+        return (Math.sqrt(v * v + 2 * GRAVITY * h) - v) / GRAVITY;
+      }
+
+      function pose() {
+        if (mode === 'hurt') {
+          // Turning from however it hit the water to lying limp along it
+          var settle = Math.min(modeTime / 0.6, 1);
+          settle = settle * settle * (3 - 2 * settle);
+          ctx.translate(x, WATER + plunging[0] + 0.4 * Math.sin(time * 1.3));
+          ctx.scale(dir, 1);
+          ctx.rotate(entryAngle * (1 - settle) + 0.06 * settle);
+          ctx.strokeStyle = ctx.fillStyle = hurtColor;
+          limp();
+        } else if (aloft()) {
+          ctx.translate(x, WATER - lift);
+          ctx.scale(dir, 1);
+          ctx.rotate(tilt());
+          if (balled) {
+            // Somersaulting about its middle, tucked into a ball
+            var tuck = ballTuck();
+            var middle = -(BODY + LEG) / 2 * (1 - 0.6 * tuck);
+            ctx.translate(middle, 0);
+            ctx.rotate(-flip);
+            ctx.translate(-middle, 0);
+            tumbling(tuck);
+          } else dangling();
+        } else if (mode === 'dive') {
+          var d = diver(modeTime);
+          ctx.translate(d[0], d[1]);
+          ctx.rotate(d[2]);
+          diving();
+        } else if (mode === 'swim') {
+          ctx.translate(x, WATER);
+          ctx.scale(dir, 1);
+          stroking();
+        } else if (mode === 'flip') {
+          // Rotate about the middle of the body, easing in and out of the
+          // somersault and sinking to push-off depth as it goes over
+          var u = modeTime / FLIP;
+          var turn = u * u * (3 - 2 * u);
+          var sink = Math.min(u / 0.6, 1);
+          ctx.translate(pivot, WATER + DEPTH * sink * sink * (3 - 2 * sink));
+          ctx.scale(dir, 1);
+          ctx.rotate(Math.PI * turn);
+          ctx.translate(BODY / 2, 0);
+          flipping(u);
+        } else if (breast) {
+          // Levelling out of the unfurl, and tipped head up while it's
+          // still deep, as it heads for the surface
+          var level = Math.min(modeTime / 0.4, 1);
+          level = level * level * (3 - 2 * level);
+          ctx.translate(x, WATER + plunging[0]);
+          ctx.scale(dir, 1);
+          ctx.rotate(entryAngle * (1 - level) - 0.3 * Math.min(Math.max((plunging[0] - 1.3) / 10, 0), 1));
+          frogging(modeTime);
+        } else {
+          // Holding depth through the kicks, rising to the surface over the
+          // last two
+          var g = Math.min(Math.max((modeTime - (UNDER - KICK * 2)) / (KICK * 2), 0), 1);
+          g = g * g * (3 - 2 * g);
+          // Off the dive it starts at the surface, still nose down, and
+          // sinks to kicking depth as it levels out
+          var dip = entering ? Math.min(modeTime / (entrySpeed ? 0.6 : 0.45), 1) : 1;
+          dip = dip * dip * (3 - 2 * dip);
+          // Dropped in, it's wherever the plunge has carried it
+          var depth = entering && entrySpeed ? plunging[0] : DEPTH * dip;
+          ctx.translate(x, WATER + depth * (1 - g) + 1.3 * g);
+          ctx.scale(dir, 1);
+          ctx.rotate(entryAngle * (1 - dip));
+          streamline(modeTime);
+        }
+      }
+
+      // The height of the water every 2px along the lane: two slow swells
+      // rolling past, plus the swimmer's bow wave and wake, which die down
+      // while it is under the water
+      function water() {
+        surface.length = 0;
+        var churn = aloft() || mode === 'hurt' ? 0 : mode === 'swim' ? pace : 0.25;
+        for (var px = 0; px <= W + 2; px += 2) {
+          var y = 0.7 * Math.sin(px * 0.045 - time * 1.4) + 0.35 * Math.sin(px * 0.12 + time * 2.1);
+          var ahead = (px - x) * dir;
+          if (ahead > -BODY - LEG && ahead < 10) {
+            // Bow wave building up in front of the head
+            y -= churn * 1.1 * Math.exp(-Math.pow((ahead - 5) / 4, 2)) * (0.8 + 0.2 * Math.sin(time * 9));
+          }
+          if (ahead < -BODY) {
+            // Wake trailing behind the kick, rippling and fading with distance
+            var back = -BODY - ahead;
+            y += churn * 0.9 * Math.exp(-back / 28) * Math.sin(back * 0.35 + time * 7);
+          }
+          // Rings spreading out from where the dive went in
+          splashes.forEach(function (hit) {
+            var age = time - hit.time, from = Math.abs(px - hit.x);
+            var size = hit.size || 1;
+            if (from < age * 60) {
+              y += 1.8 * size * Math.exp(-age * 1.6 - from / (40 * Math.sqrt(size))) * Math.sin(from * 0.4 - age * 11);
+            }
+          });
+          surface.push(WATER + y);
+        }
+      }
+
+      // Something hitting the water at px: a burst of spray and a ring of
+      // ripples. The dive throws its spray forward; a dropped-in splash
+      // (lean 0) throws it evenly both ways. The harder the hit (power, 1 by
+      // default), the higher and wider the spray flies, in bigger drops, and
+      // the taller the ripples and the further they carry.
+      function splash(px, lean, count, power) {
+        if (lean === undefined) lean = 0.15;
+        power = power || 1;
+        var fling = Math.sqrt(power), drop = Math.min(1 + 0.15 * (power - 1), 1.5);
+        splashes.push({ x: px, time: time, size: Math.min(power, 3) });
+        for (var i = 0; i < (count || 34) && foam.length < 400; i++) {
+          // Each drop flies off at its own angle from straight up, so the
+          // spray fans out into a crown, the steepest drops flying highest
+          var angle = (Math.random() - 0.5) * 1.3;
+          var speed = (16 + Math.random() * 36) * fling * (1 - 0.35 * Math.abs(angle));
+          foam.push({
+            x: px + (Math.random() - 0.5) * 6 * fling,
+            y: WATER - Math.random(),
+            vx: Math.sin(angle) * speed + lean * 40 * fling,
+            vy: -Math.cos(angle) * speed,
+            size: (0.6 + Math.random() * 0.7) * drop,
+            age: 0,
+            life: 3,
+            floating: false
+          });
+        }
+      }
+
+      function surfacePath() {
+        ctx.moveTo(0, surface[0]);
+        for (var i = 1; i < surface.length; i++) ctx.lineTo(i * 2, surface[i]);
+      }
+
+      // Draw the water line, then the pose twice: once clipped to the air
+      // above the surface and once to the water below it
+      function draw() {
+        var style = getComputedStyle(document.documentElement);
+        var color = style.getPropertyValue('--muted');
+        var under = parseFloat(style.getPropertyValue('--underwater')) || 0.3;
+        hurtColor = style.getPropertyValue('--hurt').trim() || 'red';
+        water();
+        ctx.clearRect(0, 0, W, H);
+
+        // A faint glow in the water just under the surface, fading out with
+        // depth; it follows the surface, so it rides the swells and ripples
+        var glow = ctx.createLinearGradient(0, WATER - 2, 0, WATER + 8);
+        // fading to a clear version of the same blue, not to clear black,
+        // keeps the fade from going gray partway down
+        var tint = style.getPropertyValue('--glow').trim();
+        glow.addColorStop(0, tint);
+        glow.addColorStop(1, tint.replace(/[\d.]+\)$/, '0)'));
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        surfacePath();
+        ctx.lineTo(W + 2, H);
+        ctx.lineTo(0, H);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.strokeStyle = style.getPropertyValue('--lane');
+        ctx.lineWidth = 1.2;
+        ctx.lineJoin = ctx.lineCap = 'round';
+        ctx.beginPath();
+        surfacePath();
+        ctx.stroke();
+
+        [[0, 1], [H, under]].forEach(function (band) {
+          ctx.save();
+          ctx.beginPath();
+          surfacePath();
+          ctx.lineTo(W + 2, band[0]);
+          ctx.lineTo(0, band[0]);
+          ctx.closePath();
+          ctx.clip();
+          ctx.globalAlpha = band[1];
+          ctx.strokeStyle = ctx.fillStyle = color;
+          ctx.lineCap = 'round';
+          ctx.save();
+          pose();
+          ctx.restore();
+          if (rescue) rescue.divers.forEach(scuba);
+          ctx.lineWidth = 0.6;
+          bubbles.forEach(function (b) {
+            if (b.age < 0) return;
+            ctx.beginPath();
+            ctx.arc(b.x, b.y, b.size, 0, TAU);
+            ctx.stroke();
+          });
+          ctx.restore();
+        });
+
+        ctx.fillStyle = style.getPropertyValue('--foam');
+        foam.forEach(function (bit) {
+          ctx.globalAlpha = 0.9 * (1 - bit.age / bit.life);
+          ctx.beginPath();
+          ctx.arc(bit.x, bit.y, bit.size, 0, TAU);
+          ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+      }
+
+      // White water off the kick: whenever a foot comes up through the
+      // surface it throws spray, more the faster it is moving, which arcs up
+      // and back, falls onto the water, and floats there as foam in the wake
+      // for a moment before it fades
+      var foam = [];
+      function surfaceAt(px) {
+        return surface[Math.min(Math.max(Math.round(px / 2), 0), surface.length - 1)];
+      }
+      function churn(dt) {
+        if (mode === 'swim' && !held) {
+          var by = 1.3 - 0.8 * (pace - 1);
+          for (var k = 0; k < 2; k++) {
+            var swing = 3 * TAU * phase + k * Math.PI;
+            var kick = KICK_SWING * Math.sin(swing);
+            var footY = by + 0.2 + Math.sin(kick) * LEG;
+            var footSpeed = Math.cos(kick) * LEG * KICK_SWING * Math.cos(swing) * 3 * TAU / CYCLE;
+            if (footY > 0.8 || footSpeed > 0) continue;  // under the water, or on its way down
+            var spawn = -footSpeed * dt * 1.8;
+            while (spawn > 0 && foam.length < 140) {
+              if (Math.random() < spawn) {
+                foam.push({
+                  x: x - dir * (BODY + Math.cos(kick) * LEG) + (Math.random() - 0.5) * 2,
+                  y: WATER + Math.min(footY, 0) - Math.random(),
+                  vx: -dir * (4 + Math.random() * 14),
+                  vy: -(6 + Math.random() * 16),
+                  size: 0.55 + Math.random() * 0.6,
+                  age: 0,
+                  life: 2,
+                  floating: false
+                });
+              }
+              spawn -= 1;
+            }
+          }
+        }
+        // Out of the water it drips, less and less as it dries off
+        if (aloft() && wet > 0) {
+          for (var drips = wet * 30 * dt; drips > 0 && foam.length < 200; drips -= 1) {
+            if (Math.random() > drips) continue;
+            var s = Math.random() * (BODY + LEG), a = tilt();
+            var px = x - dir * s * Math.cos(a), py = WATER - lift - s * Math.sin(a);
+            if (py > surfaceAt(px) - 0.5) continue;
+            foam.push({
+              x: px + (Math.random() - 0.5) * 1.5,
+              y: py,
+              vx: (Math.random() - 0.5) * 3,
+              vy: 0,
+              size: 0.45 + Math.random() * 0.4,
+              age: 0,
+              life: 2,
+              floating: false
+            });
+          }
+        }
+        // The diver's bubbles wobble up and burst at the surface
+        bubbles = bubbles.filter(function (b) {
+          b.age += dt;
+          if (b.age < 0) return true;
+          b.y -= 14 * dt;
+          b.x += 3 * Math.sin(b.age * 8 + b.seed) * dt;
+          return b.y > surfaceAt(b.x) + 0.5;
+        });
+        foam = foam.filter(function (bit) {
+          bit.age += dt;
+          if (bit.floating) {
+            bit.x += bit.vx * 0.15 * dt;
+            bit.y = surfaceAt(bit.x) - 0.4;
+          } else {
+            bit.vy += 80 * dt;
+            bit.x += bit.vx * dt;
+            bit.y += bit.vy * dt;
+            if (bit.vy > 0 && bit.y >= surfaceAt(bit.x)) {
+              bit.floating = true;
+              bit.life = bit.age + 0.5 + Math.random() * 0.7;
+            }
+          }
+          return bit.age < bit.life;
+        });
+      }
+
+      function step(dt) {
+        time += dt;
+        modeTime += dt;
+        splashes = splashes.filter(function (hit) { return time - hit.time < 3; });
+        if (mode === 'dive') {
+          // Splash the moment the leading hand touches the water
+          var d = diver(modeTime);
+          var hx = d[0] + Math.cos(d[2]) * ARM + Math.sin(d[2]) * 0.5;
+          var hy = d[1] + Math.sin(d[2]) * ARM - Math.cos(d[2]) * 0.5;
+          if (!splashed && hy >= WATER) {
+            splashed = true;
+            splash(hx);
+          }
+          if (modeTime >= FLIGHT) {
+            mode = 'glide';
+            modeTime = 0;
+            x = ENTRY_X;
+            dir = 1;
+            entering = true;
+            entryAngle = diver(FLIGHT)[2];
+            entrySpeed = 0;
+          }
+        } else if (mode === 'fall') {
+          // Let go: it drops like a stone, keeping whatever swing it had,
+          // splashes in feet first, and the water slows it until it's under
+          fall[1] += GRAVITY * dt;
+          swingV *= Math.exp(-2 * dt);
+          swing += swingV * dt;
+          if (!clear) {
+            fall[0] *= Math.exp(-4 * dt);
+            // A cannonball is stopped by the water; feet first, it slices on down
+            fall[1] = balled ? fall[1] * Math.exp(-7 * dt) : Math.max(fall[1] * Math.exp(-5 * dt), 40);
+            flail *= Math.exp(-4 * dt);
+          }
+          x += fall[0] * dt;
+          if (x < 20 || x > W - 20) {
+            x = Math.min(Math.max(x, 20), W - 20);
+            fall[0] = 0;
+          }
+          lift -= fall[1] * dt;
+          // Thrown upward, it tops out under the header rather than flying past it
+          if (lift > MAX_LIFT) {
+            lift = MAX_LIFT;
+            fall[1] = Math.max(fall[1], 0);
+          }
+          // Spun at whatever rate finishes the last flip right at the water
+          if (clear && flip < flipTo) {
+            var left = toWater();
+            flip = left > dt ? flip + (flipTo - flip) * dt / left : flipTo;
+          }
+          if (clear && lowest() >= lift) {
+            clear = false;
+            // How high it would have had to be dropped from, by the
+            // shoulders, to hit the water this hard
+            var height = fall[1] * fall[1] / (2 * GRAVITY) + lowest();
+            injured = height > hurtHeight();
+            // The splash grows with the height of the fall, and a
+            // cannonball throws up more of it
+            var power = Math.min(Math.max(height / 80, 0.3), 5) * (balled ? 1.6 : 1);
+            splash(balled ? x + shoulders(1)[0] : x - dir * reach() * Math.cos(tilt()) * 0.5,
+                   Math.min(Math.max(fall[0] / 200, -0.4), 0.4),
+                   Math.min(8 + 24 * power, 160), power);
+            if (balled && injured) {
+              // Hit too hard: it goes limp then and there, right where the
+              // ball went in
+              var at = shoulders(ballTuck());
+              x = Math.min(Math.max(x + at[0], 16), W - 16);
+              var angle = tilt() - flip;
+              entryAngle = ((angle + Math.PI) % TAU + TAU) % TAU - Math.PI;
+              plunging = [at[1] - lift, fall[1]];
+              lift = hang = swing = swingV = flail = 0;
+              flip = flipTo = 0;
+              balled = false;
+              injured = false;
+              mode = 'hurt';
+              modeTime = 0;
+              rescue = { stage: 'wait', time: 0, divers: [], speed: 0, exit: 1 };
+            } else if (balled) {
+              // Under, it turns on to the next time it's flat and facing ahead
+              var flat = 1.5 * Math.PI;
+              var to = flat + TAU * Math.ceil((flip + Math.PI / 2 - flat) / TAU);
+              unfurl = { time: 0, from: flip, to: to };
+            }
+          }
+          if (mode !== 'fall') {
+            // Already gone limp on impact
+          } else if (unfurl) {
+            unfurl.time += dt;
+            // Kept in sight above the bottom of the lane
+            if (lift < -12) {
+              lift = -12;
+              fall[1] = Math.min(fall[1], 0);
+            }
+            var u = Math.min(unfurl.time / UNFURL, 1);
+            flip = unfurl.from + (unfurl.to - unfurl.from) * u * (2 - u);
+            if (u >= 1) {
+              // Opened out flat: carry on from exactly where the shoulders are
+              var at = shoulders(0);
+              x = Math.min(Math.max(x + at[0], 16), W - 16);
+              var angle = tilt() - flip;
+              entryAngle = ((angle + Math.PI) % TAU + TAU) % TAU - Math.PI;
+              plunging = [at[1] - lift, fall[1]];
+              lift = hang = swing = swingV = flail = 0;
+              flip = flipTo = 0;
+              balled = false;
+              unfurl = null;
+              if (injured) {
+                injured = false;
+                mode = 'hurt';
+                modeTime = 0;
+                rescue = { stage: 'wait', time: 0, divers: [], speed: 0, exit: 1 };
+              } else {
+                entrySpeed = Math.min(Math.max(Math.abs(fall[0]) / SPEED, 1), 1.7);
+                drift = dir * fall[0] / SPEED;
+                mode = 'glide';
+                modeTime = 0;
+                entering = true;
+                breast = true;
+              }
+            }
+          } else if (balled) {
+            // Still in the air
+          } else if (lift <= 0 && injured) {
+            entryAngle = tilt();
+            plunging = [-lift, fall[1]];
+            lift = hang = swing = swingV = flail = 0;
+            injured = false;
+            mode = 'hurt';
+            modeTime = 0;
+            rescue = { stage: 'wait', time: 0, divers: [], speed: 0, exit: 1 };
+          } else if (lift <= 0) {
+            entryAngle = tilt();
+            entrySpeed = Math.min(Math.max(Math.abs(fall[0]) / SPEED, 1), 1.7);
+            drift = dir * fall[0] / SPEED;
+            plunging = [-lift, fall[1]];
+            lift = hang = swing = swingV = 0;
+            mode = 'glide';
+            modeTime = 0;
+            entering = true;
+          }
+        } else if (mode === 'hurt') {
+          hurting(dt);
+        } else if (mode === 'swim') {
+          phase += dt / CYCLE;
+          if (phase >= 1) phase -= 1;
+          pace += DRAG * (push() - pace * pace) * dt;
+          x += dir * SPEED * pace * dt;
+          // Start the turn a little out, since it carries on into the wall
+          if ((dir > 0 && x + 16 >= W) || (dir < 0 && x - 16 <= 0)) {
+            mode = 'flip';
+            modeTime = 0;
+            pivot = x - dir * BODY / 2;
+          }
+        } else if (mode === 'flip') {
+          // Still drifting into the wall as it goes over, slowing to a stop,
+          // but never through it: the body stays in the pool, clear of the
+          // wall, and the feet end up planted on it
+          pivot += dir * SPEED * 0.9 * Math.max(0, 1 - modeTime / FLIP) * dt;
+          var margin = BODY / 2 + HEAD + 4;
+          pivot = Math.min(Math.max(pivot, margin), W - margin);
+          if (modeTime >= FLIP) {
+            dir = -dir;
+            x = pivot + dir * BODY / 2;
+            mode = 'glide';
+            modeTime = 0;
+          }
+        } else if (breast) {
+          // Each kick sends it forward and up, then it coasts; the last of
+          // its sinking dies away first
+          var c = (modeTime / FROG) % 1;
+          var surge = c > FROG_HOLD && c < 1 ? Math.sin(Math.PI * (c - FROG_HOLD) / (1 - FROG_HOLD)) : 0;
+          var r = Math.min(modeTime / 0.6, 1);
+          var speed = drift + (0.35 + 1.2 * surge - drift) * r * r * (3 - 2 * r);
+          x = Math.min(Math.max(x + dir * SPEED * speed * dt, 16), W - 16);
+          plunging[1] *= Math.exp(-6 * dt);
+          plunging[0] += (plunging[1] - (3 + 30 * surge)) * dt;
+          plunging[0] = Math.min(plunging[0], MAX_PLUNGE);
+          flail *= Math.exp(-4 * dt);
+          if (plunging[0] <= 1.3) {
+            // At the surface: breaking out straight into the first pull
+            plunging = [0, 0];
+            breast = false;
+            entering = false;
+            mode = 'swim';
+            modeTime = 0;
+            phase = RECOVERY + REACH - 0.02;
+            pace = 0.9;
+            holdFar = true;
+          }
+        } else {
+          var v = underwater(modeTime);
+          if (entering) {
+            // Off the dive there's no wall to push from: it hits the water
+            // a little slower than it flew, the water slows it further into
+            // the kicks, and they never carry it faster than it went in
+            var hit = entrySpeed || Math.max(0.8 * DIVE_SPEED / SPEED, 1.7);
+            v = modeTime < PUSH ? hit + (1.6 - hit) * modeTime / PUSH : Math.min(v, hit);
+            if (entrySpeed) {
+              // Dropped in, it picks up speed from however fast it was
+              // drifting across, rather than shooting off at once, and
+              // sinks, overshoots and floats back up to kicking depth
+              var r = Math.min(modeTime / 0.8, 1);
+              v = drift + (v - drift) * r * r * (3 - 2 * r);
+              plunging[1] += (PLUNGE_SPRING * PLUNGE_SPRING * (DEPTH - plunging[0]) - 2 * PLUNGE_SPRING * plunging[1]) * dt;
+              plunging[0] += plunging[1] * dt;
+              if (plunging[0] > MAX_PLUNGE) {
+                plunging[0] = MAX_PLUNGE;
+                plunging[1] = Math.min(plunging[1], 0);
+              }
+            }
+          }
+          flail *= Math.exp(-4 * dt);
+          x = Math.min(Math.max(x + dir * SPEED * v * dt, 16), W - 16);
+          if (modeTime >= UNDER) {
+            // Breaking out straight into the first pull
+            entering = false;
+            mode = 'swim';
+            modeTime = 0;
+            phase = RECOVERY + REACH - 0.02;
+            pace = underwater(UNDER);
+            holdFar = true;
+          }
+        }
+      }
+
+      // It survives a fall from anywhere below the bio's last line ("Find me
+      // on"), measured as it lands, since that line rewraps as its chip
+      // changes; from any higher, it's hurt
+      function hurtHeight() {
+        var last = document.querySelector('.bio p:last-child');
+        if (!last) return MAX_LIFT * 0.6;
+        return lane.getBoundingClientRect().top - last.getBoundingClientRect().bottom;
+      }
+
+      // Hurt: it sinks a little and bobs back up to float at the surface,
+      // drifting to a stop. A moment later a diver swims in from the far side
+      // of the pool, comes up behind it and takes hold, then pushes it off
+      // out of the nearer side. Then the pool stays empty until the page is
+      // loaded again.
+      function hurting(dt) {
+        plunging[1] += (PLUNGE_SPRING * PLUNGE_SPRING * (FLOAT - plunging[0]) - 2 * PLUNGE_SPRING * plunging[1]) * dt;
+        plunging[0] = Math.min(plunging[0] + plunging[1] * dt, MAX_PLUNGE);
+        rescue.time += dt;
+        if (rescue.stage === 'carry') {
+          rescue.speed = Math.min(rescue.speed + 210 * dt, 77);
+          x += rescue.exit * rescue.speed * dt;
+        } else if (rescue.stage !== 'gone') {
+          fall[0] *= Math.exp(-1.5 * dt);
+          x = Math.min(Math.max(x + fall[0] * dt, 20 + BODY + LEG), W - 20 - BODY - LEG);
+        }
+        var mid = x - dir * (BODY + LEG) / 2;
+        if (rescue.stage === 'wait' && rescue.time > 0.25) {
+          rescue.stage = 'swim in';
+          // Out the nearer side, so the diver comes from the far one
+          rescue.exit = mid < W / 2 ? -1 : 1;
+          var side = -rescue.exit;
+          rescue.divers = [{ side: side, x: side < 0 ? -30 : W + 30, depth: 13, facing: -side, kick: Math.random(), breath: 0.5 + Math.random() }];
+        }
+        var arrived = 0;
+        rescue.divers.forEach(function (d) {
+          var to = mid + d.side * 10, gap = to - d.x, speed = 0;
+          if (rescue.stage === 'swim in') {
+            speed = Math.min(DIVER_SPEED, Math.abs(gap) * 8);
+            d.x += Math.sign(gap) * speed * dt;
+            if (Math.abs(gap) > 1) d.facing = Math.sign(gap);
+            else arrived++;
+          } else {
+            d.x = to;
+            speed = rescue.speed;
+          }
+          // Coming up under the swimmer as they get close
+          var depth = Math.abs(gap) < 50 ? 7 : 13;
+          d.depth += (depth - d.depth) * (1 - Math.exp(-12 * dt));
+          d.kick += dt * (0.8 + speed / 30);
+          d.breath -= dt;
+          if (d.breath <= 0) {
+            d.breath = 1.6 + Math.random() * 0.6;
+            for (var i = 0; i < 3; i++) {
+              bubbles.push({ x: d.x + d.facing * 4, y: WATER + d.depth - 1, age: -i * 0.15, size: 0.6 + Math.random() * 0.5, seed: Math.random() * TAU });
+            }
+          }
+        });
+        if (rescue.stage === 'swim in' && arrived === rescue.divers.length) {
+          rescue.stage = 'grip';
+          rescue.time = 0;
+          rescue.divers.forEach(function (d) { d.facing = -d.side; });
+        } else if (rescue.stage === 'grip' && rescue.time > 0.25) {
+          rescue.stage = 'carry';
+          rescue.divers.forEach(function (d) { d.facing = rescue.exit; });
+        } else if (rescue.stage === 'carry' && (rescue.exit < 0 ? mid < -50 : mid > W + 50)) {
+          rescue.stage = 'gone';
+          rescue.time = 0;
+          rescue.divers = [];
+        }
+      }
+
+      size();
+      // Refitting the pace times a few dozen simulated lengths, so wait for
+      // the window to settle rather than doing it on every resize event
+      var resizing;
+      window.addEventListener('resize', function () {
+        clearTimeout(resizing);
+        resizing = setTimeout(size, 150);
+      });
+      // and measure again once fonts and images have settled where the header is
+      window.addEventListener('load', size);
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        // Held still mid-length rather than crouched at the start
+        mode = 'swim';
+        x = W / 3;
+        draw();
+        new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+        return;
+      }
+
+      // The water answers the pointer. A quick click drops a splash where it
+      // lands. Pressing and holding freezes the swimmer where it is, and
+      // dragging carries it up and down the pool, turning it to face the way
+      // it's being dragged; let go and it swims on from there. Dragging up
+      // lifts it clean out of the water, dangling and dripping, and letting go
+      // up there drops it back in with a splash. A press turns into a hold
+      // once it's been down a moment or has moved a few pixels. Dropped from
+      // too high, it's hurt, and can't be picked up again.
+      var held = false, press = null, carried = [0, 0];
+      function poolX(event) {
+        return event.clientX - lane.getBoundingClientRect().left;
+      }
+      function poolY(event) {
+        return event.clientY - lane.getBoundingClientRect().top;
+      }
+      function grab() {
+        // Hurt, it's left to the diver; and a hold timer that outlived its
+        // press has nothing to grab with
+        if (!press || mode === 'hurt') return;
+        held = true;
+        injured = false;
+        // Caught mid-somersault, it's held the right way up
+        flip = flipTo = 0;
+        balled = false;
+        unfurl = null;
+        breast = false;
+        lane.classList.add('holding');
+        // Caught on the way down, it's held from where it is
+        if (mode === 'fall') {
+          press.lift = Math.max(lift, 0);
+          mode = 'swim';
+        }
+        // Wherever it was in the start or a turn, it's swimming once picked up
+        if (mode !== 'swim') {
+          mode = 'swim';
+          modeTime = BREAKOUT;
+          entering = false;
+          splashed = true;
+          holdFar = false;
+        }
+        entrySpeed = 0;
+      }
+      function carry(px, py) {
+        var to = Math.min(Math.max(px, 20), W - 20);
+        // Out of the water it keeps facing the same way and swings instead
+        if (Math.abs(to - x) > 0.5 && lift < 2) dir = to > x ? 1 : -1;
+        x = to;
+        lift = Math.min(Math.max(press.lift + press.y - py, 0), MAX_LIFT);
+        var h = Math.min(lift / 10, 1);
+        hang = h * h * (3 - 2 * h);
+      }
+      // While held: how fast it's being carried, for the swing and for the
+      // throw when it's let go, and the water it's lifted out of or lowered
+      // back into
+      function holding(dt, from) {
+        if (dt > 0) {
+          var k = 1 - Math.exp(-dt / 0.06);
+          carried[0] += ((x - from[0]) / dt - carried[0]) * k;
+          carried[1] += ((lift - from[1]) / dt - carried[1]) * k;
+        }
+        var target = Math.min(Math.max(carried[0] * 0.003, -0.9), 0.9) * hang;
+        swingV += ((target - swing) * 120 - swingV * 6) * dt;
+        swing += swingV * dt;
+        if (!clear && lift > reach() + 1) {
+          clear = true;
+          splashes.push({ x: x, time: time });
+        } else if (clear && lift <= reach()) {
+          clear = false;
+          splash(x, 0, 8);
+        }
+        if (!clear && lift > 0.5) wet = 1;
+        flail = lift > 0.5 ? 1 : flail * Math.exp(-4 * dt);
+      }
+      // One pointer at a time: a second finger, or a press while one is
+      // already down, is ignored rather than starting a hold timer that
+      // could fire after the first lets go and leave the swimmer stuck held
+      function ours(event) {
+        return press && event.pointerId === press.id;
+      }
+      function unselect() {
+        var selection = window.getSelection && window.getSelection();
+        if (selection) selection.removeAllRanges();
+      }
+      lane.addEventListener('pointerdown', function (event) {
+        if (press) return;
+        press = { id: event.pointerId, x: poolX(event), y: poolY(event), lift: 0, timer: setTimeout(grab, 180) };
+        // Nothing on the page can be selected while the water has the
+        // pointer, so a drag can't sweep a selection over the text above
+        document.documentElement.classList.add('pool-pressed');
+        unselect();
+        // Keep hearing about the pointer once it strays off the thin strip
+        try { lane.setPointerCapture(event.pointerId); } catch (e) {}
+      });
+      // A press here is for the water, not for starting a text selection that
+      // follows the drag across the page; on a phone, a long press would
+      // otherwise select the nearest words or pop up the callout menu
+      lane.addEventListener('mousedown', function (event) {
+        event.preventDefault();
+        unselect();
+      });
+      lane.addEventListener('touchstart', function (event) {
+        event.preventDefault();
+      }, { passive: false });
+      document.addEventListener('selectstart', function (event) {
+        if (press) event.preventDefault();
+      });
+      lane.addEventListener('pointermove', function (event) {
+        if (!ours(event)) return;
+        if (!held && Math.hypot(poolX(event) - press.x, poolY(event) - press.y) > 4) grab();
+        if (held) carry(poolX(event), poolY(event));
+      });
+      function release(event, cancelled) {
+        if (!press || (event && event.pointerId !== undefined && !ours(event))) return;
+        clearTimeout(press.timer);
+        if (!held && !cancelled) splash(press.x, 0);
+        if (held && aloft()) {
+          // Dropped, or thrown, from up there
+          mode = 'fall';
+          modeTime = 0;
+          fall = [Math.min(Math.max(carried[0], -250), 250),
+                  Math.min(Math.max(-carried[1], -160), 160)];
+          // High enough to have time for it, it balls up and turns at
+          // least half over before it's in
+          flip = 0;
+          unfurl = null;
+          balled = true;
+          var airtime = toWater();
+          balled = airtime > 0.3;
+          flipTo = balled ? Math.PI + TAU * Math.floor(Math.max(airtime - FLIP_TIME / 2, 0) / FLIP_TIME) : 0;
+          // Coming down near a wall, it turns to swim off away from it.
+          // Judged by where it will land, carried on by however it was
+          // thrown, against the room it needs to come up and get going: the
+          // kicks back up from a cannonball, or the glide from feet first.
+          var land = Math.min(Math.max(x + fall[0] * airtime, 20), W - 20);
+          var room = Math.max(W / 4, (balled ? 2 : UNDER_DIST) * SPEED * 1.2 + 30);
+          var ahead = dir > 0 ? W - land : land;
+          if (ahead < room && W - ahead > ahead) {
+            dir = -dir;
+          }
+        } else if (held) {
+          lift = hang = swing = swingV = 0;
+        }
+        carried = [0, 0];
+        held = false;
+        press = null;
+        lane.classList.remove('holding');
+        document.documentElement.classList.remove('pool-pressed');
+      }
+      lane.addEventListener('pointerup', function (event) { release(event, false); });
+      lane.addEventListener('pointercancel', function (event) { release(event, true); });
+      // However the pointer gets away (capture taken by the browser, the
+      // window losing focus mid-drag, the tab hidden), the swimmer is let go
+      // rather than left hanging until the next press
+      lane.addEventListener('lostpointercapture', function (event) { release(event, true); });
+      window.addEventListener('blur', function () { release(null, true); });
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) release(null, true);
+      });
+
+      var last = null, was = [x, lift];
+      function frame(now) {
+        // Cap the step so a backgrounded tab doesn't send it flying
+        var dt = last === null ? 0 : Math.min((now - last) / 1000, 0.05);
+        last = now;
+        // Held, the swimmer stays where it's put while the water carries on
+        if (held) {
+          time += dt;
+          holding(dt, was);
+        } else step(dt);
+        if (aloft()) wet = Math.max(wet - dt / 3, 0);
+        was = [x, lift];
+        churn(dt);
+        draw();
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    })();
+  </script>
+  <div class="footer">
+    <p class="updated" id="clock"><span id="clock-time"></span><span id="clock-in"> in </span><button type="button" class="clock-place" id="clock-place" title="Somewhere else">Princeton</button><span id="clock-diff"></span></p>
+    <nav class="webring" aria-label="Princeton webring" data-princeton-webring>
+      <a data-ring-prev href="https://firestoners.vercel.app/#https%3A%2F%2Fconancchen.github.io?nav=prev" aria-label="Previous website">&larr;</a>
+      <a href="https://firestoners.vercel.app/#https%3A%2F%2Fconancchen.github.io" aria-label="Explore the Princeton webring">
+        <img src="https://firestoners.vercel.app/icon.svg" alt="Firestone Library" width="32" height="32" />
+      </a>
+      <a data-ring-next href="https://firestoners.vercel.app/#https%3A%2F%2Fconancchen.github.io?nav=next" aria-label="Next website">&rarr;</a>
+    </nav>
+  </div>
+  <script src="https://firestoners.vercel.app/widget.js" defer></script>
+</div>
+
+<script>
+  // The clock starts in Princeton; clicking the place name scrambles it to
+  // another spot on the map and retunes the time to match. The list is baked in
+  // so the page never has to ask anyone where a city is — 500 of them,
+  // between them covering every hour the world keeps.
+  (function () {
+    var PLACES = [
+      // Home first; the rest are a spin of the globe
+      { label: 'Princeton', timeZone: 'America/New_York' },
+      // North America
+      { label: 'New York', timeZone: 'America/New_York' },
+      { label: 'Boston', timeZone: 'America/New_York' },
+      { label: 'Toronto', timeZone: 'America/Toronto' },
+      { label: 'Montréal', timeZone: 'America/Toronto' },
+      { label: 'Chicago', timeZone: 'America/Chicago' },
+      { label: 'Austin', timeZone: 'America/Chicago' },
+      { label: 'Denver', timeZone: 'America/Denver' },
+      { label: 'Santa Fe', timeZone: 'America/Denver' },
+      { label: 'Phoenix', timeZone: 'America/Phoenix' },
+      { label: 'Los Angeles', timeZone: 'America/Los_Angeles' },
+      { label: 'San Francisco', timeZone: 'America/Los_Angeles' },
+      { label: 'Seattle', timeZone: 'America/Los_Angeles' },
+      { label: 'Vancouver', timeZone: 'America/Vancouver' },
+      { label: 'Anchorage', timeZone: 'America/Anchorage' },
+      { label: 'Nome', timeZone: 'America/Nome' },
+      { label: 'Honolulu', timeZone: 'Pacific/Honolulu' },
+      { label: 'Whitehorse', timeZone: 'America/Whitehorse' },
+      { label: 'Iqaluit', timeZone: 'America/Iqaluit' },
+      { label: 'Halifax', timeZone: 'America/Halifax' },
+      { label: 'St. John\'s', timeZone: 'America/St_Johns' },
+      { label: 'Mexico City', timeZone: 'America/Mexico_City' },
+      { label: 'Tijuana', timeZone: 'America/Tijuana' },
+      { label: 'Havana', timeZone: 'America/Havana' },
+      { label: 'Kingston', timeZone: 'America/Jamaica' },
+      { label: 'San Juan', timeZone: 'America/Puerto_Rico' },
+      { label: 'Guatemala City', timeZone: 'America/Guatemala' },
+      { label: 'Panama City', timeZone: 'America/Panama' },
+      { label: 'Nuuk', timeZone: 'America/Nuuk' },
+      { label: 'Philadelphia', timeZone: 'America/New_York' },
+      { label: 'Washington, D.C.', timeZone: 'America/New_York' },
+      { label: 'Baltimore', timeZone: 'America/New_York' },
+      { label: 'Pittsburgh', timeZone: 'America/New_York' },
+      { label: 'Atlanta', timeZone: 'America/New_York' },
+      { label: 'Miami', timeZone: 'America/New_York' },
+      { label: 'Orlando', timeZone: 'America/New_York' },
+      { label: 'Charlotte', timeZone: 'America/New_York' },
+      { label: 'Raleigh', timeZone: 'America/New_York' },
+      { label: 'Nashville', timeZone: 'America/Chicago' },
+      { label: 'Detroit', timeZone: 'America/Detroit' },
+      { label: 'Cleveland', timeZone: 'America/New_York' },
+      { label: 'Columbus', timeZone: 'America/New_York' },
+      { label: 'Indianapolis', timeZone: 'America/Indiana/Indianapolis' },
+      { label: 'Louisville', timeZone: 'America/Kentucky/Louisville' },
+      { label: 'Buffalo', timeZone: 'America/New_York' },
+      { label: 'Providence', timeZone: 'America/New_York' },
+      { label: 'New Haven', timeZone: 'America/New_York' },
+      { label: 'Hartford', timeZone: 'America/New_York' },
+      { label: 'Portland, Maine', timeZone: 'America/New_York' },
+      { label: 'Burlington', timeZone: 'America/New_York' },
+      { label: 'Richmond', timeZone: 'America/New_York' },
+      { label: 'Savannah', timeZone: 'America/New_York' },
+      { label: 'Charleston', timeZone: 'America/New_York' },
+      { label: 'Tampa', timeZone: 'America/New_York' },
+      { label: 'Key West', timeZone: 'America/New_York' },
+      { label: 'New Orleans', timeZone: 'America/Chicago' },
+      { label: 'Houston', timeZone: 'America/Chicago' },
+      { label: 'Dallas', timeZone: 'America/Chicago' },
+      { label: 'San Antonio', timeZone: 'America/Chicago' },
+      { label: 'Memphis', timeZone: 'America/Chicago' },
+      { label: 'St. Louis', timeZone: 'America/Chicago' },
+      { label: 'Kansas City', timeZone: 'America/Chicago' },
+      { label: 'Minneapolis', timeZone: 'America/Chicago' },
+      { label: 'Milwaukee', timeZone: 'America/Chicago' },
+      { label: 'Madison', timeZone: 'America/Chicago' },
+      { label: 'Omaha', timeZone: 'America/Chicago' },
+      { label: 'Oklahoma City', timeZone: 'America/Chicago' },
+      { label: 'Winnipeg', timeZone: 'America/Winnipeg' },
+      { label: 'Regina', timeZone: 'America/Regina' },
+      { label: 'Saskatoon', timeZone: 'America/Regina' },
+      { label: 'Calgary', timeZone: 'America/Edmonton' },
+      { label: 'Edmonton', timeZone: 'America/Edmonton' },
+      { label: 'Yellowknife', timeZone: 'America/Edmonton' },
+      { label: 'Salt Lake City', timeZone: 'America/Denver' },
+      { label: 'Boise', timeZone: 'America/Boise' },
+      { label: 'Albuquerque', timeZone: 'America/Denver' },
+      { label: 'Boulder', timeZone: 'America/Denver' },
+      { label: 'Tucson', timeZone: 'America/Phoenix' },
+      { label: 'Las Vegas', timeZone: 'America/Los_Angeles' },
+      { label: 'San Diego', timeZone: 'America/Los_Angeles' },
+      { label: 'San Jose', timeZone: 'America/Los_Angeles' },
+      { label: 'Sacramento', timeZone: 'America/Los_Angeles' },
+      { label: 'Palo Alto', timeZone: 'America/Los_Angeles' },
+      { label: 'Portland', timeZone: 'America/Los_Angeles' },
+      { label: 'Victoria', timeZone: 'America/Vancouver' },
+      { label: 'Juneau', timeZone: 'America/Juneau' },
+      { label: 'Fairbanks', timeZone: 'America/Anchorage' },
+      { label: 'Utqiaġvik', timeZone: 'America/Anchorage' },
+      { label: 'Adak', timeZone: 'America/Adak' },
+      { label: 'Hilo', timeZone: 'Pacific/Honolulu' },
+      { label: 'Dawson City', timeZone: 'America/Dawson' },
+      { label: 'Ottawa', timeZone: 'America/Toronto' },
+      { label: 'Québec City', timeZone: 'America/Toronto' },
+      { label: 'Charlottetown', timeZone: 'America/Halifax' },
+      { label: 'Fredericton', timeZone: 'America/Moncton' },
+      { label: 'Goose Bay', timeZone: 'America/Goose_Bay' },
+      { label: 'Rankin Inlet', timeZone: 'America/Rankin_Inlet' },
+      { label: 'Cambridge Bay', timeZone: 'America/Cambridge_Bay' },
+      { label: 'Guadalajara', timeZone: 'America/Mexico_City' },
+      { label: 'Monterrey', timeZone: 'America/Monterrey' },
+      { label: 'Cancún', timeZone: 'America/Cancun' },
+      { label: 'Oaxaca', timeZone: 'America/Mexico_City' },
+      { label: 'Mérida', timeZone: 'America/Merida' },
+      { label: 'Puebla', timeZone: 'America/Mexico_City' },
+      { label: 'Chihuahua', timeZone: 'America/Chihuahua' },
+      { label: 'Hermosillo', timeZone: 'America/Hermosillo' },
+      // South America
+      { label: 'Bogotá', timeZone: 'America/Bogota' },
+      { label: 'Quito', timeZone: 'America/Guayaquil' },
+      { label: 'Lima', timeZone: 'America/Lima' },
+      { label: 'La Paz', timeZone: 'America/La_Paz' },
+      { label: 'Santiago', timeZone: 'America/Santiago' },
+      { label: 'Buenos Aires', timeZone: 'America/Argentina/Buenos_Aires' },
+      { label: 'Montevideo', timeZone: 'America/Montevideo' },
+      { label: 'Asunción', timeZone: 'America/Asuncion' },
+      { label: 'São Paulo', timeZone: 'America/Sao_Paulo' },
+      { label: 'Rio de Janeiro', timeZone: 'America/Sao_Paulo' },
+      { label: 'Manaus', timeZone: 'America/Manaus' },
+      { label: 'Caracas', timeZone: 'America/Caracas' },
+      { label: 'Galápagos', timeZone: 'Pacific/Galapagos' },
+      { label: 'Ushuaia', timeZone: 'America/Argentina/Ushuaia' },
+      { label: 'Medellín', timeZone: 'America/Bogota' },
+      { label: 'Cartagena', timeZone: 'America/Bogota' },
+      { label: 'Cali', timeZone: 'America/Bogota' },
+      { label: 'Guayaquil', timeZone: 'America/Guayaquil' },
+      { label: 'Cusco', timeZone: 'America/Lima' },
+      { label: 'Arequipa', timeZone: 'America/Lima' },
+      { label: 'Santa Cruz', timeZone: 'America/La_Paz' },
+      { label: 'Sucre', timeZone: 'America/La_Paz' },
+      { label: 'Valparaíso', timeZone: 'America/Santiago' },
+      { label: 'Punta Arenas', timeZone: 'America/Punta_Arenas' },
+      { label: 'Córdoba', timeZone: 'America/Argentina/Cordoba' },
+      { label: 'Mendoza', timeZone: 'America/Argentina/Mendoza' },
+      { label: 'Bariloche', timeZone: 'America/Argentina/Salta' },
+      { label: 'Salta', timeZone: 'America/Argentina/Salta' },
+      { label: 'Rosario', timeZone: 'America/Argentina/Buenos_Aires' },
+      { label: 'Brasília', timeZone: 'America/Sao_Paulo' },
+      { label: 'Salvador', timeZone: 'America/Bahia' },
+      { label: 'Recife', timeZone: 'America/Recife' },
+      { label: 'Fortaleza', timeZone: 'America/Fortaleza' },
+      { label: 'Belém', timeZone: 'America/Belem' },
+      { label: 'Porto Alegre', timeZone: 'America/Sao_Paulo' },
+      { label: 'Curitiba', timeZone: 'America/Sao_Paulo' },
+      { label: 'Florianópolis', timeZone: 'America/Sao_Paulo' },
+      { label: 'Belo Horizonte', timeZone: 'America/Sao_Paulo' },
+      { label: 'Cuiabá', timeZone: 'America/Cuiaba' },
+      { label: 'Campo Grande', timeZone: 'America/Campo_Grande' },
+      { label: 'Porto Velho', timeZone: 'America/Porto_Velho' },
+      { label: 'Rio Branco', timeZone: 'America/Rio_Branco' },
+      // Europe
+      { label: 'Reykjavík', timeZone: 'Atlantic/Reykjavik' },
+      { label: 'Dublin', timeZone: 'Europe/Dublin' },
+      { label: 'London', timeZone: 'Europe/London' },
+      { label: 'Lisbon', timeZone: 'Europe/Lisbon' },
+      { label: 'Madrid', timeZone: 'Europe/Madrid' },
+      { label: 'Barcelona', timeZone: 'Europe/Madrid' },
+      { label: 'Paris', timeZone: 'Europe/Paris' },
+      { label: 'Brussels', timeZone: 'Europe/Brussels' },
+      { label: 'Amsterdam', timeZone: 'Europe/Amsterdam' },
+      { label: 'Berlin', timeZone: 'Europe/Berlin' },
+      { label: 'Zürich', timeZone: 'Europe/Zurich' },
+      { label: 'Milan', timeZone: 'Europe/Rome' },
+      { label: 'Rome', timeZone: 'Europe/Rome' },
+      { label: 'Vienna', timeZone: 'Europe/Vienna' },
+      { label: 'Prague', timeZone: 'Europe/Prague' },
+      { label: 'Warsaw', timeZone: 'Europe/Warsaw' },
+      { label: 'Copenhagen', timeZone: 'Europe/Copenhagen' },
+      { label: 'Oslo', timeZone: 'Europe/Oslo' },
+      { label: 'Stockholm', timeZone: 'Europe/Stockholm' },
+      { label: 'Helsinki', timeZone: 'Europe/Helsinki' },
+      { label: 'Tallinn', timeZone: 'Europe/Tallinn' },
+      { label: 'Riga', timeZone: 'Europe/Riga' },
+      { label: 'Vilnius', timeZone: 'Europe/Vilnius' },
+      { label: 'Kyiv', timeZone: 'Europe/Kyiv' },
+      { label: 'Bucharest', timeZone: 'Europe/Bucharest' },
+      { label: 'Sofia', timeZone: 'Europe/Sofia' },
+      { label: 'Athens', timeZone: 'Europe/Athens' },
+      { label: 'Istanbul', timeZone: 'Europe/Istanbul' },
+      { label: 'Belgrade', timeZone: 'Europe/Belgrade' },
+      { label: 'Budapest', timeZone: 'Europe/Budapest' },
+      { label: 'Moscow', timeZone: 'Europe/Moscow' },
+      { label: 'Tórshavn', timeZone: 'Atlantic/Faroe' },
+      { label: 'Azores', timeZone: 'Atlantic/Azores' },
+      { label: 'Longyearbyen', timeZone: 'Arctic/Longyearbyen' },
+      { label: 'Edinburgh', timeZone: 'Europe/London' },
+      { label: 'Glasgow', timeZone: 'Europe/London' },
+      { label: 'Manchester', timeZone: 'Europe/London' },
+      { label: 'Oxford', timeZone: 'Europe/London' },
+      { label: 'Cambridge', timeZone: 'Europe/London' },
+      { label: 'Belfast', timeZone: 'Europe/London' },
+      { label: 'Cardiff', timeZone: 'Europe/London' },
+      { label: 'Cork', timeZone: 'Europe/Dublin' },
+      { label: 'Galway', timeZone: 'Europe/Dublin' },
+      { label: 'Porto', timeZone: 'Europe/Lisbon' },
+      { label: 'Madeira', timeZone: 'Atlantic/Madeira' },
+      { label: 'Seville', timeZone: 'Europe/Madrid' },
+      { label: 'Valencia', timeZone: 'Europe/Madrid' },
+      { label: 'Bilbao', timeZone: 'Europe/Madrid' },
+      { label: 'Granada', timeZone: 'Europe/Madrid' },
+      { label: 'Palma', timeZone: 'Europe/Madrid' },
+      { label: 'Canary Islands', timeZone: 'Atlantic/Canary' },
+      { label: 'Gibraltar', timeZone: 'Europe/Gibraltar' },
+      { label: 'Andorra la Vella', timeZone: 'Europe/Andorra' },
+      { label: 'Lyon', timeZone: 'Europe/Paris' },
+      { label: 'Marseille', timeZone: 'Europe/Paris' },
+      { label: 'Nice', timeZone: 'Europe/Paris' },
+      { label: 'Bordeaux', timeZone: 'Europe/Paris' },
+      { label: 'Strasbourg', timeZone: 'Europe/Paris' },
+      { label: 'Monaco', timeZone: 'Europe/Monaco' },
+      { label: 'Luxembourg', timeZone: 'Europe/Luxembourg' },
+      { label: 'Antwerp', timeZone: 'Europe/Brussels' },
+      { label: 'Rotterdam', timeZone: 'Europe/Amsterdam' },
+      { label: 'The Hague', timeZone: 'Europe/Amsterdam' },
+      { label: 'Hamburg', timeZone: 'Europe/Berlin' },
+      { label: 'Munich', timeZone: 'Europe/Berlin' },
+      { label: 'Frankfurt', timeZone: 'Europe/Berlin' },
+      { label: 'Cologne', timeZone: 'Europe/Berlin' },
+      { label: 'Dresden', timeZone: 'Europe/Berlin' },
+      { label: 'Geneva', timeZone: 'Europe/Zurich' },
+      { label: 'Bern', timeZone: 'Europe/Zurich' },
+      { label: 'Vaduz', timeZone: 'Europe/Vaduz' },
+      { label: 'Salzburg', timeZone: 'Europe/Vienna' },
+      { label: 'Innsbruck', timeZone: 'Europe/Vienna' },
+      { label: 'Venice', timeZone: 'Europe/Rome' },
+      { label: 'Florence', timeZone: 'Europe/Rome' },
+      { label: 'Naples', timeZone: 'Europe/Rome' },
+      { label: 'Turin', timeZone: 'Europe/Rome' },
+      { label: 'Bologna', timeZone: 'Europe/Rome' },
+      { label: 'Palermo', timeZone: 'Europe/Rome' },
+      { label: 'Vatican City', timeZone: 'Europe/Vatican' },
+      { label: 'San Marino', timeZone: 'Europe/San_Marino' },
+      { label: 'Valletta', timeZone: 'Europe/Malta' },
+      { label: 'Ljubljana', timeZone: 'Europe/Ljubljana' },
+      { label: 'Zagreb', timeZone: 'Europe/Zagreb' },
+      { label: 'Split', timeZone: 'Europe/Zagreb' },
+      { label: 'Dubrovnik', timeZone: 'Europe/Zagreb' },
+      { label: 'Sarajevo', timeZone: 'Europe/Sarajevo' },
+      { label: 'Podgorica', timeZone: 'Europe/Podgorica' },
+      { label: 'Tirana', timeZone: 'Europe/Tirane' },
+      { label: 'Skopje', timeZone: 'Europe/Skopje' },
+      { label: 'Pristina', timeZone: 'Europe/Belgrade' },
+      { label: 'Thessaloniki', timeZone: 'Europe/Athens' },
+      { label: 'Santorini', timeZone: 'Europe/Athens' },
+      { label: 'Crete', timeZone: 'Europe/Athens' },
+      { label: 'Nicosia', timeZone: 'Asia/Nicosia' },
+      { label: 'Bratislava', timeZone: 'Europe/Bratislava' },
+      { label: 'Brno', timeZone: 'Europe/Prague' },
+      { label: 'Kraków', timeZone: 'Europe/Warsaw' },
+      { label: 'Gdańsk', timeZone: 'Europe/Warsaw' },
+      { label: 'Wrocław', timeZone: 'Europe/Warsaw' },
+      { label: 'Chișinău', timeZone: 'Europe/Chisinau' },
+      { label: 'Minsk', timeZone: 'Europe/Minsk' },
+      { label: 'Lviv', timeZone: 'Europe/Kyiv' },
+      // Africa and the Middle East
+      { label: 'Casablanca', timeZone: 'Africa/Casablanca' },
+      { label: 'Marrakesh', timeZone: 'Africa/Casablanca' },
+      { label: 'Dakar', timeZone: 'Africa/Dakar' },
+      { label: 'Accra', timeZone: 'Africa/Accra' },
+      { label: 'Lagos', timeZone: 'Africa/Lagos' },
+      { label: 'Kinshasa', timeZone: 'Africa/Kinshasa' },
+      { label: 'Cairo', timeZone: 'Africa/Cairo' },
+      { label: 'Khartoum', timeZone: 'Africa/Khartoum' },
+      { label: 'Addis Ababa', timeZone: 'Africa/Addis_Ababa' },
+      { label: 'Nairobi', timeZone: 'Africa/Nairobi' },
+      { label: 'Dar es Salaam', timeZone: 'Africa/Dar_es_Salaam' },
+      { label: 'Kampala', timeZone: 'Africa/Kampala' },
+      { label: 'Luanda', timeZone: 'Africa/Luanda' },
+      { label: 'Windhoek', timeZone: 'Africa/Windhoek' },
+      { label: 'Johannesburg', timeZone: 'Africa/Johannesburg' },
+      { label: 'Cape Town', timeZone: 'Africa/Johannesburg' },
+      { label: 'Antananarivo', timeZone: 'Indian/Antananarivo' },
+      { label: 'Mauritius', timeZone: 'Indian/Mauritius' },
+      { label: 'Tel Aviv', timeZone: 'Asia/Jerusalem' },
+      { label: 'Beirut', timeZone: 'Asia/Beirut' },
+      { label: 'Amman', timeZone: 'Asia/Amman' },
+      { label: 'Riyadh', timeZone: 'Asia/Riyadh' },
+      { label: 'Dubai', timeZone: 'Asia/Dubai' },
+      { label: 'Doha', timeZone: 'Asia/Qatar' },
+      { label: 'Tehran', timeZone: 'Asia/Tehran' },
+      { label: 'Baku', timeZone: 'Asia/Baku' },
+      { label: 'Tbilisi', timeZone: 'Asia/Tbilisi' },
+      { label: 'Yerevan', timeZone: 'Asia/Yerevan' },
+      { label: 'Rabat', timeZone: 'Africa/Casablanca' },
+      { label: 'Fez', timeZone: 'Africa/Casablanca' },
+      { label: 'Tangier', timeZone: 'Africa/Casablanca' },
+      { label: 'Laayoune', timeZone: 'Africa/El_Aaiun' },
+      { label: 'Algiers', timeZone: 'Africa/Algiers' },
+      { label: 'Oran', timeZone: 'Africa/Algiers' },
+      { label: 'Tunis', timeZone: 'Africa/Tunis' },
+      { label: 'Tripoli', timeZone: 'Africa/Tripoli' },
+      { label: 'Alexandria', timeZone: 'Africa/Cairo' },
+      { label: 'Luxor', timeZone: 'Africa/Cairo' },
+      { label: 'Nouakchott', timeZone: 'Africa/Nouakchott' },
+      { label: 'Bamako', timeZone: 'Africa/Bamako' },
+      { label: 'Timbuktu', timeZone: 'Africa/Bamako' },
+      { label: 'Niamey', timeZone: 'Africa/Niamey' },
+      { label: 'Ouagadougou', timeZone: 'Africa/Ouagadougou' },
+      { label: 'Banjul', timeZone: 'Africa/Banjul' },
+      { label: 'Bissau', timeZone: 'Africa/Bissau' },
+      { label: 'Conakry', timeZone: 'Africa/Conakry' },
+      { label: 'Freetown', timeZone: 'Africa/Freetown' },
+      { label: 'Monrovia', timeZone: 'Africa/Monrovia' },
+      { label: 'Abidjan', timeZone: 'Africa/Abidjan' },
+      { label: 'Lomé', timeZone: 'Africa/Lome' },
+      { label: 'Cotonou', timeZone: 'Africa/Porto-Novo' },
+      { label: 'Abuja', timeZone: 'Africa/Lagos' },
+      { label: 'Kano', timeZone: 'Africa/Lagos' },
+      { label: 'Douala', timeZone: 'Africa/Douala' },
+      { label: 'Yaoundé', timeZone: 'Africa/Douala' },
+      { label: 'Malabo', timeZone: 'Africa/Malabo' },
+      { label: 'Libreville', timeZone: 'Africa/Libreville' },
+      { label: 'São Tomé', timeZone: 'Africa/Sao_Tome' },
+      { label: 'Brazzaville', timeZone: 'Africa/Brazzaville' },
+      { label: 'Bangui', timeZone: 'Africa/Bangui' },
+      { label: 'N\'Djamena', timeZone: 'Africa/Ndjamena' },
+      { label: 'Lubumbashi', timeZone: 'Africa/Lubumbashi' },
+      { label: 'Goma', timeZone: 'Africa/Lubumbashi' },
+      { label: 'Kigali', timeZone: 'Africa/Kigali' },
+      { label: 'Bujumbura', timeZone: 'Africa/Bujumbura' },
+      { label: 'Juba', timeZone: 'Africa/Juba' },
+      { label: 'Asmara', timeZone: 'Africa/Asmara' },
+      { label: 'Djibouti', timeZone: 'Africa/Djibouti' },
+      { label: 'Mogadishu', timeZone: 'Africa/Mogadishu' },
+      { label: 'Hargeisa', timeZone: 'Africa/Mogadishu' },
+      { label: 'Mombasa', timeZone: 'Africa/Nairobi' },
+      { label: 'Zanzibar', timeZone: 'Africa/Dar_es_Salaam' },
+      { label: 'Arusha', timeZone: 'Africa/Dar_es_Salaam' },
+      { label: 'Lilongwe', timeZone: 'Africa/Blantyre' },
+      { label: 'Lusaka', timeZone: 'Africa/Lusaka' },
+      { label: 'Victoria Falls', timeZone: 'Africa/Harare' },
+      { label: 'Harare', timeZone: 'Africa/Harare' },
+      { label: 'Maputo', timeZone: 'Africa/Maputo' },
+      { label: 'Gaborone', timeZone: 'Africa/Gaborone' },
+      { label: 'Maseru', timeZone: 'Africa/Maseru' },
+      { label: 'Mbabane', timeZone: 'Africa/Mbabane' },
+      { label: 'Durban', timeZone: 'Africa/Johannesburg' },
+      { label: 'Pretoria', timeZone: 'Africa/Johannesburg' },
+      { label: 'Moroni', timeZone: 'Indian/Comoro' },
+      { label: 'Mamoudzou', timeZone: 'Indian/Mayotte' },
+      { label: 'Saint-Denis, Réunion', timeZone: 'Indian/Reunion' },
+      // Asia
+      { label: 'Karachi', timeZone: 'Asia/Karachi' },
+      { label: 'Lahore', timeZone: 'Asia/Karachi' },
+      { label: 'Kabul', timeZone: 'Asia/Kabul' },
+      { label: 'Tashkent', timeZone: 'Asia/Tashkent' },
+      { label: 'Almaty', timeZone: 'Asia/Almaty' },
+      { label: 'Delhi', timeZone: 'Asia/Kolkata' },
+      { label: 'Mumbai', timeZone: 'Asia/Kolkata' },
+      { label: 'Bengaluru', timeZone: 'Asia/Kolkata' },
+      { label: 'Colombo', timeZone: 'Asia/Colombo' },
+      { label: 'Kathmandu', timeZone: 'Asia/Kathmandu' },
+      { label: 'Dhaka', timeZone: 'Asia/Dhaka' },
+      { label: 'Yangon', timeZone: 'Asia/Yangon' },
+      { label: 'Bangkok', timeZone: 'Asia/Bangkok' },
+      { label: 'Hanoi', timeZone: 'Asia/Ho_Chi_Minh' },
+      { label: 'Phnom Penh', timeZone: 'Asia/Phnom_Penh' },
+      { label: 'Kuala Lumpur', timeZone: 'Asia/Kuala_Lumpur' },
+      { label: 'Singapore', timeZone: 'Asia/Singapore' },
+      { label: 'Jakarta', timeZone: 'Asia/Jakarta' },
+      { label: 'Bali', timeZone: 'Asia/Makassar' },
+      { label: 'Manila', timeZone: 'Asia/Manila' },
+      { label: 'Hong Kong', timeZone: 'Asia/Hong_Kong' },
+      { label: 'Taipei', timeZone: 'Asia/Taipei' },
+      { label: 'Shanghai', timeZone: 'Asia/Shanghai' },
+      { label: 'Beijing', timeZone: 'Asia/Shanghai' },
+      { label: 'Chengdu', timeZone: 'Asia/Shanghai' },
+      { label: 'Ulaanbaatar', timeZone: 'Asia/Ulaanbaatar' },
+      { label: 'Seoul', timeZone: 'Asia/Seoul' },
+      { label: 'Tokyo', timeZone: 'Asia/Tokyo' },
+      { label: 'Kyoto', timeZone: 'Asia/Tokyo' },
+      { label: 'Sapporo', timeZone: 'Asia/Tokyo' },
+      { label: 'Vladivostok', timeZone: 'Asia/Vladivostok' },
+      { label: 'Novosibirsk', timeZone: 'Asia/Novosibirsk' },
+      { label: 'Yekaterinburg', timeZone: 'Asia/Yekaterinburg' },
+      { label: 'Kamchatka', timeZone: 'Asia/Kamchatka' },
+      { label: 'Islamabad', timeZone: 'Asia/Karachi' },
+      { label: 'Peshawar', timeZone: 'Asia/Karachi' },
+      { label: 'Herat', timeZone: 'Asia/Kabul' },
+      { label: 'Samarkand', timeZone: 'Asia/Samarkand' },
+      { label: 'Bukhara', timeZone: 'Asia/Samarkand' },
+      { label: 'Bishkek', timeZone: 'Asia/Bishkek' },
+      { label: 'Dushanbe', timeZone: 'Asia/Dushanbe' },
+      { label: 'Ashgabat', timeZone: 'Asia/Ashgabat' },
+      { label: 'Astana', timeZone: 'Asia/Almaty' },
+      { label: 'Aktau', timeZone: 'Asia/Aqtau' },
+      { label: 'Kolkata', timeZone: 'Asia/Kolkata' },
+      { label: 'Chennai', timeZone: 'Asia/Kolkata' },
+      { label: 'Hyderabad', timeZone: 'Asia/Kolkata' },
+      { label: 'Pune', timeZone: 'Asia/Kolkata' },
+      { label: 'Jaipur', timeZone: 'Asia/Kolkata' },
+      { label: 'Varanasi', timeZone: 'Asia/Kolkata' },
+      { label: 'Goa', timeZone: 'Asia/Kolkata' },
+      { label: 'Ahmedabad', timeZone: 'Asia/Kolkata' },
+      { label: 'Kochi', timeZone: 'Asia/Kolkata' },
+      { label: 'Leh', timeZone: 'Asia/Kolkata' },
+      { label: 'Thimphu', timeZone: 'Asia/Thimphu' },
+      { label: 'Malé', timeZone: 'Indian/Maldives' },
+      { label: 'Chittagong', timeZone: 'Asia/Dhaka' },
+      { label: 'Mandalay', timeZone: 'Asia/Yangon' },
+      { label: 'Chiang Mai', timeZone: 'Asia/Bangkok' },
+      { label: 'Phuket', timeZone: 'Asia/Bangkok' },
+      { label: 'Vientiane', timeZone: 'Asia/Vientiane' },
+      { label: 'Luang Prabang', timeZone: 'Asia/Vientiane' },
+      { label: 'Ho Chi Minh City', timeZone: 'Asia/Ho_Chi_Minh' },
+      { label: 'Da Nang', timeZone: 'Asia/Ho_Chi_Minh' },
+      { label: 'Siem Reap', timeZone: 'Asia/Phnom_Penh' },
+      { label: 'Penang', timeZone: 'Asia/Kuala_Lumpur' },
+      { label: 'Kota Kinabalu', timeZone: 'Asia/Kuching' },
+      { label: 'Kuching', timeZone: 'Asia/Kuching' },
+      { label: 'Bandar Seri Begawan', timeZone: 'Asia/Brunei' },
+      { label: 'Surabaya', timeZone: 'Asia/Jakarta' },
+      { label: 'Yogyakarta', timeZone: 'Asia/Jakarta' },
+      { label: 'Medan', timeZone: 'Asia/Jakarta' },
+      { label: 'Makassar', timeZone: 'Asia/Makassar' },
+      { label: 'Jayapura', timeZone: 'Asia/Jayapura' },
+      { label: 'Dili', timeZone: 'Asia/Dili' },
+      { label: 'Cebu', timeZone: 'Asia/Manila' },
+      { label: 'Davao', timeZone: 'Asia/Manila' },
+      { label: 'Macau', timeZone: 'Asia/Macau' },
+      { label: 'Shenzhen', timeZone: 'Asia/Shanghai' },
+      { label: 'Guangzhou', timeZone: 'Asia/Shanghai' },
+      { label: 'Hangzhou', timeZone: 'Asia/Shanghai' },
+      { label: 'Nanjing', timeZone: 'Asia/Shanghai' },
+      { label: 'Suzhou', timeZone: 'Asia/Shanghai' },
+      { label: 'Xi\'an', timeZone: 'Asia/Shanghai' },
+      { label: 'Wuhan', timeZone: 'Asia/Shanghai' },
+      { label: 'Chongqing', timeZone: 'Asia/Shanghai' },
+      { label: 'Kunming', timeZone: 'Asia/Shanghai' },
+      { label: 'Guilin', timeZone: 'Asia/Shanghai' },
+      { label: 'Harbin', timeZone: 'Asia/Shanghai' },
+      { label: 'Qingdao', timeZone: 'Asia/Shanghai' },
+      { label: 'Tianjin', timeZone: 'Asia/Shanghai' },
+      { label: 'Xiamen', timeZone: 'Asia/Shanghai' },
+      { label: 'Lhasa', timeZone: 'Asia/Shanghai' },
+      { label: 'Ürümqi', timeZone: 'Asia/Urumqi' },
+      { label: 'Kaohsiung', timeZone: 'Asia/Taipei' },
+      { label: 'Tainan', timeZone: 'Asia/Taipei' },
+      { label: 'Busan', timeZone: 'Asia/Seoul' },
+      { label: 'Jeju', timeZone: 'Asia/Seoul' },
+      { label: 'Incheon', timeZone: 'Asia/Seoul' },
+      // Oceania and the far south
+      { label: 'Perth', timeZone: 'Australia/Perth' },
+      { label: 'Adelaide', timeZone: 'Australia/Adelaide' },
+      { label: 'Darwin', timeZone: 'Australia/Darwin' },
+      { label: 'Brisbane', timeZone: 'Australia/Brisbane' },
+      { label: 'Melbourne', timeZone: 'Australia/Melbourne' },
+      { label: 'Sydney', timeZone: 'Australia/Sydney' },
+      { label: 'Hobart', timeZone: 'Australia/Hobart' },
+      { label: 'Auckland', timeZone: 'Pacific/Auckland' },
+      { label: 'Wellington', timeZone: 'Pacific/Auckland' },
+      { label: 'Chatham Islands', timeZone: 'Pacific/Chatham' },
+      { label: 'Suva', timeZone: 'Pacific/Fiji' },
+      { label: 'Nouméa', timeZone: 'Pacific/Noumea' },
+      { label: 'Port Moresby', timeZone: 'Pacific/Port_Moresby' },
+      { label: 'Apia', timeZone: 'Pacific/Apia' },
+      { label: 'Tongatapu', timeZone: 'Pacific/Tongatapu' },
+      { label: 'Tahiti', timeZone: 'Pacific/Tahiti' },
+      { label: 'Easter Island', timeZone: 'Pacific/Easter' },
+      { label: 'Guam', timeZone: 'Pacific/Guam' },
+      { label: 'Midway', timeZone: 'Pacific/Midway' },
+      { label: 'McMurdo Station', timeZone: 'Antarctica/McMurdo' },
+      { label: 'Rothera Station', timeZone: 'Antarctica/Rothera' },
+      { label: 'Casey Station', timeZone: 'Antarctica/Casey' },
+      { label: 'Canberra', timeZone: 'Australia/Sydney' },
+      { label: 'Gold Coast', timeZone: 'Australia/Brisbane' },
+      { label: 'Cairns', timeZone: 'Australia/Brisbane' },
+      { label: 'Townsville', timeZone: 'Australia/Brisbane' },
+      { label: 'Alice Springs', timeZone: 'Australia/Darwin' },
+      { label: 'Uluru', timeZone: 'Australia/Darwin' },
+      { label: 'Broome', timeZone: 'Australia/Perth' },
+      { label: 'Eucla', timeZone: 'Australia/Eucla' },
+      { label: 'Broken Hill', timeZone: 'Australia/Broken_Hill' },
+      { label: 'Lord Howe Island', timeZone: 'Australia/Lord_Howe' },
+      { label: 'Norfolk Island', timeZone: 'Pacific/Norfolk' },
+      { label: 'Christmas Island', timeZone: 'Indian/Christmas' },
+      { label: 'Cocos Islands', timeZone: 'Indian/Cocos' },
+      { label: 'Christchurch', timeZone: 'Pacific/Auckland' },
+      { label: 'Queenstown', timeZone: 'Pacific/Auckland' },
+      { label: 'Dunedin', timeZone: 'Pacific/Auckland' },
+      { label: 'Rotorua', timeZone: 'Pacific/Auckland' },
+      { label: 'Nadi', timeZone: 'Pacific/Fiji' },
+      { label: 'Port Vila', timeZone: 'Pacific/Efate' },
+      { label: 'Honiara', timeZone: 'Pacific/Guadalcanal' },
+      { label: 'Bougainville', timeZone: 'Pacific/Bougainville' },
+      { label: 'Nuku\'alofa', timeZone: 'Pacific/Tongatapu' },
+      { label: 'Pago Pago', timeZone: 'Pacific/Pago_Pago' },
+      { label: 'Rarotonga', timeZone: 'Pacific/Rarotonga' },
+      { label: 'Niue', timeZone: 'Pacific/Niue' },
+      { label: 'Funafuti', timeZone: 'Pacific/Funafuti' },
+      { label: 'Tarawa', timeZone: 'Pacific/Tarawa' },
+      { label: 'Kiritimati', timeZone: 'Pacific/Kiritimati' },
+      { label: 'Kanton Island', timeZone: 'Pacific/Kanton' },
+      { label: 'Majuro', timeZone: 'Pacific/Majuro' },
+      { label: 'Kwajalein', timeZone: 'Pacific/Kwajalein' },
+      { label: 'Palikir', timeZone: 'Pacific/Pohnpei' },
+      { label: 'Chuuk', timeZone: 'Pacific/Chuuk' },
+      { label: 'Kosrae', timeZone: 'Pacific/Kosrae' },
+      { label: 'Koror', timeZone: 'Pacific/Palau' },
+      { label: 'Saipan', timeZone: 'Pacific/Saipan' },
+      { label: 'Yaren', timeZone: 'Pacific/Nauru' },
+      { label: 'Wallis and Futuna', timeZone: 'Pacific/Wallis' },
+      { label: 'Marquesas Islands', timeZone: 'Pacific/Marquesas' },
+      { label: 'Gambier Islands', timeZone: 'Pacific/Gambier' },
+      { label: 'Pitcairn Islands', timeZone: 'Pacific/Pitcairn' },
+      { label: 'Tokelau', timeZone: 'Pacific/Fakaofo' }
+    ];
+
+    var timeEl = document.getElementById('clock-time');
+    var inEl = document.getElementById('clock-in');
+    var placeEl = document.getElementById('clock-place');
+    var diffEl = document.getElementById('clock-diff');
+    var format;
+    var current = -1;
+    var scrambling = false;  // the scramble owns the time while it runs
+
+    function setZone(i) {
+      var place = PLACES[i];
+      try {
+        format = new Intl.DateTimeFormat('en-US', {
+          timeZone: place.timeZone,
+          hour: 'numeric',
+          minute: '2-digit',
+          second: '2-digit'
+        });
+      } catch (e) {
+        return false;  // a zone this browser has never heard of
+      }
+      current = i;
+      tick();
+      if (!scrambling) diffEl.textContent = diff();
+      return true;
+    }
+
+    function now() {
+      return format.format(new Date());
+    }
+
+    function tick() {
+      if (!scrambling) timeEl.textContent = now();
+    }
+
+    // How far the place's clock runs ahead of (or behind) the viewer's own,
+    // like " (+13h)" or " (−4h 30m)", and nothing when they read the same.
+    // The place's offset comes from its wall time read back as if it were UTC.
+    function diff() {
+      var date = new Date();
+      var p = {};
+      new Intl.DateTimeFormat('en-US', {
+        timeZone: PLACES[current].timeZone, hourCycle: 'h23',
+        year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric'
+      }).formatToParts(date).forEach(function (part) { p[part.type] = +part.value; });
+      var there = (Date.UTC(p.year, p.month - 1, p.day, p.hour % 24, p.minute) - Math.floor(date / 60000) * 60000) / 60000;
+      var minutes = Math.round(there + date.getTimezoneOffset());
+      if (!minutes) return '';
+      var abs = Math.abs(minutes);
+      return ' (' + (minutes > 0 ? '+' : '\u2212') + Math.floor(abs / 60) + 'h' +
+        (abs % 60 ? ' ' + abs % 60 + 'm' : '') + ')';
+    }
+
+    function elsewhere() {
+      if (scrambling) return;  // let one scramble finish before the next
+      for (var tries = 0; tries < 20; tries++) {
+        var i = Math.floor(Math.random() * PLACES.length);
+        if (i === current) continue;
+        // Claim the time first, so the new zone's time doesn't flash up
+        // before the scramble starts
+        scrambling = true;
+        if (!setZone(i)) { scrambling = false; continue; }
+        // The whole line scrambles, time and all, into the new place
+        window.scrambleSwap([[timeEl, now], [inEl, ' in '], [placeEl, PLACES[i].label], [diffEl, diff]], 700, function () {
+          scrambling = false;
+        });
+        return;
+      }
+    }
+
+    placeEl.addEventListener('click', elsewhere);
+
+    setZone(0);
+    placeEl.textContent = PLACES[0].label;
+    setInterval(tick, 1000);
+  })();
+</script>
+
