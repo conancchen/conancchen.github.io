@@ -4,7 +4,7 @@
 /**************/
 /* THEME      */
 /**************/
-// Light is the default; the toggle opts into dark and remembers the choice
+// The site is light only
 :root {
   color-scheme: light;
   --bg: #fff;
@@ -25,25 +25,6 @@
   --glow: rgba(55, 135, 240, 0.22);  // the water's tint just under the surface
 }
 
-:root[data-theme="dark"] {
-  color-scheme: dark;
-  --bg: #121212;
-  --text: #f2f2f0;
-  --muted: #8a8a8a;
-  --rule: #3a3a3a;
-  --link: #9a9a98;
-  --underline: #55554f;
-  --swim: #3987e5;
-  --bike: #008300;
-  --run: #e66767;
-  --toast-bg: #f2f2f0;
-  --toast-text: #121212;
-  --lane: #3a5a78;
-  --foam: #e6e6e4;
-  --hurt: #ff5a4f;
-  --underwater: 0.35;
-  --glow: rgba(60, 160, 250, 0.3);
-}
 
 
 
@@ -234,17 +215,6 @@ $reveal: '.subtitle, .header-actions, .bio, .block, .rule, .updated, .webring, .
   color: var(--text);
 }
 
-// The theme toggle shows a moon on the light page and a sun on the dark one,
-// matching /strava and /study
-.icon-theme .icon-sun,
-:root[data-theme="dark"] .icon-theme .icon-moon {
-  display: none;
-}
-
-:root[data-theme="dark"] .icon-theme .icon-sun {
-  display: inline;
-}
-
 // Moving between pages on this site (and /strava, /study) keeps the name in
 // place while the rest swaps
 @view-transition {
@@ -322,10 +292,6 @@ $reveal: '.subtitle, .header-actions, .bio, .block, .rule, .updated, .webring, .
   border-radius: 3px;
 }
 
-// Logos drawn in plain black are flipped to white on the dark page
-:root[data-theme="dark"] .row-icon-mono {
-  filter: invert(1);
-}
 
 .row-year {
   color: var(--muted);
@@ -955,7 +921,7 @@ $dot-center: calc(4px + 20px / 2);
   margin-top: 48px;
 }
 
-// The painting's frame: light oak on the light page, walnut on the dark one
+// The painting's frame: light oak
 :root {
   --frame-face: #c9a878;
   --frame-top: #d9bf95;
@@ -963,12 +929,6 @@ $dot-center: calc(4px + 20px / 2);
   --frame-lip: #e8d6b4;
 }
 
-:root[data-theme="dark"] {
-  --frame-face: #5c4331;
-  --frame-top: #6f5440;
-  --frame-side: #3f2e22;
-  --frame-lip: #8c7150;
-}
 
 .frame-face { fill: var(--frame-face); }
 .frame-top { fill: var(--frame-top); }
@@ -984,12 +944,6 @@ $dot-center: calc(4px + 20px / 2);
   --crate-ink: rgba(70, 45, 20, 0.55);
 }
 
-:root[data-theme="dark"] {
-  --crate: #9b7a52;
-  --crate-side: #765a3a;
-  --crate-inside: #4a3824;
-  --crate-ink: rgba(30, 20, 10, 0.6);
-}
 
 .bin-front { fill: var(--crate); }
 .bin-side { fill: var(--crate-side); }
@@ -1286,13 +1240,6 @@ $dot-center: calc(4px + 20px / 2);
   --shelf-ink: #1a1a18;
 }
 
-:root[data-theme="dark"] {
-  // the same pale wood on the dark page, a shade down
-  --plank-top: #d4cdbf;
-  --plank-front: #bfb7a7;
-  --plank-end: #b3ab9a;
-  --shelf-ink: #000;  // black outlines on the dark page, rather than gray
-}
 
 .plank-top,
 .plank-front,
@@ -1497,44 +1444,13 @@ $dot-center: calc(4px + 20px / 2);
   color: rgb(55, 135, 240);
 }
 
-// In dark mode, everything on the shelf and the pictures under it give off
-// a faint glow, so they lift off the dark page
-:root[data-theme="dark"] {
-  .shelf-book,
-  .art-bin {
-    filter: drop-shadow(0 0 5px rgba(255, 244, 220, 0.132));
-  }
 
-  .art-fig img,
-  .read .cover {
-    box-shadow: 0 0 14px rgba(255, 244, 220, 0.11);
-  }
-}
-
-// The pothos's pot, a soft white, a little dimmer on the dark page; there its
-// leaves are outlined in dark green rather than the page's gray lines, so
-// they stay rich instead of chalky
+// The pothos's pot, a soft white
 :root {
   --pot: #f2f0eb;
   --pot-rim: #f7f6f2;
 }
 
-:root[data-theme="dark"] {
-  --pot: #cfccc4;
-  --pot-rim: #dad7d0;
-
-  .plant .leaf-shape {
-    stroke: #16290f;
-  }
-
-  .plant .stem {
-    stroke: #4f7d3d;
-  }
-
-  .plant .deco-line:not(.leaf-shape) {
-    stroke: #2a2a28;
-  }
-}
 
 // The bookend: the same pale pine as the art crate, its top a little lighter
 :root {
@@ -1543,9 +1459,6 @@ $dot-center: calc(4px + 20px / 2);
   --bookend-side: var(--crate-side);
 }
 
-:root[data-theme="dark"] {
-  --bookend-top: #b08e64;
-}
 
 .bookend-face { fill: var(--bookend); }
 .bookend-top { fill: var(--bookend-top); }
