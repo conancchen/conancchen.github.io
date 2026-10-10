@@ -997,22 +997,132 @@ $dot-center: calc(4px + 20px / 2);
 
 .bin-label {
   fill: var(--crate-ink);
-  font-size: 11px;
+  font-size: 18px;
   text-anchor: middle;
 }
 
-// The crate pulls forward a touch when hovered
+// The fish tank on the lower shelf: with its light off, the water goes dim
+.tank {
+  cursor: pointer;
+  outline: none;
+}
+
+.tank-back {
+  fill: #9fcfd8;
+}
+
+.tank-side {
+  fill: #8fc2cc;
+}
+
+.tank-water {
+  fill: #b7e0e8;
+}
+
+.tank-sand-top {
+  fill: #e3cf9f;
+}
+
+.tank-sand {
+  fill: #d7bf86;
+}
+
+.tank-pebble {
+  fill: #a68a5b;
+}
+
+.tank-weed path {
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.fish path,
+.fish ellipse {
+  stroke: #1a1a18;
+  stroke-width: 0.45;
+  stroke-linejoin: round;
+}
+
+.tank-surface {
+  fill: #c4e6ed;
+  stroke: #9fcfd8;
+  stroke-width: 0.6;
+}
+
+.tank-bubble {
+  fill: rgba(255, 255, 255, 0.75);
+  stroke: rgba(255, 255, 255, 0.95);
+  stroke-width: 0.3;
+}
+
+.tank-glass {
+  fill: rgba(210, 240, 248, 0.18);
+}
+
+.tank-hood,
+.tank-hood-top,
+.tank-hood-side {
+  fill: #2b2b2a;
+}
+
+.tank-hood-top {
+  fill: #3a3a38;
+}
+
+.tank-bulb {
+  fill: #6b6b66;
+  transition: fill 0.3s ease;
+}
+
+.tank.is-on .tank-bulb {
+  fill: #fff8dc;
+}
+
+.tank-dark {
+  fill: #0d2630;
+  opacity: 0.45;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+
+.tank.is-on .tank-dark {
+  opacity: 0;
+}
+
+// The tank and the pots can be slid along their shelves
+.cabinet .slides {
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.cabinet .slides.is-sliding {
+  cursor: grabbing;
+}
+
+// The crate lifts like a book when hovered, without tipping
 .art-bin {
   cursor: pointer;
   outline: none;
 }
 
 .bin-body {
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), filter 0.2s ease, opacity 0.2s ease;
 }
 
+// While a book is out, the crate blurs back
+.bookshelf.has-picked .bin-body {
+  filter: blur(2.5px);
+  opacity: 0.6;
+}
+
+.bin-backing {
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.art-bin.is-open .bin-backing,
 .art-bin.is-open .bin-body {
-  transform: translate(-5px, 4px);
+  transform: translate(-4px, -14px);
 }
 
 // The Art section, opened from the crate: it slides open above the reading
@@ -1178,6 +1288,10 @@ $dot-center: calc(4px + 20px / 2);
   z-index: 1;
   display: block;
   width: 100%;
+  // nothing in the drawing gets selected or flashes when pressed
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
   height: auto;
   overflow: visible;
 }
@@ -1196,9 +1310,10 @@ $dot-center: calc(4px + 20px / 2);
 }
 
 :root[data-theme="dark"] {
-  --plank-top: #2c2a27;
-  --plank-front: #3a3733;
-  --plank-end: #312e2a;
+  // the same pale wood on the dark page, a shade down
+  --plank-top: #d4cdbf;
+  --plank-front: #bfb7a7;
+  --plank-end: #b3ab9a;
   --shelf-ink: #000;  // black outlines on the dark page, rather than gray
 }
 
@@ -1225,12 +1340,24 @@ $dot-center: calc(4px + 20px / 2);
 .shelf-book {
   cursor: pointer;
   outline: none;
-  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.15s ease;
+  transition: opacity 0.15s ease;
 }
 
-// A hovered (or pinned) book pops up out of the row
-.shelf-book.is-picked {
-  transform: translate(-4px, -14px);
+// What catches the cursor over a book or the crate, unseen
+.hit {
+  fill: transparent;
+}
+
+// A hovered (or pinned) book pops up out of the row and tips back 10°,
+// pivoting on its bottom corner
+.book-lift {
+  transform-box: fill-box;
+  transform-origin: 0% 100%;
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.shelf-book.is-picked .book-lift {
+  transform: translate(-4px, -14px) rotate(-10deg);
 }
 
 // The other books fade back while one is picked or the art is out, over
@@ -1249,34 +1376,13 @@ $dot-center: calc(4px + 20px / 2);
 }
 
 // Books are outlined in solid black, a little heavier than the rest of the
-// shelf, down to the page block framed by the covers on top
+// shelf
 .book-spine,
-.book-side,
-.book-edge {
+.book-top,
+.book-side {
   stroke: #000;
   stroke-width: 0.9;
   stroke-linejoin: round;
-}
-
-// The page block on a book's top: cream, with fine lines for the pages,
-// and the black outline of the top drawn over their ends
-.book-pages {
-  fill: #f3eddf;
-}
-
-.book-edge {
-  fill: none;
-}
-
-// The inside of a cover, where it stands up past the pages
-.book-wall {
-  fill: #cfc4ad;
-}
-
-.book-page-lines {
-  fill: none;
-  stroke: #b7aa90;
-  stroke-width: 0.15;
 }
 
 .deco-line {
@@ -1307,7 +1413,7 @@ $dot-center: calc(4px + 20px / 2);
 }
 
 .book-title {
-  font-size: 10px;
+  font-size: 15px;
   letter-spacing: 0.1px;
 }
 
@@ -1350,7 +1456,7 @@ $dot-center: calc(4px + 20px / 2);
 
 .read {
   display: flex;
-  gap: 14px;
+  gap: 16px;
   padding: 12px 0;
   outline: none;
   cursor: default;
@@ -1362,7 +1468,7 @@ $dot-center: calc(4px + 20px / 2);
 .cover {
   flex: none;
   align-self: flex-start;
-  width: 46px;
+  width: 56px;
   height: auto;
   border-radius: 1px 3px 3px 1px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
@@ -1375,6 +1481,10 @@ $dot-center: calc(4px + 20px / 2);
   min-width: 0;
 }
 
+.read-title {
+  font-size: 15px;
+}
+
 .read-by,
 .read-note {
   color: var(--muted);
@@ -1382,7 +1492,7 @@ $dot-center: calc(4px + 20px / 2);
 
 @media (prefers-reduced-motion: reduce) {
   .shelf-list .read.is-shown { animation: none; }
-  .shelf-book { transition: none; }
+  .book-lift, .bin-body, .bin-backing { transition: none; }
 }
 
 .now-tag {

@@ -5,7 +5,7 @@ subtitle: Bookshelf
 permalink: /bookshelf/
 ---
 <section class="bookshelf">
-  <svg class="cabinet block" id="cabinet" viewBox="0 0 600 178" role="img" aria-label="A shelf of what I'm reading now and just finished"></svg>
+  <svg class="cabinet block" id="cabinet" viewBox="0 0 667 466" role="img" aria-label="A shelf of what I'm reading now and just finished"></svg>
 
   <div class="art-section" id="art-section">
     <div class="art-section-inner">
@@ -40,7 +40,7 @@ permalink: /bookshelf/
   <ul class="reads" id="reads">
     {% for book in site.data.books %}
     <li class="read{% if book.current %} is-current{% endif %}" data-i="{{ forloop.index0 }}" tabindex="0">
-      <img class="cover" src="{{ site.baseurl }}/images/books/{{ book.cover }}" alt="Cover of {{ book.title | escape }}" width="46" height="70" loading="lazy">
+      <img class="cover" src="{{ site.baseurl }}/images/books/{{ book.cover }}" alt="Cover of {{ book.title | escape }}" width="56" height="86" loading="lazy">
       <span class="read-text">
         <span class="read-title">{{ book.title }}</span>
         <span class="read-by">{{ book.author }}{% if book.current %}<span class="now-tag"> · currently reading</span>{% endif %}</span>
@@ -112,11 +112,12 @@ permalink: /bookshelf/
 </script>
 
 <script>
-  // Draws the shelf: a plank seen from a little above and to the left, its
-  // top running back and its front edge showing, and the books standing on
-  // it side by side as blocks. Each shows its spine (in its own color, the
-  // title running up it), its top with the page edges showing between the
-  // covers, and its right side in a darker shade. Hovering a book (on the
+  // Draws two shelves, one over the other: planks seen from a little above
+  // and to the left, their tops running back and their front edges showing.
+  // The top one holds the books and a trailing pothos, the lower one a fish
+  // tank and the crate of art. The books stand side by side as blocks. Each shows its spine (in its own color, the
+  // title running up it), its top in a lighter shade, and its right side in
+  // a darker one. Hovering a book (on the
   // shelf or in the list) lifts it and marks both.
   (function () {
     var BOOKS = {{ site.data.books | jsonify }};
@@ -124,7 +125,15 @@ permalink: /bookshelf/
     var NS = 'http://www.w3.org/2000/svg';
     // DX, DY: how far back-and-up a book's depth runs on the page
     var BOOK_DEEP = 2;
-    var W = 600, H = 178, LINE = 162, PLANK = 6, GAP = 3, DX = 9, DY = -7, X0 = 4;
+    // How thick a page is, px: a book's thickness is in proportion to its pages
+    var PAGE_W = 0.15;
+    // W runs a little wider than the 600 the shelf was drawn at, so that
+    // filling the 550px column, everything on it comes out 10% smaller
+    var W = 667, LINE = 222, PLANK = 6, GAP = 7, DX = 9, DY = -7, X0 = 4;
+
+    // The lower shelf hangs as far under the top one as the top one's books
+    // stand tall, so both shelves have the same room
+    var LINE2 = 2 * LINE + PLANK, H = LINE2 + 16;
 
     function el(name, attrs, parent) {
       var node = document.createElementNS(NS, name);
@@ -140,20 +149,22 @@ permalink: /bookshelf/
     }
     svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
 
-    // A plank: its top surface running back, then its front edge
+    // A plank: its top surface running back, then its front edge. LINE is the
+    // top shelf's, LINE2 the lower one's.
     var back = 2.2;  // the plank is deeper than the books
-    function plank() {
+    function plank(LINE) {
       el('polygon', { points: pts([[0, LINE], [W - DX * back, LINE], [W, LINE + DY * back], [DX * back, LINE + DY * back]]), 'class': 'plank-top' });
       el('rect', { x: 0, y: LINE, width: W - DX * back, height: PLANK, 'class': 'plank-front' });
       el('polygon', { points: pts([[W - DX * back, LINE], [W, LINE + DY * back], [W, LINE + DY * back + PLANK], [W - DX * back, LINE + PLANK]]), 'class': 'plank-end' });
     }
-    plank();
+    plank(LINE);
+    plank(LINE2);
 
     // Books left to right, each one covering the side of the one before it
     var groups = [];
     var x = X0;
     BOOKS.forEach(function (b, i) {
-      var w = b.width, h = b.height, top = LINE - h, L = x, R = x + w;
+      var w = b.pages * PAGE_W, h = b.height, top = LINE - h, L = x, R = x + w;
       var g = el('g', { 'class': 'shelf-book' + (b.current ? ' is-current' : ''), 'data-i': i, tabindex: 0 });
       g.style.setProperty('--i', i);
       // A book runs about as deep as the shelf, mostly hidden by its neighbors
@@ -161,60 +172,43 @@ permalink: /bookshelf/
       var side = [[R, top], [R + dx, top + dy], [R + dx, LINE + dy], [R, LINE]];
       // A backing in the page's color fills the book's outline, so when the
       // drawing over it fades back, nothing behind shows through
-      el('polygon', { points: pts([[L, LINE], [L, top], [L + dx, top + dy], [R + dx, top + dy], [R + dx, LINE + dy], [R, LINE]]), 'class': 'book-backing' }, g);
-      var art = el('g', { 'class': 'book-art' }, g);
+      var outline = pts([[L, LINE], [L, top], [L + dx, top + dy], [R + dx, top + dy], [R + dx, LINE + dy], [R, LINE]]);
+      // An unseen copy of the outline stays put to catch the cursor, so the
+      // book doesn't slip out from under it as it pops up and tips
+      el('polygon', { points: outline, 'class': 'hit' }, g);
+      var lift = el('g', { 'class': 'book-lift' }, g);
+      el('polygon', { points: outline, 'class': 'book-backing' }, lift);
+      var art = el('g', { 'class': 'book-art' }, lift);
       el('polygon', { points: pts(side), 'class': 'book-side', style: 'fill:' + shade(b.color, 0.72) }, art);
-      // Its top: the page block, sitting a little down inside the two cover
-      // boards and the spine's edge, which stand up around it in a lighter
-      // shade
-      function at(across, depth) { return [L + across + dx * depth, top + dy * depth]; }
-      function line(list) { return 'M' + pts(list).replace(/ /g, ' L'); }
-      // The covers and the spine's edge come out equally thick, measured
-      // square to each band: the covers run back along the depth, the
-      // spine's edge across
-      var thick = 1.8, len = Math.sqrt(dx * dx + dy * dy);
-      var board = thick * len / -dy, near = thick / -dy;
-      // How far down the pages sit; less than the boards are thick, so the
-      // boards hide the pages' near and right edges
-      var sink = 1.5;
-      function down(q) { return [q[0], q[1] + sink]; }
-      var block = [at(board, near), at(w - board, near), at(w - board, 1), at(board, 1)];
-      el('polygon', { points: pts(block.map(down)), 'class': 'book-pages' }, art);
-      // ruled with the edges of the pages, and a faint line along their back
-      var lines = line([at(board, 1), at(w - board, 1)].map(down));
-      for (var p = board + 0.8; p < w - board; p += 0.8) lines += line([at(p, near), at(p, 1)].map(down));
-      el('path', { d: lines, 'class': 'book-page-lines' }, art);
-      // The inside of the near cover shows above the pages, in shadow
-      el('polygon', { points: pts([at(board, near), at(board, 1), down(at(board, 1)), down(at(board, near))]), 'class': 'book-wall' }, art);
-      // The boards: a U around the pages, open at the back
-      var boards = [at(0, 0), at(w, 0), at(w, 1), at(w - board, 1), at(w - board, near), at(board, near), at(board, 1), at(0, 1)];
-      el('polygon', { points: pts(boards), 'class': 'book-top', style: 'fill:' + shade(b.color, 1.18) }, art);
-      // Outlined in black all round but the back, between the ends of the covers
-      el('path', { d: line([at(board, 1), at(0, 1), at(0, 0)]) + ' ' + line([at(board, 1), at(board, near), at(w - board, near), at(w - board, 1), at(w, 1)]), 'class': 'book-edge' }, art);
+      el('polygon', { points: pts([[L, top], [R, top], [R + dx, top + dy], [L + dx, top + dy]]), 'class': 'book-top', style: 'fill:' + shade(b.color, 1.18) }, art);
       var spine = el('rect', { x: L, y: top, width: w, height: h, 'class': 'book-spine' }, art);
       spine.style.fill = b.color;
       // The title runs up the spine, shrinking if it's too long for it
       var clip = el('clipPath', { id: 'spine-' + i }, art);
       el('rect', { x: L, y: top + 5, width: w, height: h - 10 }, clip);
       var holder = el('g', { 'clip-path': 'url(#spine-' + i + ')' }, art);
-      var title = el('text', {
-        x: 0, y: 0, 'class': 'book-title',
-        transform: 'translate(' + (L + w / 2 + 3.2) + ',' + (LINE - 7) + ') rotate(-90)'
-      }, holder);
+      var title = el('text', { x: 0, y: 0, 'class': 'book-title' }, holder);
       title.textContent = b.title;
       title.style.fill = b.ink === 'dark' ? '#1a1a18' : '#fff';
-      for (var size = 10; size > 6.5 && title.getComputedTextLength() > h - 14; size -= 0.5) {
-        title.style.fontSize = size - 0.5 + 'px';
+      var size = 15;
+      title.style.fontSize = size + 'px';
+      while (size > 7 && title.getComputedTextLength() > h - 18) {
+        size -= 0.5;
+        title.style.fontSize = size + 'px';
       }
+      // centered across the spine at whatever size it came out
+      title.setAttribute('transform', 'translate(' + (L + w / 2 + size * 0.35) + ',' + (LINE - 9) + ') rotate(-90)');
       groups[i] = g;
       x += w + GAP;
     });
+    // how far the books reach, out to the far side of the last one
+    var booksR = x - GAP + DX * BOOK_DEEP;
 
     // A bookend holding up the last book: an L of pine to match the crate, its
     // upright standing flush against the book with a rounded top, and its
     // foot running out along the shelf
     (function () {
-      var L = x - GAP, w = 4, tall = 100, d = 1.6, r = 3;
+      var L = x - GAP, w = 9, tall = 136, d = 1.6, r = 3;
       var T = LINE - tall, R = L + w;
       var be = el('g', { 'class': 'bookend' });
       el('polygon', { points: pts([[R, T + r], [R + DX * d, T + r + DY * d], [R + DX * d, LINE + DY * d], [R, LINE]]), 'class': 'deco-line bookend-side' }, be);
@@ -222,15 +216,16 @@ permalink: /bookshelf/
         ' Q' + (R + DX * d) + ',' + (T + DY * d) + ' ' + (R + DX * d) + ',' + (T + r + DY * d) + ' L' + R + ',' + (T + r) + ' Z', 'class': 'deco-line bookend-top' }, be);
       el('path', { d: 'M' + L + ',' + LINE + ' L' + L + ',' + (T + r) + ' Q' + L + ',' + T + ' ' + (L + r) + ',' + T + ' Q' + R + ',' + T + ' ' + R + ',' + (T + r) + ' L' + R + ',' + LINE + ' Z', 'class': 'deco-line bookend-face' }, be);
       // its foot, a thin plate running out along the shelf from the bottom
-      var foot = 26, plate = 3, FR = R + foot, FT = LINE - plate;
+      var foot = 44, plate = 4, FR = R + foot, FT = LINE - plate;
       el('polygon', { points: pts([[R, FT], [FR, FT], [FR + DX * d, FT + DY * d], [R + DX * d, FT + DY * d]]), 'class': 'deco-line bookend-top' }, be);
       el('polygon', { points: pts([[FR, FT], [FR + DX * d, FT + DY * d], [FR + DX * d, LINE + DY * d], [FR, LINE]]), 'class': 'deco-line bookend-side' }, be);
       el('rect', { x: R, y: FT, width: foot, height: plate, 'class': 'deco-line bookend-face' }, be);
       x = FR + DX * d + GAP;
     })();
+    var bookendR = x;  // where the bookend's foot ends
 
-    // After the books, a crate of art prints, and a trailing plant at the far
-    // end of the shelf
+    // After the books, a trailing plant at the far end of the top shelf; on
+    // the lower shelf, a crate of art prints
     function box(L, w, h, front, parent) {
       var T = LINE - h, R = L + w;
       el('polygon', { points: pts([[R, T], [R + DX, T + DY], [R + DX, LINE + DY], [R, LINE]]), 'class': 'deco-line', style: 'fill:' + shade(front, 0.75) }, parent);
@@ -243,59 +238,63 @@ permalink: /bookshelf/
       el('image', { href: src, x: L, y: base - h, width: w, height: h, preserveAspectRatio: 'xMidYMid slice', 'class': 'shelf-deco print' }, parent);
     }
 
-    // The art bin: an open wooden crate past the books, its inside in shadow, with
-    // three prints standing in it. Opening it pulls the crate forward a little.
-    // centered in the open stretch between the bookend and the plant (whose
-    // leaves spread about 24px left of its pot's middle)
-    var binW = 150, binH = 40, plantLeft = W - DX * 2.2 - 46 - 24;
-    var binL = (x + plantLeft - binW - DX * 1.6) / 2, binT = LINE - binH;
+    // The art bin: an open wooden crate on the lower shelf, its inside in
+    // shadow, with three prints standing in it. Opening it lifts the crate
+    // a little. Its right end tucks in under the pothos vines hanging
+    // down at the right, which start around x = 500.
+    var binW = 250, binH = 60, binL = W - DX * 2.2 - 40 - binW - DX * 1.6, binT = LINE2 - binH;
     var bin = el('g', { 'class': 'art-bin', tabindex: 0, role: 'button', 'aria-expanded': 'false', 'aria-controls': 'art-section', 'aria-label': 'Art: show the paintings', 'aria-pressed': 'false' });
+    // A backing in the page's color fills the crate's outline, so when the
+    // crate blurs back the shelf behind it doesn't show through
+    // (and, as with a book, an unseen copy stays put to catch the cursor)
+    var deep = [DX * 1.6, DY * 1.6];
+    var binOutline = pts([[binL, LINE2], [binL, binT], [binL + deep[0], binT + deep[1]], [binL + binW + deep[0], binT + deep[1]],
+      [binL + binW + deep[0], LINE2 + deep[1]], [binL + binW, LINE2]]);
+    el('polygon', { points: binOutline, 'class': 'hit' }, bin);
+    el('polygon', { points: binOutline, 'class': 'book-backing bin-backing' }, bin);
     var body = el('g', { 'class': 'bin-body' }, bin);
     el('polygon', { points: pts([[binL, binT], [binL + binW, binT], [binL + binW + DX * 1.6, binT + DY * 1.6], [binL + DX * 1.6, binT + DY * 1.6]]), 'class': 'deco-line bin-inside' }, body);
     // [picture, width, height, left in the crate, how far back]
     var prints = [
-      ['monk-by-the-sea.jpg', 122, 78, 20, 1.2],
-      ['zojoji-snow-hasui.jpg', 50, 75, 6, 0.6],
-      ['sisyphus-titian.jpg', 58, 67, 80, 0.35]
+      ['monk-by-the-sea.jpg', 202, 128, 30, 1.2],
+      ['zojoji-snow-hasui.jpg', 83, 124, 10, 0.6],
+      ['sisyphus-titian.jpg', 96, 110, 134, 0.35]
     ];
     prints.forEach(function (p) {
-      var back = p[4], L = binL + p[3] + DX * back, base = LINE - 6 + DY * back;
+      var back = p[4], L = binL + p[3] + DX * back, base = LINE2 - 6 + DY * back;
       print(L, p[1], p[2], '{{ site.baseurl }}/images/art/' + p[0], base, body);
     });
-    el('polygon', { points: pts([[binL + binW, binT], [binL + binW + DX * 1.6, binT + DY * 1.6], [binL + binW + DX * 1.6, LINE + DY * 1.6], [binL + binW, LINE]]), 'class': 'deco-line bin-side' }, body);
+    el('polygon', { points: pts([[binL + binW, binT], [binL + binW + DX * 1.6, binT + DY * 1.6], [binL + binW + DX * 1.6, LINE2 + DY * 1.6], [binL + binW, LINE2]]), 'class': 'deco-line bin-side' }, body);
     el('rect', { x: binL, y: binT, width: binW, height: binH, 'class': 'deco-line bin-front' }, body);
-    var label = el('text', { x: binL + binW / 2, y: binT + binH / 2 + 4, 'class': 'bin-label' }, body);
+    var label = el('text', { x: binL + binW / 2, y: binT + binH / 2 + 6, 'class': 'bin-label' }, body);
     label.textContent = 'Art';
-    // Like a book, hovering (or focusing) the crate pulls it forward and opens
+    // Like a book, hovering (or focusing) the crate lifts it and opens
     // the Art section above the reading list, where the prints are shown
     // large; pressing it pins the section open, so the prints can be pressed
-    // in turn, until it's pressed again or Esc
+    // in turn, until it's pressed again or Esc. It and the books take turns:
+    // see update() below.
     var artSection = document.getElementById('art-section');
-    var artPinned = false;
-    function showArt(on) {
-      on = on || artPinned;
-      artSection.classList.toggle('is-open', on);
-      bin.classList.toggle('is-open', on);
-      bin.setAttribute('aria-expanded', on);
-      bin.setAttribute('aria-pressed', artPinned);
-      // the books fade back while the art is out, as they do for a picked book
-      document.querySelector('.bookshelf').classList.toggle('has-art', on);
-    }
+    var artPinned = false, artHover = false;
     function pinArt() {
       artPinned = !artPinned;
-      showArt(false);
+      if (artPinned) pinned = null;
+      // a press settles it: a tap on a touch screen never leaves, so the
+      // hover it started would otherwise hang on
+      hovered = null;
+      artHover = false;
+      update();
     }
-    bin.addEventListener('mouseenter', function () { showArt(true); });
-    bin.addEventListener('focus', function () { showArt(true); });
-    bin.addEventListener('mouseleave', function () { showArt(false); });
-    bin.addEventListener('blur', function () { showArt(false); });
+    bin.addEventListener('mouseenter', function () { artHover = true; update(); });
+    bin.addEventListener('focus', function () { artHover = true; update(); });
+    bin.addEventListener('mouseleave', function () { artHover = false; update(); });
+    bin.addEventListener('blur', function () { artHover = false; update(); });
     bin.addEventListener('click', pinArt);
     bin.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pinArt(); }
     });
     document.addEventListener('keydown', function (e) {
       // Esc closes an open painting first
-      if (e.key === 'Escape' && artPinned && document.getElementById('lightbox').hidden) { artPinned = false; showArt(false); }
+      if (e.key === 'Escape' && artPinned && document.getElementById('lightbox').hidden) { artPinned = false; update(); }
     });
 
     // Round things (the pot) are drawn from a profile: half-widths
@@ -318,12 +317,193 @@ permalink: /bookshelf/
       return { clip: id, shade: shadeG };
     }
 
-    // A trailing pothos, like an IKEA FEJKA, in a round white pot at the end
-    // of the shelf: leaves heaped over the rim, and vines coming over
-    // the front and hanging down past the shelf, on down over the reading
-    // list under it (clear of its text, out at the right)
+    // A fish tank on the lower shelf, left of the crate: a glass box seen
+    // like the crate, a little from above, with sand on the bottom, a few
+    // plants swaying, and fish swimming back and forth while bubbles rise.
+    // Pressing it turns the light in its hood on or off (the water dims). It's set behind
+    // the crate.
+    // It stands centered under the books
+    var tW = 172, tL = (X0 + booksR) / 2 - (tW + DX * 1.6) / 2, tH = 122, tD = 1.6, tR = tL + tW, tB = LINE2 - 1, tT = tB - tH;
+    var tdx = DX * tD, tdy = DY * tD, waterT = tT + 9;
+    var tank = el('g', { 'class': 'tank is-on', tabindex: 0, role: 'button', 'aria-pressed': 'true', 'aria-label': 'Fish tank light' });
+    svg.insertBefore(tank, bin);
+    var tdefs = el('defs', {}, tank);
+    // the far glass and the right side, seen through the water
+    el('rect', { x: tL + tdx, y: tT + tdy, width: tW, height: tH, 'class': 'deco-line tank-back' }, tank);
+    el('polygon', { points: pts([[tR, tT], [tR + tdx, tT + tdy], [tR + tdx, tB + tdy], [tR, tB]]), 'class': 'deco-line tank-side' }, tank);
+    // everything in the water is clipped to it
+    var waterShape = pts([[tL, waterT], [tL + tdx, waterT + tdy], [tR + tdx, waterT + tdy], [tR + tdx, tB + tdy], [tR, tB], [tL, tB]]);
+    var wclip = el('clipPath', { id: 'tank-water' }, tdefs);
+    el('polygon', { points: waterShape }, wclip);
+    var water = el('g', { 'clip-path': 'url(#tank-water)' }, tank);
+    el('polygon', { points: waterShape, 'class': 'tank-water' }, water);
+    // sand: its top running back, and its front against the glass
+    var sandT = tB - 11;
+    el('polygon', { points: pts([[tL, sandT], [tR, sandT + 2], [tR + tdx, sandT + tdy + 1], [tL + tdx, sandT + tdy]]), 'class': 'tank-sand-top' }, water);
+    el('path', { d: 'M' + tL + ',' + sandT + ' Q' + (tL + tW * 0.3) + ',' + (sandT - 3) + ' ' + (tL + tW * 0.55) + ',' + (sandT + 1) + ' T' + tR + ',' + (sandT + 2) + ' L' + tR + ',' + tB + ' L' + tL + ',' + tB + ' Z', 'class': 'tank-sand' }, water);
+    for (var pb = 0; pb < 26; pb++) {
+      el('circle', { cx: tL + 4 + (pb * 37 % (tW - 8)), cy: sandT + 4 + (pb * 13 % 6), r: 0.9 + (pb % 3) * 0.3, 'class': 'tank-pebble' }, water);
+    }
+    // plants: ribbons of green standing up out of the sand, swaying (placed
+    // for a 150 × 106 tank, and spread to fit this one)
+    var weeds = [], WEEDS = ['#3f7d32', '#5a9a43', '#4a8a3a', '#6fae52', '#356e2b'];
+    [[14, 62, 0], [22, 48, 1], [30, 70, 2], [118, 58, 3], [127, 76, 4], [136, 44, 0]].forEach(function (w, k) {
+      var g = el('g', { 'class': 'tank-weed' }, water);
+      var path = el('path', { style: 'stroke:' + WEEDS[w[2] % WEEDS.length] }, g);
+      weeds.push({ path: path, x: tL + w[0] * tW / 150, h: w[1] * tH / 106, phase: k * 1.3 });
+    });
+    function drawWeeds(t) {
+      weeds.forEach(function (w) {
+        var sway = Math.sin(t * 1.1 + w.phase) * 4, base = sandT + 3;
+        w.path.setAttribute('d', 'M' + w.x + ',' + base + ' C' + (w.x - 3 + sway * 0.3) + ',' + (base - w.h * 0.35) + ' ' + (w.x + 3 + sway * 0.7) + ',' + (base - w.h * 0.7) + ' ' + (w.x + sway) + ',' + (base - w.h));
+      });
+    }
+    // The fish, each drawn facing right about its middle and outlined like
+    // the rest of the shelf: a clownfish, a blue tang, and a little school of neon tetras that keep together
+    var FISH = {
+      clown: function (g) {
+        el('path', { d: 'M-10,0 C-13,-3 -16,-5 -17,-4 C-16,-1 -16,1 -17,4 C-16,5 -13,3 -10,0Z', style: 'fill:#f27a1f' }, g);
+        el('path', { d: 'M-5,-6 C-3,-10 2,-10 4,-6.5Z', style: 'fill:#f27a1f' }, g);
+        el('path', { d: 'M10,0 C10,-5 4,-7 -2,-7 C-8,-7 -11,-3 -12,0 C-11,3 -8,7 -2,7 C4,7 10,5 10,0Z', style: 'fill:#f58a2b' }, g);
+        el('path', { d: 'M5.2,-5.8 Q7.4,0 5.2,5.8 L2.6,6.6 Q4.8,0 2.6,-6.6Z', style: 'fill:#fff' }, g);
+        el('path', { d: 'M-3.6,-7 Q-1,0 -3.6,7 L-6.6,6.4 Q-4,0 -6.6,-6.4Z', style: 'fill:#fff' }, g);
+        el('circle', { cx: 6.6, cy: -1.6, r: 1.2, style: 'fill:#1a1a18' }, g);
+      },
+      tang: function (g) {
+        el('path', { d: 'M-10,0 L-17,-6 Q-15,0 -17,6Z', style: 'fill:#f5cf3a' }, g);
+        el('path', { d: 'M11,0 C9,-6 2,-8.5 -4,-7.5 C-9,-6.5 -11,-3 -12,0 C-11,3 -9,6.5 -4,7.5 C2,8.5 9,6 11,0Z', style: 'fill:#2f6fd6' }, g);
+        el('path', { d: 'M6,-4.6 C1,-6.6 -6,-5 -10,-1 C-6,-2.4 -2,-2 1,0.4 C-2,-0.2 -6,1 -8.4,3.2 C-3,3.6 3,1.6 6,-4.6Z', style: 'fill:#16233d' }, g);
+        el('circle', { cx: 7, cy: -1.4, r: 1.2, style: 'fill:#1a1a18' }, g);
+      },
+      tetras: function (g) {
+        [[0, 0], [-11, -5], [-9, 6]].forEach(function (o) {
+          var t = el('g', { transform: 'translate(' + o[0] + ',' + o[1] + ')' }, g);
+          el('path', { d: 'M5.5,0 C4,-2.4 -2,-2.6 -4.5,0 L-7,-2 L-6.4,0 L-7,2 L-4.5,0 C-2,2.6 4,2.4 5.5,0Z', style: 'fill:#d9dee2' }, t);
+          el('path', { d: 'M-0.5,0.4 L-4.5,0.4 C-2.5,2 -1,2 -0.5,0.4Z', style: 'fill:#e0383e;stroke:none' }, t);
+          el('path', { d: 'M4.5,-0.6 L-4,-0.6', style: 'stroke:#2ec7f0;stroke-width:0.9;fill:none' }, t);
+          el('circle', { cx: 3.4, cy: -0.6, r: 0.6, style: 'fill:#1a1a18;stroke:none' }, t);
+        });
+      }
+    };
+    // [kind, size, speed px/s, how far down the water it keeps, half its length]
+    var fishes = [];
+    [['clown', 0.95, 15, 0.3, 16], ['tang', 0.85, 21, 0.6, 16], ['tetras', 1, 26, 0.85, 18]].forEach(function (f, k) {
+      var g = el('g', { 'class': 'fish' }, water);
+      var body = el('g', {}, g);
+      FISH[f[0]](body);
+      fishes.push({ g: g, body: body, size: f[1], speed: f[2], band: f[3], half: f[4], x: tL + 30 + k * 30, dir: k % 2 ? -1 : 1, phase: k * 2.1 });
+    });
+    var bubbles = [];
+    for (var bb = 0; bb < 6; bb++) {
+      bubbles.push({ c: el('circle', { r: 1 + (bb % 3) * 0.5, 'class': 'tank-bubble' }, water), t: bb / 6 });
+    }
+    // the water's surface, running back from the near glass, its near edge
+    // rippling
+    var surface = el('path', { 'class': 'tank-surface' }, tank);
+    function ripple(t) {
+      var d = 'M' + (tL + tdx) + ',' + (waterT + tdy) + ' L' + (tR + tdx) + ',' + (waterT + tdy) + ' L' + tR + ',' + waterT;
+      for (var rx = tR; rx >= tL; rx -= 5) {
+        d += ' L' + rx + ',' + (waterT + Math.sin(rx * 0.16 + t * 2.4) * 0.9 + Math.sin(rx * 0.07 - t * 1.3) * 0.6).toFixed(2);
+      }
+      surface.setAttribute('d', d + ' Z');
+    }
+    // the near glass: a faint tint, then the frame
+    el('rect', { x: tL, y: tT, width: tW, height: tH, 'class': 'tank-glass' }, tank);
+    el('rect', { x: tL, y: tT, width: tW, height: tH, 'class': 'deco-line', style: 'fill:none' }, tank);
+    // the hood on top, with its light along the front
+    var hoodH = 6;
+    el('polygon', { points: pts([[tL - 1, tT - hoodH], [tR + 1, tT - hoodH], [tR + 1 + tdx, tT - hoodH + tdy], [tL - 1 + tdx, tT - hoodH + tdy]]), 'class': 'deco-line tank-hood-top' }, tank);
+    el('polygon', { points: pts([[tR + 1, tT - hoodH], [tR + 1 + tdx, tT - hoodH + tdy], [tR + 1 + tdx, tT + tdy], [tR + 1, tT]]), 'class': 'deco-line tank-hood-side' }, tank);
+    el('rect', { x: tL - 1, y: tT - hoodH, width: tW + 2, height: hoodH, 'class': 'deco-line tank-hood' }, tank);
+    el('rect', { x: tL + 6, y: tT - 2.2, width: tW - 12, height: 1.4, 'class': 'tank-bulb' }, tank);
+    // a shade over the water for when the light's off
+    el('polygon', { points: waterShape, 'class': 'tank-dark' }, tank);
+
+    // The fish swim the width of the tank and turn at the glass, bobbing a
+    // little; bubbles rise from the back corner and the plants sway
+    function swim(now) {
+      var t = now / 1000;
+      fishes.forEach(function (f) {
+        if (f.last !== undefined) f.x += f.dir * f.speed * Math.min(t - f.last, 0.1);
+        f.last = t;
+        var lo = tL + f.half * f.size + 2, hi = tR + tdx - f.half * f.size - 2;
+        if (f.x > hi) { f.x = hi; f.dir = -1; }
+        if (f.x < lo) { f.x = lo; f.dir = 1; }
+        var y = waterT + 10 + (sandT - waterT - 22) * f.band + Math.sin(t * 1.4 + f.phase) * 3;
+        f.g.setAttribute('transform', 'translate(' + f.x.toFixed(1) + ',' + y.toFixed(1) + ') scale(' + (f.dir * f.size) + ',' + f.size + ')');
+        f.body.setAttribute('transform', 'rotate(' + (Math.sin(t * 6 + f.phase) * 4).toFixed(1) + ')');
+      });
+      bubbles.forEach(function (b, k) {
+        var p = (t * 0.25 + b.t) % 1;
+        b.c.setAttribute('cx', (tR - 10 + tdx * 0.5 + Math.sin(p * 12 + k) * 1.5).toFixed(1));
+        b.c.setAttribute('cy', (sandT - 2 - p * (sandT - waterT - 6)).toFixed(1));
+      });
+      drawWeeds(t);
+      ripple(t);
+      if (!still) requestAnimationFrame(swim);
+    }
+    var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    swim(performance.now());
+    if (!still) requestAnimationFrame(swim);
+    var tankOn = true;
+    function toggleTank() {
+      tankOn = !tankOn;
+      tank.classList.toggle('is-on', tankOn);
+      tank.setAttribute('aria-pressed', tankOn);
+    }
+    tank.addEventListener('click', toggleTank);
+    // It slides along the shelf, between the shelf's left end and the crate
+    slider(tank, function () {
+      return [4 - tL, binL - 4 - (tR + tdx)];
+    });
+
+    // Something that can be slid sideways along its shelf by dragging it,
+    // kept within the range range() gives for its offset. A drag that goes
+    // anywhere isn't a press, so the click that ends it is swallowed. On a
+    // touch screen, sideways drags slide it and up-and-down ones still
+    // scroll the page.
+    function slider(node, range) {
+      var off = 0, start = null, moved = false;
+      node.classList.add('slides');
+      node.addEventListener('pointerdown', function (e) {
+        if (e.button) return;
+        start = { x: e.clientX, off: off, scale: W / svg.getBoundingClientRect().width };
+        moved = false;
+        node.setPointerCapture(e.pointerId);
+      });
+      node.addEventListener('pointermove', function (e) {
+        if (!start) return;
+        var d = (e.clientX - start.x) * start.scale;
+        if (!moved && Math.abs(d) < 3) return;
+        moved = true;
+        node.classList.add('is-sliding');
+        var r = range();
+        off = Math.max(r[0], Math.min(r[1], start.off + d));
+        node.setAttribute('transform', 'translate(' + off.toFixed(1) + ',0)');
+      });
+      function end() {
+        start = null;
+        node.classList.remove('is-sliding');
+      }
+      node.addEventListener('pointerup', end);
+      node.addEventListener('pointercancel', end);
+      node.addEventListener('click', function (e) {
+        if (moved) {
+          e.stopImmediatePropagation();
+          moved = false;
+        }
+      }, true);
+      return { offset: function () { return off; } };
+    }
+    tank.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleTank(); }
+    });
+
+    // Two trailing pothos, like IKEA FEJKAs, side by side in round white pots
+    // at the end of the shelf: leaves heaped over the rims, and vines coming
+    // over the front and hanging down past the shelf, the longest on past the
+    // shelf below
     var potX = W - DX * 2.2 - 46, potBase = LINE - 1, potR = 19, potH = 30;
-    var plant = el('g', { 'class': 'shelf-deco plant' });
     var GREENS = ['#3f7d32', '#5a9a43', '#4a8a3a', '#6fae52', '#356e2b'];
     // A pothos leaf: a pointed heart hanging off its stalk at the notch,
     // with a vein down the middle. Angle 0 points the tip straight down.
@@ -336,43 +516,65 @@ permalink: /bookshelf/
       el('path', { d: 'M0,0.5 L0,12', style: 'stroke:rgba(255,255,255,0.35);stroke-width:' + (0.6 * 12 / size).toFixed(2) + ';fill:none' }, g);
     }
     var rimY = potBase - potH;
-    // Leaves heaped up out of the pot, behind its rim
-    [[-20, 3, 10, 128], [-14, 1, 11, 145], [-8, -4, 12, 168], [-1, -7, 13, 185], [6, -5, 12, 200], [13, -1, 11, 218],
-     [19, 3, 10, 235], [-11, -8, 11, 158], [10, -8, 11, 210], [-4, 0, 10, 160], [4, 0, 10, 208], [0, -11, 11, 180]].forEach(function (l, k) {
-      leaf(potX + l[0], rimY + l[1] + 2, l[2], l[3], k, plant);
-    });
-    // The pot: a slightly tapered cylinder, its rim an ellipse with the
-    // soil showing inside
-    turned(potX, potBase, [[potR - 3, 0], [potR - 1.5, potH * 0.5], [potR, potH]], 'var(--pot)', plant);
-    el('ellipse', { cx: potX, cy: rimY, rx: potR, ry: 3.4, 'class': 'deco-line', style: 'fill:var(--pot-rim)' }, plant);
-    el('ellipse', { cx: potX, cy: rimY + 0.4, rx: potR - 2.5, ry: 2.2, style: 'fill:#4a3a2c' }, plant);
-    // Vines over the front of the rim, each a stem curving down with leaves
-    // along it, swinging gently from the rim
-    var vines = [];
-    // [where on the rim it leaves (-1 left edge, 1 right edge), how far it
-    // hangs, which way it bows]
-    [[-0.95, 128, -1], [0.95, 196, 1], [0.6, 92, 1], [-0.55, 64, -1], [-0.8, 168, -1], [0.3, 150, 1], [-0.25, 98, -1], [0.8, 72, 1], [0.1, 58, -1]].forEach(function (vn, n) {
-      var x0 = potX + vn[0] * potR, y0 = rimY + 1, len = vn[1], out = vn[2];
-      var g = el('g', { 'class': 'vine' }, plant);
-      g.style.transformOrigin = x0 + 'px ' + y0 + 'px';
-      vines.push({ g: g, leaves: [], angle: 0, speed: 0 });
-      // Out over the rim first, then down past the pot's side
-      var P0 = [x0, y0], P1 = [x0 + out * 10, y0 - 2], P2 = [x0 + out * 9, y0 + len * 0.5], P3 = [x0 + out * 4, y0 + len];
-      el('path', { d: 'M' + P0 + ' C' + P1 + ' ' + P2 + ' ' + P3, 'class': 'stem' }, g);
-      function bez(t) {
-        var u = 1 - t;
-        return [0, 1].map(function (j) {
-          return u * u * u * P0[j] + 3 * u * u * t * P1[j] + 3 * u * t * t * P2[j] + t * t * t * P3[j];
-        });
-      }
-      var count = Math.round(len / 12);
-      for (var i = 1; i <= count; i++) {
-        var t = 0.08 + 0.92 * i / count, p = bez(t), side = i % 2 ? -1 : 1;
-        var fl = el('g', { 'class': 'leaf-flutter' }, g);
-        fl.style.transformOrigin = p[0].toFixed(1) + 'px ' + p[1].toFixed(1) + 'px';
-        vines[vines.length - 1].leaves.push(fl);
-        leaf(p[0], p[1], 8.5 + (i % 3) * 1.4 - t * 2, side * (38 + (i % 3) * 8), i + n, fl);
-      }
+    var vines = [], plants = [];
+    // One pothos in its pot at potX; flip mirrors its heap of leaves, so the
+    // two don't match. [where on the rim a vine leaves (-1 left edge, 1 right
+    // edge), how far it hangs, which way it bows] for each vine in hang.
+    function pothos(potX, flip, hang) {
+      var plant = el('g', { 'class': 'shelf-deco plant' });
+      plants.push(plant);
+      // Leaves heaped up out of the pot, behind its rim
+      [[-20, 3, 10, 128], [-14, 1, 11, 145], [-8, -4, 12, 168], [-1, -7, 13, 185], [6, -5, 12, 200], [13, -1, 11, 218],
+       [19, 3, 10, 235], [-11, -8, 11, 158], [10, -8, 11, 210], [-4, 0, 10, 160], [4, 0, 10, 208], [0, -11, 11, 180]].forEach(function (l, k) {
+        leaf(potX + l[0] * flip, rimY + l[1] + 2, l[2], flip > 0 ? l[3] : 360 - l[3], k + (flip > 0 ? 0 : 2), plant);
+      });
+      // The pot: a slightly tapered cylinder, its rim an ellipse with the
+      // soil showing inside
+      turned(potX, potBase, [[potR - 3, 0], [potR - 1.5, potH * 0.5], [potR, potH]], 'var(--pot)', plant);
+      el('ellipse', { cx: potX, cy: rimY, rx: potR, ry: 3.4, 'class': 'deco-line', style: 'fill:var(--pot-rim)' }, plant);
+      el('ellipse', { cx: potX, cy: rimY + 0.4, rx: potR - 2.5, ry: 2.2, style: 'fill:#4a3a2c' }, plant);
+      // Vines over the front of the rim, each a stem curving down with leaves
+      // along it, swinging gently from the rim
+      hang.forEach(function (vn, n) {
+        var x0 = potX + vn[0] * potR, y0 = rimY + 1, len = vn[1], out = vn[2];
+        var g = el('g', { 'class': 'vine' }, plant);
+        g.style.transformOrigin = x0 + 'px ' + y0 + 'px';
+        vines.push({ g: g, leaves: [], angle: 0, speed: 0 });
+        // Out over the rim first, then down past the pot's side
+        var P0 = [x0, y0], P1 = [x0 + out * 10, y0 - 2], P2 = [x0 + out * 9, y0 + len * 0.5], P3 = [x0 + out * 4, y0 + len];
+        el('path', { d: 'M' + P0 + ' C' + P1 + ' ' + P2 + ' ' + P3, 'class': 'stem' }, g);
+        function bez(t) {
+          var u = 1 - t;
+          return [0, 1].map(function (j) {
+            return u * u * u * P0[j] + 3 * u * u * t * P1[j] + 3 * u * t * t * P2[j] + t * t * t * P3[j];
+          });
+        }
+        var count = Math.round(len / 12);
+        for (var i = 1; i <= count; i++) {
+          var t = 0.08 + 0.92 * i / count, p = bez(t), side = i % 2 ? -1 : 1;
+          var fl = el('g', { 'class': 'leaf-flutter' }, g);
+          fl.style.transformOrigin = p[0].toFixed(1) + 'px ' + p[1].toFixed(1) + 'px';
+          vines[vines.length - 1].leaves.push(fl);
+          leaf(p[0], p[1], 8.5 + (i % 3) * 1.4 - t * 2, side * (38 + (i % 3) * 8), i + n, fl);
+        }
+      });
+      return plant;
+    }
+    var ivyLX = potX - 68;  // a little way left of the other
+    var ivyL = pothos(ivyLX, -1, [[-0.9, 176, -1], [0.85, 254, 1], [0.5, 132, 1], [-0.5, 92, -1], [-0.75, 232, -1], [0.2, 196, 1], [-0.2, 140, -1], [0.7, 104, 1]]);
+    var ivyR = pothos(potX, 1, [[-0.95, 208, -1], [0.95, 300, 1], [0.6, 152, 1], [-0.55, 108, -1], [-0.8, 276, -1], [0.3, 240, 1], [-0.25, 164, -1], [0.8, 124, 1], [0.1, 96, -1]]);
+    // Each pot slides along the top shelf, between the bookend and the
+    // shelf's end, and stops at the other pot. Their leaves spread about 22
+    // either side of the middle.
+    var ivies = [{ node: ivyL, x: ivyLX }, { node: ivyR, x: potX }];
+    ivies.forEach(function (v, k) {
+      v.slide = slider(v.node, function () {
+        var lo = bookendR + 22 - v.x, hi = W - DX * 2.2 - 22 - v.x;
+        var other = ivies[1 - k], at = other.x + (other.slide ? other.slide.offset() : 0);
+        if (k === 0) hi = Math.min(hi, at - 2 * potR - 4 - v.x);
+        else lo = Math.max(lo, at + 2 * potR + 4 - v.x);
+        return [lo, hi];
+      });
     });
 
     // The vines hang still until the cursor moves through them. Each is a
@@ -417,14 +619,14 @@ permalink: /bookshelf/
         requestAnimationFrame(step);
       }
     });
-    // On a phone, a tap on the plant gives it a nudge instead
-    plant.addEventListener('click', function () {
+    // On a phone, a tap on a plant gives them a nudge instead
+    plants.forEach(function (plant) { plant.addEventListener('click', function () {
       vines.forEach(function (v, i) { v.speed += (i % 2 ? -1 : 1) * 10; });
       if (!running) {
         running = true;
         requestAnimationFrame(step);
       }
-    });
+    }); });
 
     // The reading list stays hidden until a book is picked. Hovering (or
     // focusing) a book on the shelf pops it up and shows just its line in the
@@ -433,22 +635,35 @@ permalink: /bookshelf/
     var reads = document.querySelectorAll('.read');
     var list = document.getElementById('shelf-list');
     var shelf = document.querySelector('.bookshelf');
-    var pinned = null;
-    function mark(i) {
-      if (pinned !== null) i = pinned;
+    var pinned = null, hovered = null;
+    // A book and the art are never out at once. Whatever's under the cursor
+    // (or focused) shows, a book over the art; otherwise whatever's pinned,
+    // and pinning one unpins the other. While a book is out, the crate blurs
+    // back; while the art is out, the books fade.
+    function update() {
+      var book = hovered !== null ? hovered : artHover ? null : pinned;
+      var art = hovered === null && (artHover || artPinned);
       groups.forEach(function (g, j) {
-        g.classList.toggle('is-picked', j === i);
+        g.classList.toggle('is-picked', j === book);
         g.setAttribute('aria-pressed', j === pinned);
       });
-      reads.forEach(function (r, j) { r.classList.toggle('is-shown', j === i); });
-      list.hidden = i === null;
-      shelf.classList.toggle('has-picked', i !== null);
+      reads.forEach(function (r, j) { r.classList.toggle('is-shown', j === book); });
+      list.hidden = book === null;
+      shelf.classList.toggle('has-picked', book !== null);
+      artSection.classList.toggle('is-open', art);
+      bin.classList.toggle('is-open', art);
+      bin.setAttribute('aria-expanded', art);
+      bin.setAttribute('aria-pressed', artPinned);
+      shelf.classList.toggle('has-art', art);
     }
     function pin(i) {
       pinned = pinned === i ? null : i;
-      mark(null);
+      if (pinned !== null) artPinned = false;
+      hovered = null;
+      artHover = false;
+      update();
     }
-    mark(null);
+    update();
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && pinned !== null) pin(pinned);
     });
@@ -456,10 +671,10 @@ permalink: /bookshelf/
       g.setAttribute('role', 'button');
       g.setAttribute('aria-label', BOOKS[i].title + ', ' + BOOKS[i].author);
       g.setAttribute('aria-controls', 'shelf-list');
-      g.addEventListener('mouseenter', function () { mark(i); });
-      g.addEventListener('focus', function () { mark(i); });
-      g.addEventListener('mouseleave', function () { mark(null); });
-      g.addEventListener('blur', function () { mark(null); });
+      g.addEventListener('mouseenter', function () { hovered = i; update(); });
+      g.addEventListener('focus', function () { hovered = i; update(); });
+      g.addEventListener('mouseleave', function () { hovered = null; update(); });
+      g.addEventListener('blur', function () { hovered = null; update(); });
       g.addEventListener('click', function () { pin(i); });
       g.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pin(i); }

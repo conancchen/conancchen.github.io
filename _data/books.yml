@@ -2,8 +2,8 @@
 # Each book is drawn as a spine on the shelf:
 #   color   the spine's color
 #   ink     light or dark text on it
-#   width   how thick the book is, px
-#   height  how tall it stands, px (the shelf is about 200px high)
+#   pages   how many pages it has (its thickness on the shelf follows)
+#   height  how tall it stands, px (the top shelf is about 220px high)
 #   current true while I'm still reading it (it gets a pulsing dot)
 #   note    an optional line shown under it in the list
 #   cover   the cover picture shown in the list, in images/books
@@ -12,42 +12,42 @@
   author: Haruki Murakami
   color: "#f4f2ee"
   ink: dark
-  width: 36
-  height: 140
+  pages: 327
+  height: 192
   current: true
 - title: Flash Boys
   cover: flash-boys.jpg
   author: Michael Lewis
   color: "#ed1b2c"
   ink: light
-  width: 31
-  height: 146
+  pages: 274
+  height: 201
   current: true
 - title: One Hundred Years of Solitude
   cover: one-hundred-years-of-solitude.jpg
   author: Gabriel García Márquez
   color: "#46794f"
   ink: light
-  width: 36
-  height: 142
+  pages: 417
+  height: 194
 - title: South of the Border, West of the Sun
   cover: south-of-the-border-west-of-the-sun.jpg
   author: Haruki Murakami
   color: "#c73532"
   ink: light
-  width: 24
-  height: 134
+  pages: 213
+  height: 184
 - title: Kafka on the Shore
   cover: kafka-on-the-shore.jpg
   author: Haruki Murakami
   color: "#dbaabb"
   ink: dark
-  width: 38
-  height: 142
+  pages: 467
+  height: 194
 - title: Going Infinite
   cover: going-infinite.jpg
   author: Michael Lewis
   color: "#f4f3ef"
   ink: dark
-  width: 31
-  height: 146
+  pages: 288
+  height: 201
