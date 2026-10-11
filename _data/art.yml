@@ -1,0 +1,28 @@
+# The prints in the art crate at the end of the shelf, shown large when it's
+# opened. Each painting:
+#   src     the picture, in images/art
+#   title, by   its caption
+#   aspect  its width over its height
+#   row     which row of the Art section it's in (paintings in a row come
+#           out the same height and fill the width)
+#   crate   where it stands in the crate: how far in from the left, its
+#           width and height there, and how far back (leave it out and
+#           the prints are spread across the crate on their own)
+- src: zojoji-snow-hasui.jpg
+  title: Snow at Zōjō-ji Temple
+  by: Kawase Hasui, 1925
+  aspect: 0.664
+  row: 0
+  crate: { x: 8, width: 66, height: 99, back: 0.6 }
+- src: sisyphus-titian.jpg
+  title: Sisyphus
+  by: Titian, 1548–49
+  aspect: 0.864
+  row: 0
+  crate: { x: 107, width: 77, height: 88, back: 0.35 }
+- src: monk-by-the-sea.jpg
+  title: The Monk by the Sea
+  by: Caspar David Friedrich, 1808–10
+  aspect: 1.57
+  row: 1
+  crate: { x: 24, width: 162, height: 102, back: 1.2 }

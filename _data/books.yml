@@ -1,20 +1,13 @@
 # What's on the bookshelf: what I'm reading now, then what I just finished.
-# Each book is drawn as a spine on the shelf:
-#   color   the spine's color
-#   ink     light or dark text on it
-#   pages   how many pages it has (its thickness on the shelf follows)
-#   height  how tall it stands, px (the top shelf is about 190px high)
-#   current true while I'm still reading it (it gets a pulsing dot)
-#   note    an optional line shown under it in the list
+# Each book is drawn as a spine on the shelf (only the title is required):
+#   author  shown under the title in the list
 #   cover   the cover picture shown in the list, in images/books
-- title: The Elephant Vanishes
-  cover: elephant-vanishes.jpg
-  author: Haruki Murakami
-  color: "#f4f2ee"
-  ink: dark
-  pages: 327
-  height: 163
-  current: true
+#   color   the spine's color, as #rrggbb
+#   ink     light or dark text on it (picked from the color if left out)
+#   pages   how many pages it has (its thickness on the shelf follows)
+#   height  how tall it stands, 90 to 180 (the shelf is 190 high)
+#   current true while I'm still reading it ("currently reading" in the list)
+#   note    an optional line shown under it in the list
 - title: Flash Boys
   cover: flash-boys.jpg
   author: Michael Lewis
@@ -23,20 +16,14 @@
   pages: 274
   height: 171
   current: true
-- title: One Hundred Years of Solitude
-  cover: one-hundred-years-of-solitude.jpg
-  author: Gabriel García Márquez
-  color: "#46794f"
-  ink: light
-  pages: 417
-  height: 165
-- title: South of the Border, West of the Sun
-  cover: south-of-the-border-west-of-the-sun.jpg
+- title: The Elephant Vanishes
+  cover: elephant-vanishes.jpg
   author: Haruki Murakami
-  color: "#c73532"
-  ink: light
-  pages: 213
-  height: 156
+  color: "#f4f2ee"
+  ink: dark
+  pages: 327
+  height: 163
+  current: true
 - title: Kafka on the Shore
   cover: kafka-on-the-shore.jpg
   author: Haruki Murakami
@@ -47,7 +34,21 @@
 - title: Going Infinite
   cover: going-infinite.jpg
   author: Michael Lewis
-  color: "#f4f3ef"
+  color: "#f2c230"
   ink: dark
   pages: 288
   height: 171
+- title: One Hundred Years of Solitude
+  cover: one-hundred-years-of-solitude.jpg
+  author: Gabriel García Márquez
+  color: "#46794f"
+  ink: light
+  pages: 417
+  height: 165
+- title: Thinking, Fast and Slow
+  cover: thinking-fast-and-slow.jpg
+  author: Daniel Kahneman
+  color: "#f7f6f2"
+  ink: dark
+  pages: 499
+  height: 168
