@@ -1050,7 +1050,23 @@ $dot-center: calc(4px + 20px / 2);
 }
 
 .zm-ready {
+  position: relative;
   padding-top: 16px;
+}
+
+// During a round the problem sits where the score and Start were, and all
+// but the round graph stays in place out of sight, so nothing moves when a
+// round starts or ends
+.zm-ready > .zm-play {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding-top: 16px;
+}
+
+.zm.is-running .zm-ready > :not(.zm-play):not(#zm-round) {
+  visibility: hidden;
 }
 
 .zm-ready[hidden],
@@ -1120,8 +1136,14 @@ $dot-center: calc(4px + 20px / 2);
   font-variant-numeric: tabular-nums;
 }
 
+// before any round, the score's room is kept, empty
+.zm-last {
+  min-height: 60px;
+}
+
 .zm-last[hidden] {
-  display: none;
+  display: block;
+  visibility: hidden;
 }
 
 // Start: plain text, a little lighter under the pointer
@@ -1373,7 +1395,8 @@ $dot-center: calc(4px + 20px / 2);
 
 .zm-stat:hover,
 .zm-stat:focus-visible,
-.zm-stat[aria-pressed="true"] {
+.zm-stat[aria-pressed="true"],
+.zm-stat.is-lit {
   outline: none;
   color: var(--text);
 }
@@ -1388,15 +1411,25 @@ $dot-center: calc(4px + 20px / 2);
   cursor: pointer;
 }
 
-// the round graph: a dot for each problem, the line through them lighter,
-// and the time into the round along the bottom
+// the round graph: a dot for each problem, the line through them faint
+// under the pace, and the time into the round along the bottom
 .zm-lap {
   fill: var(--zm-line);
 }
 
+// the pace in the ink color, faint, with a dot where the pointer is
+.zm-pace {
+  stroke: var(--text);
+  stroke-opacity: 0.3;
+}
+
+.zm-pace-dot {
+  fill: var(--text);
+}
+
 .zm-line-thin {
-  stroke-width: 1.25;
-  stroke-opacity: 0.6;
+  stroke-width: 1;
+  stroke-opacity: 0.35;
 }
 
 .zm-tick-time {

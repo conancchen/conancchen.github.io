@@ -16,7 +16,18 @@ permalink: /zetamac/
     <span class="zm-score" id="zm-score">0</span>
   </div>
 
+  <!-- During a round the problem takes the place of the score and Start,
+       with the rest kept where it was but out of sight, except the round
+       graph at the bottom, which fills in as the round goes -->
   <div class="zm-ready" id="zm-ready">
+    <div class="zm-play" id="zm-play" hidden>
+      <label class="zm-problem" for="zm-answer">
+        <span class="zm-question" id="zm-question"></span>
+        <span class="zm-equals">=</span>
+        <input class="zm-answer" id="zm-answer" type="text" inputmode="numeric" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Answer">
+      </label>
+    </div>
+
     <span class="zm-last" id="zm-last" hidden></span>
     <button type="button" class="zm-start" id="zm-start">Space to Start</button>
 
@@ -36,7 +47,8 @@ permalink: /zetamac/
     </div>
 
     <!-- How long each problem of a round took, across its two minutes: the
-         latest round's, or the one picked on the graph above -->
+         one being played, the latest one, or the one picked on the graph
+         above -->
     <div class="zm-history" id="zm-round" hidden>
       <div class="zm-history-head">
         <h2 class="block-label block-label-plain" id="zm-round-title">Last round</h2>
@@ -45,14 +57,6 @@ permalink: /zetamac/
       <p class="zm-stats" id="zm-round-stats"></p>
       <div class="zm-chart" id="zm-round-chart" tabindex="0" role="img"></div>
     </div>
-  </div>
-
-  <div class="zm-play" id="zm-play" hidden>
-    <label class="zm-problem" for="zm-answer">
-      <span class="zm-question" id="zm-question"></span>
-      <span class="zm-equals">=</span>
-      <input class="zm-answer" id="zm-answer" type="text" inputmode="numeric" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Answer">
-    </label>
   </div>
 
 </section>
@@ -150,7 +154,6 @@ permalink: /zetamac/
       if (last !== undefined) lastEl.textContent = last;
       clock(LENGTH);
       play.hidden = true;
-      ready.hidden = false;
       drawHistory(true);
       startButton.focus();
     }
@@ -161,11 +164,11 @@ permalink: /zetamac/
       scoreEl.textContent = '0';
       scoreEl.style.visibility = '';
       zm.classList.add('is-running');
-      ready.hidden = true;
       play.hidden = false;
       show(next());
       answer.focus();
       started = performance.now();
+      drawRound([]);
       frame = requestAnimationFrame(tick);
     }
 
@@ -180,7 +183,10 @@ permalink: /zetamac/
     function finish() {
       remember(score);
       picked = null;
+      // the round graph, already drawn, doesn't draw itself in again
+      justPlayed = true;
       reset(score);
+      justPlayed = false;
     }
 
     // An answer goes in as soon as it's right
@@ -197,12 +203,13 @@ permalink: /zetamac/
       score++;
       scoreEl.textContent = score;
       show(next());
+      drawRound([]);
     }
 
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') reset();
       // Space (or Enter) starts, wherever the focus is
-      else if ((e.key === ' ' || e.key === 'Enter') && !ready.hidden && !e.target.closest('button:not(#zm-start)')) { e.preventDefault(); start(); }
+      else if ((e.key === ' ' || e.key === 'Enter') && started === null && !e.target.closest('button:not(#zm-start)')) { e.preventDefault(); start(); }
     });
     startButton.addEventListener('click', start);
 
@@ -293,10 +300,10 @@ permalink: /zetamac/
       // the sample standard deviation, 0 for a single round
       var sd = scores.length > 1 ? Math.sqrt(scores.reduce(function (a, v) { return a + (v - mean) * (v - mean); }, 0) / (scores.length - 1)) : 0;
       // with no rounds yet, just n = 0 over the empty graph; otherwise max,
-      // average and std can each be hovered or pressed to show on the graph
+      // mean (μ) and std (σ) can each be hovered or pressed to show on the graph
       stats.textContent = 'n = ' + scores.length;
       if (scores.length) {
-        [['max', 'max: ' + top], ['mean', 'average: ' + (Math.round(mean * 10) / 10)], ['mean', 'std: ' + (Math.round(sd * 10) / 10)]].forEach(function (st) {
+        [['max', 'max = ' + top], ['mean', 'μ = ' + (Math.round(mean * 10) / 10)], ['mean', 'σ = ' + (Math.round(sd * 10) / 10)]].forEach(function (st) {
           stats.appendChild(document.createTextNode(', '));
           var b = document.createElement('button');
           b.type = 'button';
@@ -356,7 +363,7 @@ permalink: /zetamac/
         });
         overlays.mean.push(meanGroup);
       }
-      drawRound(list, drawingIn);
+      drawRound(list, drawingIn && !justPlayed);
       if (!points.length) return;
       var last = points[points.length - 1];
       svgEl('line', { x1: 0, x2: W, y1: last.y, y2: last.y, 'class': 'zm-now zm-late' }, svg);
@@ -518,6 +525,8 @@ permalink: /zetamac/
       ['max', 'mean'].forEach(function (k) {
         (overlays[k] || []).forEach(function (g) { g.classList.toggle('is-shown', k === kind); });
       });
+      // μ and σ, showing the same, light up together
+      stats.querySelectorAll('.zm-stat').forEach(function (b) { b.classList.toggle('is-lit', b.dataset.show === kind); });
     }
     stats.addEventListener('mouseover', function (e) {
       var b = e.target.closest('.zm-stat');
@@ -559,17 +568,22 @@ permalink: /zetamac/
     });
 
     // The round graph: a dot for each problem, at the time into the round it
-    // was answered and as high as the seconds it took, a line through them
-    // over the same fading fill, and the average dashed across in a pill.
+    // was answered and as high as the seconds it took, a faint line through
+    // them, and the pace smoothed over them in black, over the same fading
+    // fill, and the average dashed across in a pill.
     // A hairline follows the pointer (or the arrow keys) to show each
-    // problem, how long it took and when
+    // problem, how long it took and its answer, and the score the pace there
+    // projects
     var roundBox = document.getElementById('zm-round');
     var roundTitle = document.getElementById('zm-round-title');
     var roundLatest = document.getElementById('zm-round-latest');
     var roundStats = document.getElementById('zm-round-stats');
     var roundChart = document.getElementById('zm-round-chart');
     var picked = null;  // when the round graphed was played; null for the latest
-    var laps = [], lapAt = null, lapTip, lapGuide, lapRing;
+    var justPlayed = false;  // while going back to the start after a round
+    var laps = [], lapAt = null, lapTip, lapGuide, lapRing, lapPaceRing;
+    var roundOverlays = {}, roundPinned = null;  // the stats drawn on the round graph, and the one pressed
+    var PACE = 4;  // how many problems either side mostly make up the pace
 
     function pickedIndex(list) {
       for (var i = 0; i < list.length; i++) if (list[i][1] === picked) return i;
@@ -584,6 +598,11 @@ permalink: /zetamac/
       startButton.focus();
     });
 
+    // a problem's answer, from the problem as it was shown
+    function solve(text) {
+      var m = text.match(/(\d+) (.) (\d+)/), a = +m[1], b = +m[3];
+      return m[2] === '+' ? a + b : m[2] === '−' ? a - b : m[2] === '×' ? a * b : a / b;
+    }
     function secs(v) { return (Math.round(v * 10) / 10) + 's'; }
     function mmss(t) { var s = Math.floor(t); return Math.floor(s / 60) + ':' + ('0' + s % 60).slice(-2); }
 
@@ -592,14 +611,22 @@ permalink: /zetamac/
       roundStats.textContent = '';
       laps = [];
       lapAt = null;
-      roundBox.hidden = !list.length;
-      if (!list.length) return;
-      var i = pickedIndex(list), r = list[i], isLatest = i === list.length - 1;
-      roundTitle.textContent = isLatest ? 'Last round' : when(r[1]);
+      // during a round, the round so far
+      var live = started !== null;
+      roundBox.hidden = !list.length && !live;
+      if (roundBox.hidden) return;
+      var i = pickedIndex(list), r = live ? [score, Date.now(), marks, LENGTH] : list[i], isLatest = live || i === list.length - 1;
+      roundTitle.textContent = live ? 'This round' : isLatest ? 'Last round' : when(r[1]);
       roundLatest.hidden = isLatest;
       var done = Array.isArray(r[2]) ? r[2] : null, length = r[3] || 120;
       roundChart.setAttribute('aria-label', 'Seconds each problem took: none to show.');
       if (!done || !done.length) {
+        if (live) {
+          // nothing answered yet: just the empty graph to fill
+          roundStats.textContent = 'score = 0';
+          frameRound(length, 4, null, false);
+          return;
+        }
         roundStats.textContent = done ? 'No problems answered this round.' : 'No timings were kept for this round.';
         return;
       }
@@ -611,34 +638,50 @@ permalink: /zetamac/
       });
       var took = laps.map(function (l) { return l.took; });
       var avg = before / laps.length, fastest = Math.min.apply(null, took), slowest = Math.max.apply(null, took);
-      roundStats.textContent = 'score: ' + laps.length + ', avg: ' + secs(avg) + ', fastest: ' + secs(fastest) + ', slowest: ' + secs(slowest);
+      // and the sample standard deviation of the times, 0 for a single problem
+      var sd = took.length > 1 ? Math.sqrt(took.reduce(function (a, v) { return a + (v - avg) * (v - avg); }, 0) / (took.length - 1)) : 0;
+      // μ, σ and the range can each be hovered or pressed to show on the
+      // graph, as on Recent
+      roundStats.textContent = 'score = ' + laps.length;
+      [['mean', 'μ = ' + secs(avg)], ['mean', 'σ = ' + secs(sd)], ['range', 'x ∈ [' + secs(fastest) + ', ' + secs(slowest) + ']']].forEach(function (st) {
+        roundStats.appendChild(document.createTextNode(', '));
+        var b = roundStats.appendChild(document.createElement('button'));
+        b.type = 'button';
+        b.className = 'zm-stat';
+        b.textContent = st[1];
+        b.dataset.show = st[0];
+        b.setAttribute('aria-pressed', roundPinned === st[0]);
+      });
       roundChart.setAttribute('aria-label', 'Seconds each problem took: ' + laps.length + ' problems, ' + secs(avg) + ' on average. Use the arrow keys to read each one.');
 
-      // the seconds up the side in whole steps, the time into the round along
-      // the bottom every 30 seconds (every quarter, in a shorter round)
-      var W = roundChart.clientWidth, H = 140, R = 44, T = 18, B = 24;
-      var step = slowest <= 4 ? 1 : slowest <= 10 ? 2 : 5, hi = Math.max(step, Math.ceil(slowest / step) * step);
-      var x = function (t) { return (W - R) * t / length; };
-      var y = function (v) { return T + (H - T - B) * (1 - v / hi); };
-      var svg = svgEl('svg', { width: W, height: H, viewBox: '0 0 ' + W + ' ' + H, 'aria-hidden': 'true', 'class': drawingIn && !still ? 'is-drawing' : '' }, roundChart);
-      var reveal = svgEl('clipPath', { id: 'zm-round-reveal' }, svgEl('defs', {}, svg));
-      svgEl('rect', { x: -10, y: -10, width: W + 20, height: H + 20, 'class': 'zm-reveal' }, reveal);
+      // room for the slowest problem, and for a σ above the mean
+      var f = frameRound(length, Math.max(slowest, avg + sd), avg, drawingIn), svg = f.svg, x = f.x, y = f.y, H = f.H, B = f.B, T = f.T, W = f.W, R = f.R;
       var avgY = y(avg);
-      for (var v = 0; v <= hi; v += step) {
-        svgEl('line', { x1: 0, x2: W, y1: y(v), y2: y(v), 'class': 'zm-grid' }, svg);
-        if (Math.abs(y(v) - 7 - avgY) > 14) svgEl('text', { x: W, y: y(v) - 7, 'class': 'zm-tick' }, svg).textContent = v + 's';
-      }
-      var every = length >= 60 ? 30 : length / 4;
-      for (var t = 0; t <= length; t += every) {
-        svgEl('text', { x: x(t), y: H - 6, 'class': 'zm-tick zm-tick-time' + (t === 0 ? ' is-first' : t + every > length ? ' is-last' : '') }, svg).textContent = mmss(t);
-      }
       laps.forEach(function (l) { l.x = x(l.t); l.y = y(l.took); });
       svgEl('line', { x1: 0, x2: W, y1: avgY, y2: avgY, 'class': 'zm-now zm-late' }, svg);
       var drawn = svgEl('g', { 'clip-path': 'url(#zm-round-reveal)' }, svg);
       if (laps.length > 1) {
-        var linePath = smooth(laps);
-        svgEl('path', { d: linePath + ' L' + laps[laps.length - 1].x + ',' + (H - B) + ' L' + laps[0].x + ',' + (H - B) + ' Z', 'class': 'zm-area' }, drawn);
-        svgEl('path', { d: linePath, 'class': 'zm-line zm-line-thin' }, drawn);
+        // the pace: each problem's time averaged with those around it, the
+        // nearer counting for more, so the line shows the speeding up and
+        // slowing down rather than every slow problem
+        var pace = laps.map(function (l, k) {
+          var sum = 0, weight = 0;
+          for (var j = Math.max(0, k - 3 * PACE); j <= Math.min(laps.length - 1, k + 3 * PACE); j++) {
+            var w = Math.exp(-(j - k) * (j - k) / (2 * PACE * PACE));
+            sum += w * laps[j].took;
+            weight += w;
+          }
+          l.pace = sum / weight;
+          l.paceY = y(l.pace);
+          // the score the round was headed for there: those answered so
+          // far, and the rest of the round at that pace
+          l.proj = Math.round(l.n + (length - l.t) / l.pace);
+          return { x: l.x, y: l.paceY };
+        });
+        var pacePath = smooth(pace);
+        svgEl('path', { d: pacePath + ' L' + pace[pace.length - 1].x + ',' + (H - B) + ' L' + pace[0].x + ',' + (H - B) + ' Z', 'class': 'zm-area' }, drawn);
+        svgEl('path', { d: smooth(laps), 'class': 'zm-line zm-line-thin' }, drawn);
+        svgEl('path', { d: pacePath, 'class': 'zm-line zm-pace' }, drawn);
       }
       laps.forEach(function (l) { svgEl('circle', { cx: l.x, cy: l.y, r: 2.5, 'class': 'zm-lap' }, drawn); });
       // the average in a pill at the right, on its dashed line
@@ -650,15 +693,62 @@ permalink: /zetamac/
       pill.setAttribute('width', pillW);
       pill.setAttribute('x', W - pillW);
       label.setAttribute('x', W - pillW + 8);
+      // the mean with a band and capped bars a σ either side of it (not below
+      // nothing), and the fastest and slowest problems ringed
+      roundOverlays = { mean: [], range: [] };
+      var meanGroup = svgEl('g', { 'class': 'zm-overlay' }, svg), lo = Math.max(0, avg - sd);
+      svgEl('rect', { x: 0, width: W - R, y: y(avg + sd), height: y(lo) - y(avg + sd), 'class': 'zm-sd' }, meanGroup);
+      [avg + sd, lo].forEach(function (v) {
+        svgEl('line', { x1: 0, x2: W - R, y1: y(v), y2: y(v), 'class': 'zm-sd-edge' }, meanGroup);
+      });
+      svgEl('line', { x1: 0, x2: W - R, y1: avgY, y2: avgY, 'class': 'zm-mean' }, meanGroup);
+      [6, W - R - 6].forEach(function (ex) {
+        svgEl('path', { d: 'M' + ex + ',' + y(avg + sd) + ' V' + y(lo) + ' M' + (ex - 4) + ',' + y(avg + sd) + ' H' + (ex + 4) +
+          ' M' + (ex - 4) + ',' + y(lo) + ' H' + (ex + 4), 'class': 'zm-err' }, meanGroup);
+      });
+      roundOverlays.mean.push(meanGroup);
+      var rangeGroup = svgEl('g', { 'class': 'zm-overlay' }, svg);
+      laps.forEach(function (l) {
+        if (l.took !== fastest && l.took !== slowest) return;
+        svgEl('circle', { cx: l.x, cy: l.y, r: 10, 'class': 'zm-max-halo' }, rangeGroup);
+        svgEl('circle', { cx: l.x, cy: l.y, r: 5, 'class': 'zm-dot' }, rangeGroup);
+      });
+      roundOverlays.range.push(rangeGroup);
+      showRoundStat(roundPinned);
       lapGuide = svgEl('line', { y1: T, y2: H - B, 'class': 'zm-guide' }, svg);
       lapRing = svgEl('circle', { r: 4, 'class': 'zm-dot' }, svg);
-      lapGuide.style.display = lapRing.style.display = 'none';
+      lapPaceRing = svgEl('circle', { r: 3.5, 'class': 'zm-dot zm-pace-dot' }, svg);
+      lapGuide.style.display = lapRing.style.display = lapPaceRing.style.display = 'none';
       lapTip = document.createElement('div');
       lapTip.className = 'zm-tip';
       lapTip.hidden = true;
       lapTip.value = lapTip.appendChild(document.createElement('strong'));
       lapTip.when = lapTip.appendChild(document.createElement('span'));
+      lapTip.pace = lapTip.appendChild(document.createElement('span'));
       roundChart.appendChild(lapTip);
+    }
+
+    // the round graph's frame: the seconds up the side in whole steps (room
+    // for the slowest problem), the time into the round along the bottom
+    // every 30 seconds (every quarter, in a shorter round); a guide's
+    // seconds give way to the average's pill
+    function frameRound(length, slowest, avg, drawingIn) {
+      var W = roundChart.clientWidth, H = 140, R = 44, T = 18, B = 24;
+      var step = slowest <= 4 ? 1 : slowest <= 10 ? 2 : 5, hi = Math.max(step, Math.ceil(slowest / step) * step);
+      var x = function (t) { return (W - R) * t / length; };
+      var y = function (v) { return T + (H - T - B) * (1 - v / hi); };
+      var svg = svgEl('svg', { width: W, height: H, viewBox: '0 0 ' + W + ' ' + H, 'aria-hidden': 'true', 'class': drawingIn && !still ? 'is-drawing' : '' }, roundChart);
+      var reveal = svgEl('clipPath', { id: 'zm-round-reveal' }, svgEl('defs', {}, svg));
+      svgEl('rect', { x: -10, y: -10, width: W + 20, height: H + 20, 'class': 'zm-reveal' }, reveal);
+      for (var v = 0; v <= hi; v += step) {
+        svgEl('line', { x1: 0, x2: W, y1: y(v), y2: y(v), 'class': 'zm-grid' }, svg);
+        if (avg === null || Math.abs(y(v) - 7 - y(avg)) > 14) svgEl('text', { x: W, y: y(v) - 7, 'class': 'zm-tick' }, svg).textContent = v + 's';
+      }
+      var every = length >= 60 ? 30 : length / 4;
+      for (var t = 0; t <= length; t += every) {
+        svgEl('text', { x: x(t), y: H - 6, 'class': 'zm-tick zm-tick-time' + (t === 0 ? ' is-first' : t + every > length ? ' is-last' : '') }, svg).textContent = mmss(t);
+      }
+      return { svg: svg, x: x, y: y, W: W, H: H, T: T, B: B, R: R };
     }
 
     function lap(i) {
@@ -666,7 +756,7 @@ permalink: /zetamac/
       lapAt = i;
       if (i === null) {
         lapTip.hidden = true;
-        lapGuide.style.display = lapRing.style.display = 'none';
+        lapGuide.style.display = lapRing.style.display = lapPaceRing.style.display = 'none';
         return;
       }
       var l = laps[i];
@@ -675,8 +765,13 @@ permalink: /zetamac/
       lapRing.setAttribute('cx', l.x);
       lapRing.setAttribute('cy', l.y);
       lapGuide.style.display = lapRing.style.display = '';
+      // and where the pace stood then, with only one problem there's none
+      lapPaceRing.style.display = l.pace === undefined ? 'none' : '';
+      lapPaceRing.setAttribute('cx', l.x);
+      lapPaceRing.setAttribute('cy', l.paceY);
       lapTip.value.textContent = secs(l.took);
-      lapTip.when.textContent = l.text + ', at ' + mmss(l.t);
+      lapTip.when.textContent = l.text + ' = ' + solve(l.text);
+      lapTip.pace.textContent = l.pace === undefined ? '' : 'proj: ' + l.proj;
       lapTip.hidden = false;
       var w = lapTip.offsetWidth;
       lapTip.style.left = (l.x + 10 + w > roundChart.clientWidth ? l.x - 10 - w : l.x + 10) + 'px';
@@ -689,6 +784,32 @@ permalink: /zetamac/
       if (best !== lapAt) lap(best);
     });
     roundChart.addEventListener('pointerleave', function () { lap(null); });
+
+    function showRoundStat(kind) {
+      ['mean', 'range'].forEach(function (k) {
+        (roundOverlays[k] || []).forEach(function (g) { g.classList.toggle('is-shown', k === kind); });
+      });
+      roundStats.querySelectorAll('.zm-stat').forEach(function (b) { b.classList.toggle('is-lit', b.dataset.show === kind); });
+    }
+    roundStats.addEventListener('mouseover', function (e) {
+      var b = e.target.closest('.zm-stat');
+      if (b) showRoundStat(b.dataset.show);
+    });
+    roundStats.addEventListener('mouseout', function (e) {
+      if (e.target.closest('.zm-stat')) showRoundStat(roundPinned);
+    });
+    roundStats.addEventListener('focusin', function (e) {
+      var b = e.target.closest('.zm-stat');
+      if (b) showRoundStat(b.dataset.show);
+    });
+    roundStats.addEventListener('focusout', function () { showRoundStat(roundPinned); });
+    roundStats.addEventListener('click', function (e) {
+      var b = e.target.closest('.zm-stat');
+      if (!b) return;
+      roundPinned = roundPinned === b.dataset.show ? null : b.dataset.show;
+      roundStats.querySelectorAll('.zm-stat').forEach(function (o) { o.setAttribute('aria-pressed', o.dataset.show === roundPinned); });
+      showRoundStat(roundPinned || b.dataset.show);
+    });
     roundChart.addEventListener('blur', function () { lap(null); });
     roundChart.addEventListener('keydown', function (e) {
       if (!laps.length || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
@@ -700,7 +821,7 @@ permalink: /zetamac/
     var resizing;
     window.addEventListener('resize', function () {
       clearTimeout(resizing);
-      resizing = setTimeout(function () { if (!ready.hidden) drawHistory(false); }, 100);
+      resizing = setTimeout(function () { drawHistory(false); }, 100);
     });
 
     reset();
