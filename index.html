@@ -92,20 +92,27 @@ subtitle: Updated Sep 2026
     }, HOLD);
   })();
 
-  // Pressing the Ironman link opens its results card, and pressing it again,
-  // anywhere else, or Esc closes it. On a narrow screen the card shifts left
-  // so it never runs past the edge.
+  // Pressing the Ironman link grows its results card out of it, and pressing
+  // it again, anywhere else, or Esc closes it. On a narrow screen the card
+  // shifts left so it never runs past the edge.
   (function () {
     var preview = document.querySelector('.preview');
     var link = preview.querySelector('.preview-link');
     var card = preview.querySelector('.preview-card');
+    // the card grows out of the middle of the link, wherever the card sits
+    function growFrom(shift) {
+      card.style.setProperty('--grow-x', link.offsetWidth / 2 + shift + 'px');
+    }
+    growFrom(0);
     function toggle(on) {
       preview.classList.toggle('is-open', on);
       link.setAttribute('aria-expanded', on);
-      card.style.left = '';
       if (on) {
-        var over = card.getBoundingClientRect().right - (document.documentElement.clientWidth - 16);
+        card.style.left = '';
+        // measured by layout, as the card's still scaled down as it starts
+        var over = preview.getBoundingClientRect().left + card.offsetWidth - (document.documentElement.clientWidth - 16);
         if (over > 0) card.style.left = -over + 'px';
+        growFrom(Math.max(0, over));
       }
     }
     link.addEventListener('click', function () { toggle(!preview.classList.contains('is-open')); });
@@ -228,6 +235,9 @@ subtitle: Updated Sep 2026
     </div>
     <div class="row">
       <a href="{{ site.baseurl }}/bookshelf/" class="row-link">Bookshelf</a>
+    </div>
+    <div class="row">
+      <a href="{{ site.baseurl }}/zetamac/" class="row-link">Zetamac</a>
     </div>
   </section>
 

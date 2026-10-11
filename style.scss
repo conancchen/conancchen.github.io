@@ -12,8 +12,7 @@
   --muted: #8a8a8a;
   --rule: #e0dfdb;
   --link: #6f6e6a;
-  --underline: #d3d2ce;
-  --swim: #2a78d6;  // the sports' colors, as on /strava
+  --swim: #2a78d6;  // the sports' colors
   --bike: #006e00;
   --run: #e8605f;
   --toast-bg: #3a3a38;
@@ -27,6 +26,23 @@
 
 
 
+
+/**************/
+/* CURSOR     */
+/**************/
+// With a mouse, the cursor is a small black dot everywhere, the same over
+// anything that can be pressed or dragged (ringed in white so it still shows
+// over the dark lightbox)
+$cursor-dot: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Ccircle cx='6' cy='6' r='4.5' fill='%23000' stroke='%23fff' stroke-width='1'/%3E%3C/svg%3E") 6 6, auto;
+
+@media (pointer: fine) {
+  html,
+  html *,
+  html *::before,
+  html *::after {
+    cursor: $cursor-dot !important;
+  }
+}
 
 /**************/
 /* BASE       */
@@ -721,9 +737,9 @@ $dot-center: calc(4px + 20px / 2);
 /**************/
 /* PREVIEW    */
 /**************/
-// Pressing the Ironman link (or hovering it, where there's a pointer) floats a
-// little results card over it: the total, a bar splitting the race into swim,
-// bike and run by time, and the placings.
+// Pressing the Ironman link (or hovering it, where there's a pointer) grows a
+// little results card up out of it: the total, a bar splitting the race into
+// swim, bike and run by time, and the placings.
 .preview {
   position: relative;
 }
@@ -770,17 +786,33 @@ $dot-center: calc(4px + 20px / 2);
   line-height: 16px;
   font-variant-numeric: tabular-nums;
   white-space: normal;
+  // It grows from the middle of the link below it (--grow-x is set by the
+  // script, as the card can shift left on a narrow screen), a touch past
+  // full size and back, and shrinks back down into the link when it closes
+  transform-origin: var(--grow-x, 40px) calc(100% + 20px);
   opacity: 0;
   visibility: hidden;
-  transform: translateY(4px);
-  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+  transform: scale(0.2);
+  transition: opacity 0.12s ease 0.06s, transform 0.2s cubic-bezier(0.55, 0, 1, 0.45), visibility 0.2s;
   pointer-events: none;
+}
+
+// what's on it comes in once it's mostly grown, and goes first as it shrinks
+.preview-card > * {
+  opacity: 0;
+  transition: opacity 0.1s ease;
 }
 
 .preview.is-open .preview-card {
   opacity: 1;
   visibility: visible;
   transform: none;
+  transition: opacity 0.12s ease, transform 0.38s cubic-bezier(0.34, 1.3, 0.64, 1), visibility 0s;
+}
+
+.preview.is-open .preview-card > * {
+  opacity: 1;
+  transition: opacity 0.2s ease 0.12s;
 }
 
 @media (hover: hover) {
@@ -789,6 +821,22 @@ $dot-center: calc(4px + 20px / 2);
     opacity: 1;
     visibility: visible;
     transform: none;
+    transition: opacity 0.12s ease, transform 0.38s cubic-bezier(0.34, 1.3, 0.64, 1), visibility 0s;
+  }
+
+  .preview:hover .preview-card > *,
+  .preview:focus-within .preview-card > * {
+    opacity: 1;
+    transition: opacity 0.2s ease 0.12s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preview-card,
+  .preview.is-open .preview-card,
+  .preview:hover .preview-card,
+  .preview:focus-within .preview-card {
+    transform: none !important;
   }
 }
 
@@ -921,4 +969,470 @@ $dot-center: calc(4px + 20px / 2);
   --bs-muted: var(--muted);
   --bs-title-weight: 474;
   margin-top: 24px;
+}
+
+/**************/
+/* ZETAMAC    */
+/**************/
+// One problem at a time, large, with the answer typed in after it; the time
+// and score sit above it in gray
+.zm-meta {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.zm-time,
+.zm-score {
+  color: var(--text);
+}
+
+// while the clock runs, a blue dot ahead of the time, pulsing like the
+// timeline's "now"; it hangs out in the margin, so the time doesn't shift
+// when it comes
+.zm-time {
+  position: relative;
+}
+
+.zm-time::before {
+  content: '';
+  position: absolute;
+  left: -13px;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  border-radius: 50%;
+  background: rgb(55, 135, 240);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.zm.is-running .zm-time::before {
+  opacity: 1;
+  animation: now-pulse 2.4s ease-out infinite;
+}
+
+// the last ten seconds, the time and its dot go red
+.zm.is-late .zm-time {
+  color: var(--hurt);
+}
+
+.zm.is-running.is-late .zm-time::before {
+  background: var(--hurt);
+  animation-name: zm-late-pulse;
+}
+
+@keyframes zm-late-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(217, 48, 37, 0.5);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 6px rgba(217, 48, 37, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zm.is-running .zm-time::before {
+    animation: none;
+  }
+}
+
+.zm-ready,
+.zm-play {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 40px 0 8px;
+}
+
+.zm-ready {
+  padding-top: 16px;
+}
+
+.zm-ready[hidden],
+.zm-play[hidden] {
+  display: none;
+}
+
+.zm-problem {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35em;
+  font-size: 52px;
+  line-height: 60px;
+  letter-spacing: -0.5px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.zm-question {
+  display: inline-block;
+}
+
+// smaller on a phone, so a long problem and its answer still fit
+@media screen and (max-width: 479px) {
+  .zm-problem,
+  .zm-last {
+    font-size: 36px;
+    line-height: 44px;
+  }
+}
+
+.zm-question.is-new {
+  animation: zm-rise 0.16s ease-out;
+}
+
+@keyframes zm-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.zm-equals {
+  color: var(--muted);
+}
+
+// the answer: typed straight in after the =, nothing around it
+.zm-answer {
+  width: 3.2em;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  outline: none;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  letter-spacing: inherit;
+  caret-color: var(--text);
+}
+
+// the last round's score, above Start
+.zm-last {
+  margin-bottom: 8px;
+  font-size: 52px;
+  line-height: 60px;
+  letter-spacing: -0.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.zm-last[hidden] {
+  display: none;
+}
+
+// Start: plain text, a little lighter under the pointer
+.zm-start {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  transition: color 0.15s ease;
+}
+
+.zm-start:hover {
+  color: var(--muted);
+}
+
+// it's focused from the start, so Enter starts; that needs no ring
+.zm-start:focus {
+  outline: none;
+}
+
+// The recent scores under Start: one line in the site's blue over faint guide
+// lines, the latest round dotted, and a readout that follows the pointer.
+// The table beside it is for screen readers.
+.zm-history {
+  align-self: stretch;
+  margin-top: 32px;
+}
+
+.zm-history .block-label {
+  color: var(--text);
+}
+
+// Recent, with Clear at the right
+.zm-history-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.zm-clear {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 13px;
+  transition: color 0.15s ease;
+}
+
+.zm-clear:hover,
+.zm-clear:focus-visible {
+  outline: none;
+  color: var(--text);
+}
+
+.zm-clear[hidden] {
+  display: none;
+}
+
+.zm-stats {
+  margin: -4px 0 12px;
+  color: var(--muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.zm-chart {
+  position: relative;
+  outline: none;
+}
+
+.zm-chart svg {
+  display: block;
+  overflow: visible;
+}
+
+// The line's color, the site's blue, and the mono it labels things in
+.zm-chart {
+  --zm-line: rgb(55, 135, 240);
+  // dragging across it compares two rounds, so it doesn't scroll sideways
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  --zm-mono: 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.zm-grid {
+  stroke: var(--rule);
+  stroke-opacity: 0.6;
+  stroke-width: 1;
+}
+
+.zm-tick {
+  text-anchor: end;
+  fill: var(--muted);
+  font-family: var(--zm-mono);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  dominant-baseline: central;
+}
+
+.zm-fade-top {
+  stop-color: var(--zm-line);
+  stop-opacity: 0.14;
+}
+
+.zm-fade-bottom {
+  stop-color: var(--zm-line);
+  stop-opacity: 0;
+}
+
+.zm-area {
+  fill: url(#zm-fade);
+}
+
+// Drawing in, the line and its fill are uncovered from the left, and the
+// latest round's dot, pill and dashed line come in as the line reaches them
+.zm-reveal {
+  transform-box: view-box;
+  transform-origin: 0 0;
+}
+
+.is-drawing .zm-reveal {
+  animation: zm-reveal 1.1s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+@keyframes zm-reveal {
+  from { transform: scaleX(0); }
+}
+
+.is-drawing .zm-late {
+  animation: zm-late 0.3s ease 1s both;
+}
+
+@keyframes zm-late {
+  from { opacity: 0; }
+}
+
+.zm-line {
+  fill: none;
+  stroke: var(--zm-line);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+// the latest score, dashed across the chart
+.zm-now {
+  stroke: var(--zm-line);
+  stroke-opacity: 0.5;
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.zm-dot {
+  fill: var(--zm-line);
+  stroke: var(--bg);
+  stroke-width: 2;
+  paint-order: stroke;
+}
+
+// a ring that keeps swelling out of the latest round's dot and fading
+.zm-pulse {
+  fill: var(--zm-line);
+  opacity: 0;
+  animation: zm-pulse 2s ease-out infinite;
+}
+
+@keyframes zm-pulse {
+  from {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(3.5);
+  }
+}
+
+.zm-badge rect {
+  fill: var(--zm-line);
+}
+
+.zm-badge text {
+  fill: #fff;
+  font-family: var(--zm-mono);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  dominant-baseline: central;
+}
+
+.zm-guide {
+  stroke: var(--muted);
+  stroke-width: 1;
+}
+
+// The stats shown on the graph: the max ringed, and the mean dashed in the
+// ink color with a faint band and capped bars a std either side of it
+.zm-overlay {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+.zm-overlay.is-shown {
+  opacity: 1;
+}
+
+.zm-max-halo {
+  fill: var(--zm-line);
+  fill-opacity: 0.18;
+}
+
+.zm-mean {
+  stroke: var(--text);
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+
+.zm-sd {
+  fill: var(--text);
+  fill-opacity: 0.05;
+}
+
+.zm-sd-edge {
+  stroke: var(--text);
+  stroke-opacity: 0.25;
+  stroke-width: 1;
+}
+
+.zm-err {
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+// max, average and std in the stats line, which show on the graph
+.zm-stat {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  transition: color 0.15s ease;
+}
+
+.zm-stat:hover,
+.zm-stat:focus-visible,
+.zm-stat[aria-pressed="true"] {
+  outline: none;
+  color: var(--text);
+}
+
+.zm-band {
+  fill: var(--zm-line);
+  fill-opacity: 0.08;
+}
+
+.zm-chart:focus-visible .zm-grid {
+  stroke: var(--muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zm-pulse {
+    animation: none;
+  }
+}
+
+.zm-tip {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  padding: 6px 9px;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  background: var(--bg);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.zm-tip[hidden],
+.zm-tip span:empty {
+  display: none;
+}
+
+.zm-tip.is-up strong {
+  color: #1a7f37;
+}
+
+.zm-tip.is-down strong {
+  color: var(--hurt);
+}
+
+.zm-tip strong {
+  color: var(--text);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.zm-table {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }

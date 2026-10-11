@@ -1,0 +1,523 @@
+---
+layout: default
+title: Zetamac
+subtitle: Zetamac
+permalink: /zetamac/
+---
+<!-- Mental arithmetic against the clock, after arithmetic.zetamac.com: the
+     classic mix of sums, differences, products and quotients. The first
+     problem stays hidden until the round starts, with the clock; typing the
+     right answer moves straight on to the next one. Add ?demo to the address
+     to see the history graph filled with made-up rounds, with 15-second
+     rounds that join them (just until the page is reloaded). -->
+<section class="block zm" id="zm">
+  <div class="zm-meta">
+    <span class="zm-time" id="zm-time">2:00</span>
+    <span class="zm-score" id="zm-score">0</span>
+  </div>
+
+  <div class="zm-ready" id="zm-ready">
+    <span class="zm-last" id="zm-last" hidden></span>
+    <button type="button" class="zm-start" id="zm-start">Space to Start</button>
+
+    <!-- The last rounds played in this browser, oldest to latest -->
+    <div class="zm-history" id="zm-history">
+      <div class="zm-history-head">
+        <h2 class="block-label block-label-plain">Recent</h2>
+        <button type="button" class="zm-clear" id="zm-clear">Clear</button>
+      </div>
+      <p class="zm-stats"><span id="zm-stats"></span></p>
+      <div class="zm-chart" id="zm-chart" tabindex="0" role="img"></div>
+      <table class="zm-table" id="zm-table">
+        <caption>Recent scores, oldest first</caption>
+        <thead><tr><th scope="col">When</th><th scope="col">Score</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="zm-play" id="zm-play" hidden>
+    <label class="zm-problem" for="zm-answer">
+      <span class="zm-question" id="zm-question"></span>
+      <span class="zm-equals">=</span>
+      <input class="zm-answer" id="zm-answer" type="text" inputmode="numeric" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Answer">
+    </label>
+  </div>
+
+</section>
+
+<script>
+  (function () {
+    var demo = /[?&]demo\b/.test(location.search);
+    var LENGTH = demo ? 15 : 120;  // seconds in a round
+    var HISTORY_KEY = 'zetamac-history';
+    var KEEP = 30;  // rounds kept in the history
+
+    var zm = document.getElementById('zm');
+    var time = document.getElementById('zm-time');
+    var scoreEl = document.getElementById('zm-score');
+    var ready = document.getElementById('zm-ready');
+    var startButton = document.getElementById('zm-start');
+    var lastEl = document.getElementById('zm-last');
+    var play = document.getElementById('zm-play');
+    var question = document.getElementById('zm-question');
+    var answer = document.getElementById('zm-answer');
+
+    var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var current, score, started, frame;
+
+    function between(lo, hi) { return lo + Math.floor(Math.random() * (hi - lo + 1)); }
+
+    // Zetamac's defaults: sums of 2 to 100, products of 2 to 12 by 2 to 100,
+    // and differences and quotients as those turned around
+    function next() {
+      var kind = between(0, 3), a, b;
+      if (kind < 2) { a = between(2, 100); b = between(2, 100); }
+      else { a = between(2, 12); b = between(2, 100); }
+      if (kind === 0) return { text: a + ' + ' + b, value: a + b };
+      if (kind === 1) return { text: (a + b) + ' − ' + a, value: b };
+      if (kind === 2) return { text: a + ' × ' + b, value: a * b };
+      return { text: (a * b) + ' ÷ ' + a, value: b };
+    }
+
+    function show(problem) {
+      current = problem;
+      question.textContent = problem.text;
+      answer.value = '';
+      // each new problem rises in
+      if (!still) {
+        question.classList.remove('is-new');
+        question.getBoundingClientRect();
+        question.classList.add('is-new');
+      }
+    }
+
+    function clock(left) {
+      var s = Math.ceil(left);
+      time.textContent = Math.floor(s / 60) + ':' + ('0' + s % 60).slice(-2);
+      // the last ten seconds of a round in red
+      zm.classList.toggle('is-late', started !== null && left <= 10);
+    }
+
+    // The history: [score, when] for each round, oldest first (or, with
+    // ?demo, made-up rounds a day apart up to today, kept only in memory)
+    // 30 rounds: a climb from 30 to 100, then a fall back to 65
+    var demoList = [30, 29, 36, 34, 41, 43, 44, 51, 51, 57, 58, 62, 68, 75, 73, 78, 85, 92, 93, 95, 100, 99, 87, 90, 81, 77, 73, 71, 71, 65].map(function (v, i, all) {
+      return [v, Date.now() - (all.length - 1 - i) * 86400000];
+    });
+    function readHistory() {
+      if (demo) return demoList.slice(-KEEP);
+      try {
+        var list = JSON.parse(localStorage.getItem(HISTORY_KEY));
+        return Array.isArray(list) ? list.filter(function (r) { return Array.isArray(r) && isFinite(r[0]); }) : [];
+      } catch (e) { return []; }
+    }
+    function remember(points) {
+      if (demo) { demoList.push([points, Date.now()]); return; }
+      var list = readHistory().concat([[points, Date.now()]]).slice(-KEEP);
+      try { localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); } catch (e) {}
+    }
+
+    // Back to the start, the first problem not yet shown, the graph drawing
+    // itself in; after a round, its score shows large above Start, in place
+    // of the count, which only shows during a round
+    function reset(last) {
+      cancelAnimationFrame(frame);
+      score = 0;
+      started = null;
+      zm.classList.remove('is-running');
+      scoreEl.style.visibility = 'hidden';
+      lastEl.hidden = last === undefined;
+      if (last !== undefined) lastEl.textContent = last;
+      clock(LENGTH);
+      play.hidden = true;
+      ready.hidden = false;
+      drawHistory(true);
+      startButton.focus();
+    }
+
+    function start() {
+      score = 0;
+      scoreEl.textContent = '0';
+      scoreEl.style.visibility = '';
+      zm.classList.add('is-running');
+      ready.hidden = true;
+      play.hidden = false;
+      show(next());
+      answer.focus();
+      started = performance.now();
+      frame = requestAnimationFrame(tick);
+    }
+
+    function tick() {
+      var left = Math.max(0, LENGTH - (performance.now() - started) / 1000);
+      clock(left);
+      if (left <= 0) finish();
+      else frame = requestAnimationFrame(tick);
+    }
+
+    // Time up: the round goes into the history, and it's back to the start
+    function finish() {
+      remember(score);
+      reset(score);
+    }
+
+    // An answer goes in as soon as it's right
+    answer.addEventListener('input', function () {
+      var typed = answer.value.replace(/\D/g, '');
+      answer.value = typed;
+      if (typed && typed === String(current.value)) hit();
+    });
+    function hit() {
+      score++;
+      scoreEl.textContent = score;
+      show(next());
+    }
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') reset();
+      // Space (or Enter) starts, wherever the focus is
+      else if ((e.key === ' ' || e.key === 'Enter') && !ready.hidden && !e.target.closest('button:not(#zm-start)')) { e.preventDefault(); start(); }
+    });
+    startButton.addEventListener('click', start);
+
+    // A line of the recent scores, after Liveline: a smooth curve over a soft
+    // fill that fades down to nothing, a dashed line across at the latest
+    // score with that score in a pill at the right, and a pulsing dot on the
+    // latest round. Faint guide lines carry their scores at the right, and a
+    // hairline follows the pointer (or the arrow keys) to show any round's score and
+    // when it was played
+    var history = document.getElementById('zm-history');
+    var chart = document.getElementById('zm-chart');
+    var tbody = document.querySelector('#zm-table tbody');
+    var stats = document.getElementById('zm-stats');
+    var clear = document.getElementById('zm-clear');
+    var NS = 'http://www.w3.org/2000/svg';
+    var points = [], at = null, tip, guide, ring, guide2, ring2, band, plotTop, plotBottom;
+    var span = null;  // while dragging across the graph, the round it started on
+    var overlays = {}, statPinned = null;  // the stats drawn on the graph, and the one pressed
+
+    function svgEl(name, attrs, parent) {
+      var node = document.createElementNS(NS, name);
+      for (var k in attrs) node.setAttribute(k, attrs[k]);
+      parent.appendChild(node);
+      return node;
+    }
+    // A smooth curve through the points that never overshoots them (a
+    // monotone cubic), as an SVG path
+    function smooth(pts) {
+      var n = pts.length;
+      if (n < 2) return '';
+      var d = [], m = [];
+      for (var i = 0; i < n - 1; i++) d.push((pts[i + 1].y - pts[i].y) / (pts[i + 1].x - pts[i].x));
+      m[0] = d[0];
+      m[n - 1] = d[n - 2];
+      for (i = 1; i < n - 1; i++) m[i] = d[i - 1] * d[i] <= 0 ? 0 : (d[i - 1] + d[i]) / 2;
+      for (i = 0; i < n - 1; i++) {
+        if (d[i] === 0) { m[i] = m[i + 1] = 0; continue; }
+        var a = m[i] / d[i], b = m[i + 1] / d[i], h = a * a + b * b;
+        if (h > 9) { var t = 3 / Math.sqrt(h); m[i] = t * a * d[i]; m[i + 1] = t * b * d[i]; }
+      }
+      var path = 'M' + pts[0].x + ',' + pts[0].y;
+      for (i = 0; i < n - 1; i++) {
+        var dx = (pts[i + 1].x - pts[i].x) / 3;
+        path += ' C' + (pts[i].x + dx) + ',' + (pts[i].y + m[i] * dx) + ' ' +
+          (pts[i + 1].x - dx) + ',' + (pts[i + 1].y - m[i + 1] * dx) + ' ' + pts[i + 1].x + ',' + pts[i + 1].y;
+      }
+      return path;
+    }
+
+    function when(t) {
+      var d = new Date(t);
+      return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ', ' +
+        d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+    }
+    // round guide values a little past the scores, 5 apart or more
+    function niceRange(lo, hi) {
+      var step = Math.max(5, Math.ceil((hi - lo) / 3 / 5) * 5);
+      lo = Math.floor(lo / step) * step;
+      hi = Math.ceil(hi / step) * step;
+      if (hi === lo) hi = lo + step;
+      return { lo: lo, hi: hi, step: step };
+    }
+
+    // drawing in: whether the line draws itself out, left to right (on
+    // coming to the page, or back to it after a round, not on a resize)
+    function drawHistory(drawingIn) {
+      drawingIn = drawingIn && !still;
+      var list = readHistory();
+      chart.textContent = '';
+      tbody.textContent = '';
+      at = null;
+      points = [];
+      list.forEach(function (r) {
+        var row = document.createElement('tr');
+        var a = document.createElement('td'), b = document.createElement('td');
+        a.textContent = when(r[1]);
+        b.textContent = r[0];
+        row.appendChild(a);
+        row.appendChild(b);
+        tbody.appendChild(row);
+      });
+      var scores = list.map(function (r) { return r[0]; });
+      clear.hidden = !scores.length;
+      var latest = scores[scores.length - 1], top = Math.max.apply(null, scores);
+      var mean = scores.reduce(function (a, b) { return a + b; }, 0) / scores.length;
+      // the sample standard deviation, 0 for a single round
+      var sd = scores.length > 1 ? Math.sqrt(scores.reduce(function (a, v) { return a + (v - mean) * (v - mean); }, 0) / (scores.length - 1)) : 0;
+      // with no rounds yet, just n = 0 over the empty graph; otherwise max,
+      // average and std can each be hovered or pressed to show on the graph
+      stats.textContent = 'n = ' + scores.length;
+      if (scores.length) {
+        [['max', 'max: ' + top], ['mean', 'average: ' + (Math.round(mean * 10) / 10)], ['mean', 'std: ' + (Math.round(sd * 10) / 10)]].forEach(function (st) {
+          stats.appendChild(document.createTextNode(', '));
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'zm-stat';
+          b.textContent = st[1];
+          b.dataset.show = st[0];
+          b.setAttribute('aria-pressed', statPinned === st[0]);
+          stats.appendChild(b);
+        });
+      }
+      chart.setAttribute('aria-label', !scores.length ? 'Recent scores: none yet.' : 'Recent scores: ' + scores.length + (scores.length === 1 ? ' round' : ' rounds') +
+        ', latest ' + latest + ', max ' + top + '. Use the arrow keys to read each one.');
+
+      // the guide lines run the page's full width, the scores stopping short
+      // of the right end to leave room for the latest score's pill
+      var W = chart.clientWidth, H = 140, L = 0, R = 44, T = 18, B = 10;
+      // room for the scores, and for the band a std either side of the mean
+      var range = scores.length ? niceRange(Math.min(Math.min.apply(null, scores), mean - sd), Math.max(top, mean + sd)) : niceRange(0, 50);
+      var x = function (i) { return list.length > 1 ? L + (W - L - R) * i / (list.length - 1) : L + (W - L - R) / 2; };
+      var y = function (v) { return T + (H - T - B) * (1 - (v - range.lo) / (range.hi - range.lo)); };
+      var svg = svgEl('svg', { width: W, height: H, viewBox: '0 0 ' + W + ' ' + H, 'aria-hidden': 'true', 'class': drawingIn ? 'is-drawing' : '' }, chart);
+      var defs = svgEl('defs', {}, svg);
+      // drawing in, the line and its fill are uncovered left to right
+      var reveal = svgEl('clipPath', { id: 'zm-reveal' }, defs);
+      svgEl('rect', { x: -10, y: -10, width: W + 20, height: H + 20, 'class': 'zm-reveal' }, reveal);
+      var fade = svgEl('linearGradient', { id: 'zm-fade', x1: 0, y1: 0, x2: 0, y2: 1 }, defs);
+      svgEl('stop', { offset: 0, 'class': 'zm-fade-top' }, fade);
+      svgEl('stop', { offset: 1, 'class': 'zm-fade-bottom' }, fade);
+      var badgeY = scores.length ? y(latest) : null;
+      for (var v = range.lo; v <= range.hi; v += range.step) {
+        svgEl('line', { x1: 0, x2: W, y1: y(v), y2: y(v), 'class': 'zm-grid' }, svg);
+        // a guide's score gives way to the latest score's pill
+        if (badgeY === null || Math.abs(y(v) - 7 - badgeY) > 14) {
+          svgEl('text', { x: W, y: y(v) - 7, 'class': 'zm-tick' }, svg).textContent = v;
+        }
+      }
+      points = list.map(function (r, i) { return { x: x(i), y: y(r[0]), score: r[0], when: r[1] }; });
+      // the stretch between two rounds, shaded while it's dragged across
+      plotTop = T;
+      plotBottom = H - B;
+      band = svgEl('rect', { y: T, height: H - T - B, 'class': 'zm-band' }, svg);
+      band.style.display = 'none';
+      // the mean, with a band and bars a std either side of it, shown from
+      // the stats line
+      overlays = { max: [], mean: [] };
+      if (scores.length) {
+        var meanGroup = svgEl('g', { 'class': 'zm-overlay' }, svg);
+        svgEl('rect', { x: L, width: W - R - L, y: y(mean + sd), height: Math.max(0, y(mean - sd) - y(mean + sd)), 'class': 'zm-sd' }, meanGroup);
+        [mean + sd, mean - sd].forEach(function (v) {
+          svgEl('line', { x1: L, x2: W - R, y1: y(v), y2: y(v), 'class': 'zm-sd-edge' }, meanGroup);
+        });
+        svgEl('line', { x1: L, x2: W - R, y1: y(mean), y2: y(mean), 'class': 'zm-mean' }, meanGroup);
+        // an error bar at each end: the mean, a std up and down, capped
+        [L + 6, W - R - 6].forEach(function (ex) {
+          svgEl('path', { d: 'M' + ex + ',' + y(mean + sd) + ' V' + y(mean - sd) + ' M' + (ex - 4) + ',' + y(mean + sd) + ' H' + (ex + 4) +
+            ' M' + (ex - 4) + ',' + y(mean - sd) + ' H' + (ex + 4), 'class': 'zm-err' }, meanGroup);
+        });
+        overlays.mean.push(meanGroup);
+      }
+      if (!points.length) return;
+      var last = points[points.length - 1];
+      svgEl('line', { x1: 0, x2: W, y1: last.y, y2: last.y, 'class': 'zm-now zm-late' }, svg);
+      if (points.length > 1) {
+        var linePath = smooth(points);
+        var drawn = svgEl('g', { 'clip-path': 'url(#zm-reveal)' }, svg);
+        svgEl('path', { d: linePath + ' L' + last.x + ',' + (H - B) + ' L' + points[0].x + ',' + (H - B) + ' Z', 'class': 'zm-area' }, drawn);
+        svgEl('path', { d: linePath, 'class': 'zm-line' }, drawn);
+      }
+      var lastMarks = svgEl('g', { 'class': 'zm-late' }, svg);
+      var pulse = svgEl('circle', { cx: last.x, cy: last.y, r: 4, 'class': 'zm-pulse' }, lastMarks);
+      pulse.style.transformOrigin = last.x + 'px ' + last.y + 'px';
+      svgEl('circle', { cx: last.x, cy: last.y, r: 4, 'class': 'zm-dot' }, lastMarks);
+      // the latest score in a pill at the right, on its dashed line
+      var badge = svgEl('g', { 'class': 'zm-badge' }, lastMarks);
+      var pill = svgEl('rect', { y: last.y - 9, height: 18, rx: 9 }, badge);
+      var label = svgEl('text', { y: last.y }, badge);
+      label.textContent = latest;
+      var pillW = label.getComputedTextLength() + 16;
+      pill.setAttribute('width', pillW);
+      pill.setAttribute('x', W - pillW);
+      label.setAttribute('x', W - pillW + 8);
+      // every round that hit the max, ringed
+      var maxGroup = svgEl('g', { 'class': 'zm-overlay' }, svg);
+      points.forEach(function (p) {
+        if (p.score !== top) return;
+        svgEl('circle', { cx: p.x, cy: p.y, r: 10, 'class': 'zm-max-halo' }, maxGroup);
+        svgEl('circle', { cx: p.x, cy: p.y, r: 5, 'class': 'zm-dot' }, maxGroup);
+      });
+      overlays.max.push(maxGroup);
+      showStat(statPinned);
+      guide = svgEl('line', { y1: T, y2: H - B, 'class': 'zm-guide' }, svg);
+      ring = svgEl('circle', { r: 4, 'class': 'zm-dot' }, svg);
+      guide2 = svgEl('line', { y1: T, y2: H - B, 'class': 'zm-guide' }, svg);
+      ring2 = svgEl('circle', { r: 4, 'class': 'zm-dot' }, svg);
+      guide.style.display = ring.style.display = guide2.style.display = ring2.style.display = 'none';
+      tip = document.createElement('div');
+      tip.className = 'zm-tip';
+      tip.hidden = true;
+      var tipValue = document.createElement('strong'), tipWhen = document.createElement('span');
+      tip.appendChild(tipValue);
+      tip.appendChild(tipWhen);
+      chart.appendChild(tip);
+      tip.value = tipValue;
+      tip.when = tipWhen;
+    }
+
+    function point(i) {
+      if (!points.length) return;
+      at = i;
+      guide2.style.display = ring2.style.display = band.style.display = 'none';
+      tip.classList.remove('is-up', 'is-down');
+      if (i === null) {
+        tip.hidden = true;
+        guide.style.display = ring.style.display = 'none';
+        return;
+      }
+      var p = points[i];
+      guide.setAttribute('x1', p.x);
+      guide.setAttribute('x2', p.x);
+      ring.setAttribute('cx', p.x);
+      ring.setAttribute('cy', p.y);
+      guide.style.display = ring.style.display = '';
+      tip.value.textContent = p.score;
+      tip.when.textContent = when(p.when);
+      tip.hidden = false;
+      // beside the point, flipping to its left near the right edge
+      var w = tip.offsetWidth;
+      tip.style.left = (p.x + 10 + w > chart.clientWidth ? p.x - 10 - w : p.x + 10) + 'px';
+      tip.style.top = Math.max(0, p.y - tip.offsetHeight / 2) + 'px';
+    }
+
+    // Dragging across the graph, as on a stock chart, compares two rounds:
+    // the stretch between them shades, and the readout gives just the change
+    // in score from the first to the second, and as a percentage
+    function stretch(a, b) {
+      var from = points[Math.min(a, b)], to = points[Math.max(a, b)];
+      at = null;
+      [[guide, ring, from], [guide2, ring2, to]].forEach(function (g) {
+        g[0].setAttribute('x1', g[2].x);
+        g[0].setAttribute('x2', g[2].x);
+        g[1].setAttribute('cx', g[2].x);
+        g[1].setAttribute('cy', g[2].y);
+        g[0].style.display = g[1].style.display = '';
+      });
+      band.setAttribute('x', from.x);
+      band.setAttribute('width', to.x - from.x);
+      band.style.display = '';
+      var change = to.score - from.score;
+      var pct = from.score ? ' (' + (change >= 0 ? '+' : '−') + Math.abs(Math.round(change / from.score * 1000) / 10) + '%)' : '';
+      tip.value.textContent = (change >= 0 ? '+' : '−') + Math.abs(change) + pct;
+      tip.when.textContent = '';
+      tip.classList.toggle('is-up', change > 0);
+      tip.classList.toggle('is-down', change < 0);
+      tip.hidden = false;
+      // over the middle of the stretch, at the top
+      var w = tip.offsetWidth, mid = (from.x + to.x) / 2;
+      tip.style.left = Math.max(0, Math.min(chart.clientWidth - w, mid - w / 2)) + 'px';
+      tip.style.top = Math.max(0, plotTop - tip.offsetHeight - 6) + 'px';
+    }
+
+    function nearest(e) {
+      var mx = e.clientX - chart.getBoundingClientRect().left, best = 0;
+      points.forEach(function (p, i) { if (Math.abs(p.x - mx) < Math.abs(points[best].x - mx)) best = i; });
+      return best;
+    }
+    chart.addEventListener('pointerdown', function (e) {
+      if (points.length < 2 || e.button !== 0) return;
+      span = nearest(e);
+      chart.setPointerCapture(e.pointerId);
+      e.preventDefault();
+      stretch(span, span);
+    });
+    chart.addEventListener('pointermove', function (e) {
+      if (!points.length) return;
+      var i = nearest(e);
+      if (span !== null) stretch(span, i);
+      else if (i !== at) point(i);
+    });
+    function letGo(e) {
+      if (span === null) return;
+      span = null;
+      // back to the single readout if the pointer's still over the graph
+      var r = chart.getBoundingClientRect();
+      if (e.pointerType === 'mouse' && e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) point(nearest(e));
+      else point(null);
+    }
+    chart.addEventListener('pointerup', letGo);
+    chart.addEventListener('pointercancel', letGo);
+    chart.addEventListener('pointerleave', function () { if (span === null) point(null); });
+    chart.addEventListener('blur', function () { point(null); });
+    chart.addEventListener('keydown', function (e) {
+      if (!points.length || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
+      e.preventDefault();
+      var i = at === null ? points.length - 1 : at + (e.key === 'ArrowLeft' ? -1 : 1);
+      point(Math.max(0, Math.min(points.length - 1, i)));
+    });
+    // Showing a stat on the graph: hovering or focusing it shows it for as
+    // long as the pointer's there, and pressing it keeps it shown until it's
+    // pressed again
+    function showStat(kind) {
+      ['max', 'mean'].forEach(function (k) {
+        (overlays[k] || []).forEach(function (g) { g.classList.toggle('is-shown', k === kind); });
+      });
+    }
+    stats.addEventListener('mouseover', function (e) {
+      var b = e.target.closest('.zm-stat');
+      if (b) showStat(b.dataset.show);
+    });
+    stats.addEventListener('mouseout', function (e) {
+      if (e.target.closest('.zm-stat')) showStat(statPinned);
+    });
+    stats.addEventListener('focusin', function (e) {
+      var b = e.target.closest('.zm-stat');
+      if (b) showStat(b.dataset.show);
+    });
+    stats.addEventListener('focusout', function () { showStat(statPinned); });
+    stats.addEventListener('click', function (e) {
+      var b = e.target.closest('.zm-stat');
+      if (!b) return;
+      statPinned = statPinned === b.dataset.show ? null : b.dataset.show;
+      stats.querySelectorAll('.zm-stat').forEach(function (o) { o.setAttribute('aria-pressed', o.dataset.show === statPinned); });
+      showStat(statPinned || b.dataset.show);
+    });
+
+    // Clear empties the history, but only on a second press, within a few
+    // seconds of the first ("Sure?" in between)
+    var clearing = null;
+    clear.addEventListener('click', function () {
+      if (clearing === null) {
+        clear.textContent = 'Sure?';
+        clearing = setTimeout(function () { clearing = null; clear.textContent = 'Clear'; }, 3000);
+        return;
+      }
+      clearTimeout(clearing);
+      clearing = null;
+      clear.textContent = 'Clear';
+      if (demo) demoList = [];
+      else try { localStorage.removeItem(HISTORY_KEY); } catch (e) {}
+      drawHistory(false);
+      startButton.focus();
+    });
+
+    var resizing;
+    window.addEventListener('resize', function () {
+      clearTimeout(resizing);
+      resizing = setTimeout(function () { if (!ready.hidden) drawHistory(false); }, 100);
+    });
+
+    reset();
+  })();
+</script>

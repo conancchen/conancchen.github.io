@@ -53,15 +53,21 @@
   var BOOK_DEEP = 2, PLANK_DEEP = 2.2, CRATE_DEEP = 1.6;
   // How far the plank comes out in front of the books, in the same steps, so
   // they stand a little back on it
-  var PLANK_FRONT = 1;
+  var PLANK_FRONT = 2;
   // Where the first book stands (past the plank's front corner), and the
   // whole height, down past the plank's front edge
   var X0 = 4 + DX * PLANK_FRONT, H = LINE - DY * PLANK_FRONT + 16;
   // How thick a page is: a book's thickness is in proportion to its pages,
   // unless there are too many to fit, when they all come out thinner
-  var PAGE_W = 0.1275;
-  // The bookend's upright and the foot it stands on
-  var BOOKEND_W = 9, BOOKEND_TALL = 116, BOOKEND_FOOT = 44;
+  var PAGE_W = 0.11475;
+  // The bookend, a wedge: how far it runs along the shelf, and how tall it
+  // stands against the last book, as a share of that book's height
+  var BOOKEND_LONG = 53, BOOKEND_RISE = 1 / 3;
+  // How far it can be pulled away from the books, at the most
+  var PULL_MAX = 28;
+  // Where the light from up and to the left throws everything's shadow on the
+  // wall behind the shelf: how far right and down, and how soft
+  var SHADOW_X = 14, SHADOW_Y = 7, SHADOW_BLUR = 4;
   // The crate: how wide and tall, as drawn
   var CRATE_W = 200, CRATE_H = 60;
   // A line or book is moved past another once it's dragged this far over it
@@ -217,6 +223,18 @@
       return 'rgb(' + c.join(',') + ')';
     }
 
+    // The shadows on the wall come first, behind everything, softened
+    // together so where they overlap they don't come out darker; the plank
+    // hides them below the wall's foot
+    var defs = el('defs', {});
+    var soft = el('filter', { id: uid + '-soft', x: '-10%', y: '-10%', width: '120%', height: '120%' }, defs);
+    el('feGaussianBlur', { stdDeviation: SHADOW_BLUR }, soft);
+    var shadowLayer = el('g', { 'class': 'bs-shadows', filter: 'url(#' + uid + '-soft)' });
+    // the shadow of something's back, standing against the wall
+    function shadowOf(points, parent) {
+      return el('polygon', { points: pts(points.map(function (p) { return [p[0] + SHADOW_X, p[1] + SHADOW_Y]; })) }, parent || shadowLayer);
+    }
+
     // A plank: its top surface running back, then its front edge, out in
     // front of where the books stand. plankEnd is where its right end meets
     // the line the books stand on.
@@ -229,7 +247,7 @@
     // If the books, the bookend and the crate won't all fit on the plank,
     // the books come out thinner, all alike
     var pages = BOOKS.reduce(function (s, b) { return s + b.pages; }, 0);
-    var room = plankEnd - X0 - BOOKS.length * GAP - (BOOKEND_W + BOOKEND_FOOT + DX * CRATE_DEEP + GAP) -
+    var room = plankEnd - X0 - BOOKS.length * GAP - (BOOKEND_LONG + DX * PLANK_DEEP + GAP) -
       (hasArt ? CRATE_W + DX * CRATE_DEEP + 8 : 0);
     var pageW = pages ? Math.min(PAGE_W, room / pages) : PAGE_W;
 
@@ -239,7 +257,7 @@
     // shows its spine (in its own color, the title running up it), its top
     // with the page edges showing between the covers, and its right side in
     // a darker shade.
-    var groups = [], widths = [];
+    var groups = [], widths = [], shadows = [];
     var x = X0;
     BOOKS.forEach(function (b, i) {
       var w = b.pages * pageW, h = b.height, top = LINE - h, L = 0, R = w;
@@ -247,8 +265,14 @@
       // A book runs about as deep as the shelf, mostly hidden by its neighbors
       var dx = DX * BOOK_DEEP, dy = DY * BOOK_DEEP;
       var side = [[R, top], [R + dx, top + dy], [R + dx, LINE + dy], [R, LINE]];
+      // Its shadow slides along with it, and pops up and tips with it too,
+      // pivoting where the book's own pivot falls on the wall
+      shadows[i] = el('g', { 'class': 'bs-shadow' }, shadowLayer);
+      var shadowLift = el('g', { 'class': 'bs-shadow-lift' }, shadows[i]);
+      shadowLift.style.transformOrigin = SHADOW_X + 'px ' + (LINE + SHADOW_Y) + 'px';
+      shadowOf([[L + dx, top + dy], [R + dx, top + dy], [R + dx, LINE + dy], [L + dx, LINE + dy]], shadowLift);
       // A backing in the page's color fills the book's outline, so when the
-      // drawing over it fades back, nothing behind shows through
+      // drawing over it blurs back, nothing behind shows through
       var outline = pts([[L, LINE], [L, top], [L + dx, top + dy], [R + dx, top + dy], [R + dx, LINE + dy], [R, LINE]]);
       // An unseen copy of the outline stays put to catch the cursor, so the
       // book doesn't slip out from under it as it pops up and tips
@@ -282,8 +306,10 @@
       // The boards: a U around the pages, open at the back
       var boards = [at(0, 0), at(w, 0), at(w, 1), at(w - board, 1), at(w - board, near), at(board, near), at(board, 1), at(0, 1)];
       el('polygon', { points: pts(boards), 'class': 'bs-book-top', style: 'fill:' + shade(b.color, 1.18) }, art);
-      // Outlined all round but the back, between the ends of the covers
-      el('path', { d: line([at(board, 1), at(0, 1), at(0, 0)]) + ' ' + line([at(board, 1), at(board, near), at(w - board, near), at(w - board, 1), at(w, 1)]), 'class': 'bs-book-edge' }, art);
+      // Outlined all round but the back, between the ends of the covers (the
+      // right cover's outer edge too, though the side's outline runs there,
+      // since the boards cover half of that and it would come out thinner)
+      el('path', { d: line([at(board, 1), at(0, 1), at(0, 0)]) + ' ' + line([at(board, 1), at(board, near), at(w - board, near), at(w - board, 1), at(w, 1), at(w, 0)]), 'class': 'bs-book-edge' }, art);
       var spine = el('rect', { x: L, y: top, width: w, height: h, 'class': 'bs-book-spine' }, art);
       spine.style.fill = b.color;
       // The title runs up the spine, shrinking if it's too long for it
@@ -306,24 +332,31 @@
       x += w + GAP;
     });
 
-    // A bookend holding up the last book: an L of pine to match the crate, its
-    // upright standing flush against the book with a rounded top, and its
-    // foot running out along the shelf
+    // A bookend holding up the last book: a wedge of pine to match the
+    // crate, its tall end flush against the book and a third as tall, its
+    // slope running down to the shelf, and running all the way back to the
+    // wall like the shelf. It follows whichever book is last.
     var bookend = el('g', { 'class': 'bs-bookend' });
-    (function () {
-      var L = x - GAP, w = BOOKEND_W, d = CRATE_DEEP, r = 3;
-      var T = LINE - BOOKEND_TALL, R = L + w;
-      el('polygon', { points: pts([[R, T + r], [R + DX * d, T + r + DY * d], [R + DX * d, LINE + DY * d], [R, LINE]]), 'class': 'bs-line bs-bookend-side' }, bookend);
-      el('path', { d: 'M' + L + ',' + (T + r) + ' Q' + L + ',' + T + ' ' + (L + r) + ',' + T + ' L' + (L + DX * d + w - r) + ',' + (T + DY * d) +
-        ' Q' + (R + DX * d) + ',' + (T + DY * d) + ' ' + (R + DX * d) + ',' + (T + r + DY * d) + ' L' + R + ',' + (T + r) + ' Z', 'class': 'bs-line bs-bookend-top' }, bookend);
-      el('path', { d: 'M' + L + ',' + LINE + ' L' + L + ',' + (T + r) + ' Q' + L + ',' + T + ' ' + (L + r) + ',' + T + ' Q' + R + ',' + T + ' ' + R + ',' + (T + r) + ' L' + R + ',' + LINE + ' Z', 'class': 'bs-line bs-bookend-face' }, bookend);
-      // its foot, a thin plate running out along the shelf from the bottom
-      var plate = 4, FR = R + BOOKEND_FOOT, FT = LINE - plate;
-      el('polygon', { points: pts([[R, FT], [FR, FT], [FR + DX * d, FT + DY * d], [R + DX * d, FT + DY * d]]), 'class': 'bs-line bs-bookend-top' }, bookend);
-      el('polygon', { points: pts([[FR, FT], [FR + DX * d, FT + DY * d], [FR + DX * d, LINE + DY * d], [FR, LINE]]), 'class': 'bs-line bs-bookend-side' }, bookend);
-      el('rect', { x: R, y: FT, width: BOOKEND_FOOT, height: plate, 'class': 'bs-line bs-bookend-face' }, bookend);
-      x = FR + DX * d + GAP;
-    })();
+    var wedgeL = x - GAP, wedgeR = wedgeL + BOOKEND_LONG, wedgeD = [DX * PLANK_DEEP, DY * PLANK_DEEP];
+    var wedgeSlope = el('polygon', { 'class': 'bs-line bs-bookend-top' }, bookend);
+    var wedgeFace = el('polygon', { 'class': 'bs-line bs-bookend-face' }, bookend);
+    var wedgeShadow = shadowOf([]);
+    wedgeShadow.setAttribute('class', 'bs-bookend-shadow');
+    // While the books are being reordered it stands a little way out, to
+    // give them room
+    function makeRoom(on) {
+      bookend.classList.toggle('is-roomy', on);
+      wedgeShadow.classList.toggle('is-roomy', on);
+    }
+    function wedge(last) {
+      var T = LINE - BOOKS[last].height * BOOKEND_RISE;
+      wedgeShadow.setAttribute('points', pts([[wedgeL, LINE], [wedgeL, T], [wedgeR, LINE]].map(function (p) {
+        return [p[0] + wedgeD[0] + SHADOW_X, p[1] + wedgeD[1] + SHADOW_Y];
+      })));
+      wedgeSlope.setAttribute('points', pts([[wedgeL, T], [wedgeL + wedgeD[0], T + wedgeD[1]], [wedgeR + wedgeD[0], LINE + wedgeD[1]], [wedgeR, LINE]]));
+      wedgeFace.setAttribute('points', pts([[wedgeL, LINE], [wedgeL, T], [wedgeR, LINE]]));
+    }
+    x = wedgeR + wedgeD[0] + GAP;
 
     // The art crate: an open wooden crate past the books, its inside in
     // shadow, with the prints standing in it. It sits centered in the
@@ -333,6 +366,7 @@
       var binW = CRATE_W, binH = CRATE_H, deep = [DX * CRATE_DEEP, DY * CRATE_DEEP];
       var binL = (x + plankEnd - binW - deep[0]) / 2, binT = LINE - binH;
       crateTop = binT;
+      shadowOf([[binL + deep[0], binT + deep[1]], [binL + binW + deep[0], binT + deep[1]], [binL + binW + deep[0], LINE + deep[1]], [binL + deep[0], LINE + deep[1]]]);
       crate = el('g', { 'class': 'bs-crate', tabindex: 0, role: 'button', 'aria-expanded': 'false', 'aria-controls': artSection.id, 'aria-label': o.labels.crate + ': show the paintings', 'aria-pressed': 'false' });
       // A backing in the page's color fills the crate's outline, so when the
       // crate blurs back the shelf behind it doesn't show through (and, as
@@ -368,9 +402,10 @@
       el('text', { x: binL + binW / 2, y: binT + binH / 2 + 5, 'class': 'bs-crate-label' }, body).textContent = o.labels.crate;
     }
 
-    // A painting pressed in the art section opens large over the page, at up
-    // to three quarters of the screen, with its caption; pressing anywhere
-    // or Esc closes it
+    // A painting pressed in the art section grows out of its place there to
+    // up to three quarters of the screen, with its caption, over the page
+    // darkening behind it; pressing anywhere or Esc shrinks it back into its
+    // place
     var box = null;
     if (hasArt) {
       box = html('div', 'bs-lightbox', root);
@@ -383,22 +418,59 @@
       var boxImg = html('img', '', boxFig);
       var boxCap = html('figcaption', '', boxFig);
       var boxTitle = html('span', 'bs-art-title', boxCap), boxBy = html('span', 'bs-art-by', boxCap);
-      var lastFocus = null;
+      var lastFocus = null, shown = null, zoom = null;
+      // the transform that puts the large painting where rect is
+      var over = function (rect) {
+        var to = boxImg.getBoundingClientRect();
+        // measured without whatever transform it has now
+        if (zoom) to = zoom.to;
+        return 'translate(' + (rect.left - to.left) + 'px, ' + (rect.top - to.top) + 'px) scale(' +
+          rect.width / to.width + ', ' + rect.height / to.height + ')';
+      };
+      var still = function () { return matchMedia('(prefers-reduced-motion: reduce)').matches; };
       var openPainting = function (a) {
         lastFocus = document.activeElement;
+        shown = a;
         boxImg.src = a.src;
         boxImg.alt = a.alt;
         boxImg.style.width = 'min(75vw, calc(75vh * ' + a.aspect.toFixed(3) + '))';
+        boxImg.style.aspectRatio = a.aspect;
         boxTitle.textContent = a.title;
         boxBy.textContent = a.by;
         box.hidden = false;
-        requestAnimationFrame(function () { box.classList.add('is-open'); });
+        box.getBoundingClientRect();
+        box.classList.add('is-open');
         box.focus();
+        if (still()) return;
+        var to = boxImg.getBoundingClientRect();
+        var from = a.img.getBoundingClientRect();
+        a.img.style.visibility = 'hidden';
+        zoom = { to: to, anim: boxImg.animate([{ transform: over(from) }, { transform: 'none' }],
+          { duration: 420, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }) };
+        zoom.anim.onfinish = function () { zoom = null; };
       };
       var closePainting = function () {
+        var a = shown;
+        shown = null;
         box.classList.remove('is-open');
-        setTimeout(function () { box.hidden = true; }, 200);
         if (lastFocus) lastFocus.focus();
+        var done = function () {
+          box.hidden = true;
+          a.img.style.visibility = '';
+        };
+        if (still()) { done(); return; }
+        // from wherever it's got to, back down into its place in the section
+        var now = boxImg.getBoundingClientRect(), to = zoom ? zoom.to : boxImg.getBoundingClientRect();
+        if (zoom) zoom.anim.cancel();
+        zoom = { to: to };
+        var back = boxImg.animate([{ transform: over(now) }, { transform: over(a.img.getBoundingClientRect()) }],
+          { duration: 320, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards' });
+        zoom.anim = back;
+        back.onfinish = function () {
+          zoom = null;
+          back.cancel();
+          done();
+        };
       };
       ART.forEach(function (a) {
         a.img.tabIndex = 0;
@@ -408,9 +480,9 @@
           if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPainting(a); }
         });
       });
-      box.addEventListener('click', closePainting);
+      box.addEventListener('click', function () { if (shown) closePainting(); });
       document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && !box.hidden) closePainting();
+        if (e.key === 'Escape' && shown) closePainting();
       });
     }
 
@@ -418,21 +490,30 @@
     // lines in the list blur back; pressing a book pins it out that way until
     // it's pressed again, Esc, or a click anywhere else. Hovering or pressing
     // a line in the list does the same as hovering or pressing its book.
-    // Hovering the crate opens the Art section above the list (pressing pins
-    // it). A book and the art are never out at once: whatever's under the
-    // cursor shows, a book over the art; otherwise whatever's pinned, and
-    // pinning one unpins the other. While a book is out, the crate blurs
-    // back; while the art is out, the books do.
+    // Hovering the crate pops its prints up a little; pressing it sends them
+    // out into the Art section above the list, until it's pressed again or
+    // Esc. Pinning a book puts the art away and pressing the crate puts a
+    // pinned book back. While a book is out, the crate blurs back; while the
+    // art is out, the books do.
     var pinned = null, hovered = null, listHovered = null;
     var artPinned = false, artHover = false;
     function update() {
-      var book = hovered !== null ? hovered : artHover ? null : pinned;
-      var art = hovered === null && (artHover || artPinned);
+      var book = hovered !== null ? hovered : pinned;
+      var art = artPinned;
       if (book === null && !art && listHovered !== null) book = listHovered;
       groups.forEach(function (g, j) {
         g.classList.toggle('is-picked', j === book);
+        shadows[j].classList.toggle('is-lifted', j === book);
         g.setAttribute('aria-pressed', j === pinned);
       });
+      // The bookend stands in front of the last book, but when that book's
+      // out it comes up in front of the bookend instead of through it (the
+      // bookend moves rather than the book, which would lose focus)
+      if (!drag && !sort && order.length) {
+        var last = groups[order[order.length - 1]];
+        if (book === order[order.length - 1]) svg.insertBefore(bookend, last);
+        else if (last.nextSibling !== bookend) svg.insertBefore(bookend, last.nextSibling);
+      }
       // the other lines in the list blur back, as the shelf's books do
       reads.forEach(function (r, j) {
         r.classList.toggle('is-dimmed', book !== null && j !== book);
@@ -443,6 +524,7 @@
       if (crate) {
         artSection.classList.toggle('is-open', art);
         crate.classList.toggle('is-open', art);
+        crate.classList.toggle('is-peek', artHover && !art);
         crate.setAttribute('aria-expanded', art);
         crate.setAttribute('aria-pressed', artPinned);
         if (art !== artOpen) {
@@ -457,11 +539,11 @@
     // empty; closing, they fly back down into it. A painting turned back
     // mid-flight turns around from wherever it's got to.
     var artOpen = false;
-    function printRect(a) {
-      // where the print stands at rest in the crate, not risen, and how much
-      // of it the crate's front hides
-      var m = svg.getScreenCTM(), b = a.print.getBBox();
-      var top = m.f + b.y * m.d, height = b.height * m.d;
+    function printRect(a, now) {
+      // where the print stands in the crate, popped up as it is now or else
+      // at rest, and how much of it the crate's front hides
+      var m = svg.getScreenCTM(), b = a.print.getBBox(), r = a.print.getBoundingClientRect();
+      var top = now ? r.top : m.f + b.y * m.d, height = b.height * m.d;
       return { left: m.e + b.x * m.a, top: top, width: b.width * m.a, height: height,
         hidden: Math.max(0, top + height - (m.f + crateTop * m.d)) };
     }
@@ -474,7 +556,7 @@
       if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       var home = root.getBoundingClientRect();
       var turning = a.flight;
-      var from = turning ? flightRect(turning) : open ? printRect(a) : a.img.getBoundingClientRect();
+      var from = turning ? flightRect(turning) : open ? printRect(a, true) : a.img.getBoundingClientRect();
       var to = open ? a.img.getBoundingClientRect() : printRect(a);
       if (turning) turning.remove();
       // a painting in the crate is cut off at the crate's front, so it
@@ -544,19 +626,12 @@
       // hover it started would otherwise hang on
       hovered = null;
       artHover = false;
-      clearTimeout(artHoverTimer);
       update();
     }
     if (crate) {
-      // the cursor has to rest on the crate a moment to open it, so one just
-      // passing over doesn't send the paintings flying
-      var artHoverTimer = null;
-      crate.addEventListener('mouseenter', function () {
-        clearTimeout(artHoverTimer);
-        artHoverTimer = setTimeout(function () { artHover = true; update(); }, 120);
-      });
+      crate.addEventListener('mouseenter', function () { artHover = true; update(); });
       crate.addEventListener('focus', function () { artHover = true; update(); });
-      crate.addEventListener('mouseleave', function () { clearTimeout(artHoverTimer); artHover = false; update(); });
+      crate.addEventListener('mouseleave', function () { artHover = false; update(); });
       crate.addEventListener('blur', function () { artHover = false; update(); });
       crate.addEventListener('click', pinArt);
       crate.addEventListener('keydown', function (e) {
@@ -576,6 +651,7 @@
     document.addEventListener('click', function (e) {
       if (pinned === null || dragged || sorted) return;
       if (crate && crate.contains(e.target)) return;
+      if (bookend.contains(e.target)) return;
       if (groups.concat(reads).some(function (g) { return g.contains(e.target); })) return;
       pin(pinned);
     });
@@ -595,10 +671,14 @@
     }
     function titles() { return order.map(function (j) { return BOOKS[j].title; }); }
     // Slides each book to its place in the order, all but the one being dragged
+    function slide(j, x) {
+      groups[j].style.transform = shadows[j].style.transform = 'translate(' + x + 'px, 0)';
+    }
     function place(skip) {
+      if (order.length) wedge(order[order.length - 1]);
       var at = X0;
       order.forEach(function (j) {
-        if (j !== skip) groups[j].style.transform = 'translate(' + at + 'px, 0)';
+        if (j !== skip) slide(j, at);
         at += widths[j] + GAP;
       });
     }
@@ -663,6 +743,8 @@
         if (Math.abs(e.clientX - drag.x0) < 4) return;
         drag.moving = true;
         g.classList.add('is-dragging');
+        shadows[i].classList.add('is-dragging');
+        makeRoom(true);
         document.documentElement.classList.add('bookshelf-dragging');
         // in front of everything on the shelf, the bookend and crate too,
         // until it's let go and settles back into the row
@@ -672,13 +754,15 @@
       }
       var end = X0 + widths.reduce(function (s, w) { return s + w + GAP; }, 0) - GAP;
       var x = Math.max(X0, Math.min(end - widths[i], drag.home + dx));
-      g.style.transform = 'translate(' + x + 'px, 0)';
+      slide(i, x);
       order = slotFor(i, x, x > drag.home);
       place(i);
     }
     function endDrag(keep, e) {
       if (drag.moving) {
         groups[drag.i].classList.remove('is-dragging');
+        shadows[drag.i].classList.remove('is-dragging');
+        makeRoom(false);
         document.documentElement.classList.remove('bookshelf-dragging');
         if (!keep) order = drag.from;
         settle(!same(order, drag.from));
@@ -711,6 +795,8 @@
       // its book on the shelf comes up out of the row and is carried over
       // the others to its new place, in front of everything
       groups[sort.i].classList.add('is-carried');
+      shadows[sort.i].classList.add('is-carried');
+      makeRoom(true);
       svg.appendChild(groups[sort.i]);
       document.documentElement.classList.add('bookshelf-dragging');
       try { window.getSelection().removeAllRanges(); } catch (e) {}
@@ -754,6 +840,8 @@
         reads[i].classList.remove('is-sorting');
         readList.classList.remove('is-sorting');
         groups[i].classList.remove('is-carried');
+        shadows[i].classList.remove('is-carried');
+        makeRoom(false);
         document.documentElement.classList.remove('bookshelf-dragging');
         if (!keep) order = sort.from;
         // Put the lines in their new order at once, then let the dropped one
@@ -836,6 +924,35 @@
         g.addEventListener('pointerdown', function (e) { if (e.button === 0 && !sort) startDrag(i, e); });
       }
     });
+
+    // The bookend can be pulled a little way out from the books, harder the
+    // further it goes, and snaps back against them when it's let go
+    var pull = null;
+    bookend.addEventListener('pointerdown', function (e) {
+      if (e.button !== 0 || drag || sort) return;
+      pull = { x0: e.clientX, scale: W / svg.getBoundingClientRect().width };
+      bookend.classList.add('is-pulled');
+      wedgeShadow.classList.add('is-pulled');
+      document.documentElement.classList.add('bookshelf-dragging');
+      e.preventDefault();
+    });
+    document.addEventListener('pointermove', function (e) {
+      if (!pull) return;
+      var out = Math.max(0, (e.clientX - pull.x0) * pull.scale);
+      // stretches like a rubber band, never more than PULL_MAX
+      var x = PULL_MAX * out / (out + PULL_MAX);
+      bookend.style.transform = wedgeShadow.style.transform = 'translate(' + x + 'px, 0)';
+    });
+    function letGo() {
+      if (!pull) return;
+      pull = null;
+      bookend.classList.remove('is-pulled');
+      wedgeShadow.classList.remove('is-pulled');
+      document.documentElement.classList.remove('bookshelf-dragging');
+      bookend.style.transform = wedgeShadow.style.transform = '';
+    }
+    document.addEventListener('pointerup', letGo);
+    document.addEventListener('pointercancel', letGo);
 
     update();
 
