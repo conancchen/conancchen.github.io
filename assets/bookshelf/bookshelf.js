@@ -39,7 +39,7 @@
     labels: {
       shelf: "A shelf of what I'm reading now and just finished",
       reading: 'Recent reading',
-      current: 'currently reading',
+      current: 'Currently reading',
       art: 'Selected art',
       crate: 'Art'
     }
@@ -48,10 +48,15 @@
   // The drawing, in its own units: the svg scales to fill its container
   // W: the whole width; LINE: where the books stand; PLANK: the plank's
   // front edge; GAP: between books; DX, DY: how far back-and-up depth runs
-  var W = 667, LINE = 190, PLANK = 6, GAP = 7, DX = 9, DY = -7, X0 = 4;
-  var H = LINE + 16;
+  var W = 667, LINE = 190, PLANK = 6, GAP = 7, DX = 9, DY = -7;
   // How deep a book runs, in DX/DY steps, and the plank (deeper than the books)
   var BOOK_DEEP = 2, PLANK_DEEP = 2.2, CRATE_DEEP = 1.6;
+  // How far the plank comes out in front of the books, in the same steps, so
+  // they stand a little back on it
+  var PLANK_FRONT = 1;
+  // Where the first book stands (past the plank's front corner), and the
+  // whole height, down past the plank's front edge
+  var X0 = 4 + DX * PLANK_FRONT, H = LINE - DY * PLANK_FRONT + 16;
   // How thick a page is: a book's thickness is in proportion to its pages,
   // unless there are too many to fit, when they all come out thinner
   var PAGE_W = 0.1275;
@@ -92,6 +97,8 @@
       pages: Math.max(40, +b.pages || 300),
       height: Math.min(180, Math.max(90, +b.height || 165)),
       current: !!b.current,
+      // out of 5, to the nearest half star
+      rating: b.rating == null || isNaN(+b.rating) ? null : Math.min(5, Math.max(0, Math.round(b.rating * 2) / 2)),
       note: b.note ? String(b.note) : ''
     };
   }
@@ -151,7 +158,6 @@
         var img = html('img', '', fig);
         img.src = a.src;
         img.alt = a.alt;
-        img.loading = 'lazy';
         img.style.aspectRatio = a.aspect;
         var cap = html('figcaption', '', fig);
         html('span', 'bs-art-title', cap, a.title);
@@ -180,9 +186,20 @@
       }
       var text = html('span', 'bs-read-text', li);
       html('span', 'bs-read-title', text, b.title);
-      var by = html('span', 'bs-read-by', text);
-      if (b.author) html('span', 'bs-read-author', by, b.author);
-      if (b.current) html('span', 'bs-now', by, (b.author ? ' · ' : '') + o.labels.current);
+      if (b.author) html('span', 'bs-read-by', text, b.author);
+      if (b.current) html('span', 'bs-now', text, o.labels.current);
+      if (b.rating !== null) {
+        // five stars greyed, with the filled ones laid over them as far as
+        // the rating goes (so a half star is half filled), and the number
+        // beside them
+        var rating = html('span', 'bs-rating', text);
+        var stars = html('span', 'bs-stars', rating);
+        stars.setAttribute('role', 'img');
+        stars.setAttribute('aria-label', b.rating + ' out of 5 stars');
+        html('span', 'bs-stars-fill', stars, '★★★★★').style.width = b.rating / 5 * 100 + '%';
+        html('span', 'bs-stars-empty', stars, '★★★★★');
+        html('span', 'bs-rating-num', rating, b.rating + '/5').setAttribute('aria-hidden', 'true');
+      }
       if (b.note) html('span', 'bs-note', text, b.note);
       return li;
     });
@@ -200,11 +217,14 @@
       return 'rgb(' + c.join(',') + ')';
     }
 
-    // A plank: its top surface running back, then its front edge
+    // A plank: its top surface running back, then its front edge, out in
+    // front of where the books stand. plankEnd is where its right end meets
+    // the line the books stand on.
     var plankEnd = W - DX * PLANK_DEEP;
-    el('polygon', { points: pts([[0, LINE], [plankEnd, LINE], [W, LINE + DY * PLANK_DEEP], [DX * PLANK_DEEP, LINE + DY * PLANK_DEEP]]), 'class': 'bs-plank-top' });
-    el('rect', { x: 0, y: LINE, width: plankEnd, height: PLANK, 'class': 'bs-plank-front' });
-    el('polygon', { points: pts([[plankEnd, LINE], [W, LINE + DY * PLANK_DEEP], [W, LINE + DY * PLANK_DEEP + PLANK], [plankEnd, LINE + PLANK]]), 'class': 'bs-plank-end' });
+    var frontY = LINE - DY * PLANK_FRONT, frontR = plankEnd - DX * PLANK_FRONT, backY = LINE + DY * PLANK_DEEP;
+    el('polygon', { points: pts([[0, frontY], [frontR, frontY], [W, backY], [DX * (PLANK_FRONT + PLANK_DEEP), backY]]), 'class': 'bs-plank-top' });
+    el('rect', { x: 0, y: frontY, width: frontR, height: PLANK, 'class': 'bs-plank-front' });
+    el('polygon', { points: pts([[frontR, frontY], [W, backY], [W, backY + PLANK], [frontR, frontY + PLANK]]), 'class': 'bs-plank-end' });
 
     // If the books, the bookend and the crate won't all fit on the plank,
     // the books come out thinner, all alike
@@ -308,10 +328,11 @@
     // The art crate: an open wooden crate past the books, its inside in
     // shadow, with the prints standing in it. It sits centered in the
     // stretch between the bookend and the plank's front corner.
-    var crate = null;
+    var crate = null, crateTop = 0;
     if (hasArt) {
       var binW = CRATE_W, binH = CRATE_H, deep = [DX * CRATE_DEEP, DY * CRATE_DEEP];
       var binL = (x + plankEnd - binW - deep[0]) / 2, binT = LINE - binH;
+      crateTop = binT;
       crate = el('g', { 'class': 'bs-crate', tabindex: 0, role: 'button', 'aria-expanded': 'false', 'aria-controls': artSection.id, 'aria-label': o.labels.crate + ': show the paintings', 'aria-pressed': 'false' });
       // A backing in the page's color fills the crate's outline, so when the
       // crate blurs back the shelf behind it doesn't show through (and, as
@@ -339,6 +360,8 @@
         var img = el('image', { href: p.a.src, x: L, y: base - p.h, width: p.w, height: p.h, preserveAspectRatio: 'xMidYMid slice', 'class': 'bs-print' }, body);
         img.style.setProperty('--k', k);
         img.style.setProperty('--n', n);
+        p.a.print = img;
+        p.a.k = k;
       });
       el('polygon', { points: pts([[binL + binW, binT], [binL + binW + deep[0], binT + deep[1]], [binL + binW + deep[0], LINE + deep[1]], [binL + binW, LINE]]), 'class': 'bs-line bs-crate-side' }, body);
       el('rect', { x: binL, y: binT, width: binW, height: binH, 'class': 'bs-line bs-crate-front' }, body);
@@ -391,30 +414,28 @@
       });
     }
 
-    // Hovering (or focusing) a book on the shelf pops it up and narrows the
-    // list to just its line; pressing a book pins it that way until it's
-    // pressed again or Esc. Hovering a line in the list pops its book out
-    // too, but leaves the list as it is, so the line doesn't move out from
-    // under the cursor. Hovering the crate opens the Art section above the
-    // list (pressing pins it). A book and the art are never out at once:
-    // whatever's under the cursor shows, a book over the art; otherwise
-    // whatever's pinned, and pinning one unpins the other. While a book is
-    // out, the crate blurs back; while the art is out, the books fade.
+    // Hovering (or focusing) a book on the shelf pops it up, and the other
+    // lines in the list blur back; pressing a book pins it out that way until
+    // it's pressed again, Esc, or a click anywhere else. Hovering or pressing
+    // a line in the list does the same as hovering or pressing its book.
+    // Hovering the crate opens the Art section above the list (pressing pins
+    // it). A book and the art are never out at once: whatever's under the
+    // cursor shows, a book over the art; otherwise whatever's pinned, and
+    // pinning one unpins the other. While a book is out, the crate blurs
+    // back; while the art is out, the books do.
     var pinned = null, hovered = null, listHovered = null;
     var artPinned = false, artHover = false;
     function update() {
       var book = hovered !== null ? hovered : artHover ? null : pinned;
       var art = hovered === null && (artHover || artPinned);
-      var shown = book;
       if (book === null && !art && listHovered !== null) book = listHovered;
       groups.forEach(function (g, j) {
         g.classList.toggle('is-picked', j === book);
         g.setAttribute('aria-pressed', j === pinned);
       });
-      // the other lines in the list blur back, as the shelf's books fade
+      // the other lines in the list blur back, as the shelf's books do
       reads.forEach(function (r, j) {
-        r.classList.toggle('is-shown', shown === null || j === shown);
-        r.classList.toggle('is-dimmed', shown === null && book !== null && j !== book);
+        r.classList.toggle('is-dimmed', book !== null && j !== book);
       });
       list.hidden = art;
       root.classList.toggle('has-picked', book !== null);
@@ -424,12 +445,95 @@
         crate.classList.toggle('is-open', art);
         crate.setAttribute('aria-expanded', art);
         crate.setAttribute('aria-pressed', artPinned);
+        if (art !== artOpen) {
+          artOpen = art;
+          ART.forEach(function (a) { fly(a, art); });
+        }
       }
+    }
+
+    // Opening the crate, each painting flies up out of it, one after
+    // another, and lands in its place in the Art section, leaving the crate
+    // empty; closing, they fly back down into it. A painting turned back
+    // mid-flight turns around from wherever it's got to.
+    var artOpen = false;
+    function printRect(a) {
+      // where the print stands at rest in the crate, not risen, and how much
+      // of it the crate's front hides
+      var m = svg.getScreenCTM(), b = a.print.getBBox();
+      var top = m.f + b.y * m.d, height = b.height * m.d;
+      return { left: m.e + b.x * m.a, top: top, width: b.width * m.a, height: height,
+        hidden: Math.max(0, top + height - (m.f + crateTop * m.d)) };
+    }
+    function flightRect(clone) {
+      // where a painting in the air has got to, cut off as it now is
+      var r = clone.getBoundingClientRect(), cut = /inset\(\S+ \S+ ([\d.]+)px/.exec(getComputedStyle(clone).clipPath);
+      return { left: r.left, top: r.top, width: r.width, height: r.height, hidden: cut ? +cut[1] : 0 };
+    }
+    function fly(a, open) {
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var home = root.getBoundingClientRect();
+      var turning = a.flight;
+      var from = turning ? flightRect(turning) : open ? printRect(a) : a.img.getBoundingClientRect();
+      var to = open ? a.img.getBoundingClientRect() : printRect(a);
+      if (turning) turning.remove();
+      // a painting in the crate is cut off at the crate's front, so it
+      // slips in and out behind it
+      function at(r) {
+        return { left: r.left - home.left + 'px', top: r.top - home.top + 'px', width: r.width + 'px', height: r.height + 'px',
+          clipPath: 'inset(0 0 ' + (r.hidden || 0) + 'px 0 round 3px)' };
+      }
+      var clone = html('img', 'bs-flight', root);
+      clone.src = a.src;
+      clone.alt = '';
+      // stacked as they stand in the crate, back to front
+      clone.style.zIndex = 3 + a.k;
+      clone.open = open;
+      a.flight = clone;
+      a.print.classList.add('is-out');
+      a.img.style.visibility = 'hidden';
+      // Out of the crate it first rises straight up until it's clear of the
+      // front, then flies to its place; back in, it flies to just over the
+      // crate, then sinks straight down into it. (One turned around in the
+      // air flies straight back.)
+      var frames, inCrate = open ? from : to;
+      if (turning || !inCrate.hidden) {
+        frames = [at(from), at(to)];
+        frames[0].easing = 'cubic-bezier(0.22, 1, 0.36, 1)';
+      } else {
+        var over = at({ left: inCrate.left, top: inCrate.top - inCrate.hidden - 10, width: inCrate.width, height: inCrate.height });
+        frames = [at(from), over, at(to)];
+        over.offset = open ? 0.3 : 0.6;
+        frames[0].easing = open ? 'cubic-bezier(0.33, 1, 0.68, 1)' : 'cubic-bezier(0.45, 0, 0.55, 1)';
+        over.easing = open ? 'cubic-bezier(0.45, 0, 0.55, 1)' : 'cubic-bezier(0.32, 0, 0.67, 0)';
+      }
+      var order = open ? a.k : ART.length - 1 - a.k;
+      clone.animate(frames, {
+        duration: turning ? 250 : open ? 550 : 750,
+        delay: turning ? 0 : order * (open ? 40 : 70),
+        fill: 'both'
+      }).onfinish = function () {
+        // A painting that's landed waits where it is, still in the air,
+        // until they all have, so one still flying never passes through one
+        // that's already back in its place
+        clone.landed = true;
+        if (!ART.every(function (b) { return !b.flight || b.flight.landed; })) return;
+        ART.forEach(function (b) {
+          if (!b.flight) return;
+          if (!b.flight.open) b.print.classList.remove('is-out');
+          b.flight.remove();
+          b.flight = null;
+          b.img.style.visibility = '';
+        });
+      };
     }
     function pin(i) {
       pinned = pinned === i ? null : i;
       if (pinned !== null) artPinned = false;
+      // a press settles it, so a book put back goes back even with the
+      // cursor still over it or its line
       hovered = null;
+      listHovered = null;
       artHover = false;
       update();
     }
@@ -440,12 +544,19 @@
       // hover it started would otherwise hang on
       hovered = null;
       artHover = false;
+      clearTimeout(artHoverTimer);
       update();
     }
     if (crate) {
-      crate.addEventListener('mouseenter', function () { artHover = true; update(); });
+      // the cursor has to rest on the crate a moment to open it, so one just
+      // passing over doesn't send the paintings flying
+      var artHoverTimer = null;
+      crate.addEventListener('mouseenter', function () {
+        clearTimeout(artHoverTimer);
+        artHoverTimer = setTimeout(function () { artHover = true; update(); }, 120);
+      });
       crate.addEventListener('focus', function () { artHover = true; update(); });
-      crate.addEventListener('mouseleave', function () { artHover = false; update(); });
+      crate.addEventListener('mouseleave', function () { clearTimeout(artHoverTimer); artHover = false; update(); });
       crate.addEventListener('blur', function () { artHover = false; update(); });
       crate.addEventListener('click', pinArt);
       crate.addEventListener('keydown', function (e) {
@@ -457,6 +568,16 @@
       // Esc closes an open painting first
       if (artPinned && (!box || box.hidden)) { artPinned = false; update(); }
       if (pinned !== null) pin(pinned);
+    });
+    // A pulled-out book also goes back with a click or tap anywhere but on a
+    // book, its line or the crate (they handle their own), unless it ends a
+    // drag
+    var sorted = false;
+    document.addEventListener('click', function (e) {
+      if (pinned === null || dragged || sorted) return;
+      if (crate && crate.contains(e.target)) return;
+      if (groups.concat(reads).some(function (g) { return g.contains(e.target); })) return;
+      pin(pinned);
     });
 
     // The books can be put in a new order, by dragging them along the shelf
@@ -483,7 +604,7 @@
     }
     // Stacks the books in order, each covering the side of the one before
     // it, and puts the list in the same order (with CSS rather than moving
-    // the lines, so they don't replay their fade-in)
+    // the lines)
     function settle(changed) {
       place();
       order.forEach(function (j, k) {
@@ -646,6 +767,9 @@
         reads[i].style.transform = '';
         listHovered = e.pointerType === 'mouse' && reads[i].contains(e.target) ? i : null;
         update();
+        // the click that ends it doesn't put a pulled-out book back
+        sorted = true;
+        setTimeout(function () { sorted = false; }, 0);
       }
       sort = null;
     }
@@ -676,6 +800,11 @@
       r.addEventListener('focus', on);
       r.addEventListener('mouseleave', off);
       r.addEventListener('blur', off);
+      // pressing a line pulls its book out, as pressing the book does
+      r.addEventListener('click', function () { if (!sorted) pin(j); });
+      r.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pin(j); }
+      });
       if (!o.reorder) return;
       r.addEventListener('pointerdown', function (e) { if (e.button === 0 && !drag) startSort(j, e); });
       r.addEventListener('keydown', function (e) {

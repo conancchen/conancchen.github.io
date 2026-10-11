@@ -6,7 +6,8 @@
 #   ink     light or dark text on it (picked from the color if left out)
 #   pages   how many pages it has (its thickness on the shelf follows)
 #   height  how tall it stands, 90 to 180 (the shelf is 190 high)
-#   current true while I'm still reading it ("currently reading" in the list)
+#   current true while I'm still reading it ("Currently reading" in the list)
+#   rating  out of 5, in half stars, shown as stars under it in the list
 #   note    an optional line shown under it in the list
 - title: Flash Boys
   cover: flash-boys.jpg
@@ -31,6 +32,7 @@
   ink: dark
   pages: 467
   height: 165
+  rating: 5
 - title: Going Infinite
   cover: going-infinite.jpg
   author: Michael Lewis
@@ -38,6 +40,7 @@
   ink: dark
   pages: 288
   height: 171
+  rating: 3.5
 - title: One Hundred Years of Solitude
   cover: one-hundred-years-of-solitude.jpg
   author: Gabriel García Márquez
@@ -45,6 +48,7 @@
   ink: light
   pages: 417
   height: 165
+  rating: 5
 - title: Thinking, Fast and Slow
   cover: thinking-fast-and-slow.jpg
   author: Daniel Kahneman
@@ -52,3 +56,4 @@
   ink: dark
   pages: 499
   height: 168
+  rating: 4

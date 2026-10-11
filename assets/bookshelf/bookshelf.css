@@ -5,10 +5,16 @@
  * with :where() so yours always win, whichever stylesheet loads first.)
  */
 :where(.bookshelf) {
-  /* the page's background, which books fade back over */
+  /* the page's background, which books blur back over */
   --bs-bg: #fff;
+  /* how far books and the crate blur and fade when they step back */
+  --bs-recede-blur: 2.5px;
+  --bs-recede-opacity: 0.6;
   --bs-muted: #8a8a8a;
   --bs-accent: rgb(55, 135, 240);
+  /* a rating's stars, filled and not */
+  --bs-star: #e3a72f;
+  --bs-star-empty: #ddd8cc;
   --bs-title-weight: 500;
   /* the lines everything on the shelf is drawn with */
   --bs-line: #1a1a18;
@@ -125,14 +131,16 @@
   transform: translate(-14px, -26px);
 }
 
-/* The other books fade back while one is picked or the art is out */
+/* The other books blur back while one is picked or the art is out, just as
+   the crate does while a book is out */
 .bs-book-art {
-  transition: opacity 0.15s ease;
+  transition: filter 0.2s ease, opacity 0.2s ease;
 }
 
 .bookshelf.has-picked .bs-book:not(.is-picked) .bs-book-art,
 .bookshelf.has-art .bs-book:not(.is-picked) .bs-book-art {
-  opacity: 0.4;
+  filter: blur(var(--bs-recede-blur));
+  opacity: var(--bs-recede-opacity);
 }
 
 /* Books are outlined a little heavier than the rest of the shelf */
@@ -196,8 +204,8 @@
 
 /* While a book is out, the crate blurs back */
 .bookshelf.has-picked .bs-crate-body {
-  filter: blur(2.5px);
-  opacity: 0.6;
+  filter: blur(var(--bs-recede-blur));
+  opacity: var(--bs-recede-opacity);
 }
 
 /* When the crate is hovered or opened, the prints in it rise up out of it,
@@ -210,6 +218,23 @@
 .bs-crate.is-open .bs-print {
   transform: translateY(-36px);
   transition-delay: calc(var(--k, 0) * 0.06s);
+}
+
+/* A print that's flown out of the crate leaves it empty */
+.bs-print.is-out {
+  opacity: 0;
+}
+
+/* A painting on its way between the crate and the Art section, over
+   everything else */
+.bs-flight {
+  position: absolute;
+  z-index: 3;
+  margin: 0;
+  object-fit: cover;
+  border-radius: 3px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  pointer-events: none;
 }
 
 /* The Art section, opened from the crate: it slides open above the reading
@@ -354,7 +379,7 @@
 }
 
 .bs-read {
-  display: none;
+  display: flex;
   gap: 16px;
   padding: 12px 0;
   outline: none;
@@ -367,20 +392,7 @@
   cursor: default;
 }
 
-.bs-read.is-shown {
-  display: flex;
-  animation: bs-read-in 0.25s ease;
-}
-
-@keyframes bs-read-in {
-  from {
-    opacity: 0;
-    transform: translateY(-3px);
-  }
-}
-
-/* While one line is hovered, the others blur back, like the crate does while
-   a book is out */
+/* While a book is out, the other lines blur back, like the crate does */
 .bs-read.is-dimmed {
   filter: blur(2px);
   opacity: 0.5;
@@ -436,17 +448,74 @@
   color: var(--bs-muted);
 }
 
-.bs-read-author {
+.bs-read-by,
+.bs-now {
   white-space: nowrap;
 }
 
+/* A book still being read gets a blue dot, pulsing like the timeline's
+   "now" on the home page */
 .bs-now {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   color: var(--bs-accent);
-  /* drops to the next line whole rather than splitting */
+}
+
+.bs-now::before {
+  content: '';
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--bs-accent);
+  animation: bs-now-pulse 2.4s ease-out infinite;
+}
+
+@keyframes bs-now-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--bs-accent) 50%, transparent);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--bs-accent) 0%, transparent);
+  }
+}
+
+/* A rating: its stars, then the number */
+.bs-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   white-space: nowrap;
+}
+
+.bs-rating-num {
+  color: var(--bs-muted);
+}
+
+/* The filled stars sit over the empty ones, cut off where the rating ends */
+.bs-stars {
+  position: relative;
+  font-size: 13px;
+  line-height: 1;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.bs-stars-empty {
+  color: var(--bs-star-empty);
+}
+
+.bs-stars-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  color: var(--bs-star);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .bs-read.is-shown { animation: none; }
-  .bs-book-lift, .bs-crate-body, .bs-print { transition: none; }
+  .bs-now::before { animation: none; }
+  .bs-book-lift, .bs-book-art, .bs-crate-body, .bs-print { transition: none; }
 }

@@ -22,7 +22,7 @@ Your recent reading, drawn as books on a shelf with a list underneath, plus an o
 ## Options
 
 **`books`**: only `title` is required.
-`author`, `cover`, `color` (`#rrggbb`), `ink` (`'dark'`/`'light'`, otherwise picked from the color), `pages` (sets thickness), `height` (90–180), `current` (shows "currently reading"), `note`.
+`author`, `cover`, `color` (`#rrggbb`), `ink` (`'dark'`/`'light'`, otherwise picked from the color), `pages` (sets thickness), `height` (90–180), `current` (shows "Currently reading"), `rating` (out of 5, in half stars), `note`.
 
 **`art`** (optional; leave it out for no crate):
 `src`, `title`, `by`, `aspect` (width ÷ height), `row` (paintings in the same row come out the same height), `crate: { x, width, height, back }` (exact place in the crate; otherwise placed automatically).
