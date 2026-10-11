@@ -918,7 +918,7 @@ $dot-center: calc(4px + 20px / 2);
 // blocks on a shelf plank, and the same books listed under it
 .bookshelf {
   position: relative;
-  margin-top: 80px;
+  margin-top: 24px;
 }
 
 // The painting's frame: light oak
@@ -1278,7 +1278,7 @@ $dot-center: calc(4px + 20px / 2);
 .shelf-label {
   margin: 28px 0 0;
   padding-bottom: 8px;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: inherit;
 }
 
@@ -1313,10 +1313,13 @@ $dot-center: calc(4px + 20px / 2);
   flex-direction: column;
   gap: 2px;
   min-width: 0;
+  font-size: 12px;
 }
 
+// The same weight as the name in the header
 .read-title {
-  font-size: 15px;
+  font-size: 12px;
+  font-weight: 474;
 }
 
 .read-by,
@@ -1331,6 +1334,11 @@ $dot-center: calc(4px + 20px / 2);
 
 .now-tag {
   color: rgb(55, 135, 240);
+  white-space: nowrap;  // drops to the next line whole rather than splitting
+}
+
+.read-author {
+  white-space: nowrap;
 }
 
 

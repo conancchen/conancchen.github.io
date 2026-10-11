@@ -43,7 +43,7 @@ permalink: /bookshelf/
       <img class="cover" src="{{ site.baseurl }}/images/books/{{ book.cover }}" alt="Cover of {{ book.title | escape }}" width="56" height="86" loading="lazy">
       <span class="read-text">
         <span class="read-title">{{ book.title }}</span>
-        <span class="read-by">{{ book.author }}{% if book.current %}<span class="now-tag"> · currently reading</span>{% endif %}</span>
+        <span class="read-by"><span class="read-author">{{ book.author }}</span>{% if book.current %} <span class="now-tag">· currently reading</span>{% endif %}</span>
         {% if book.note %}<span class="read-note">{{ book.note }}</span>{% endif %}
       </span>
     </li>
