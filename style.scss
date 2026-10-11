@@ -918,7 +918,7 @@ $dot-center: calc(4px + 20px / 2);
 // blocks on a shelf plank, and the same books listed under it
 .bookshelf {
   position: relative;
-  margin-top: 48px;
+  margin-top: 80px;
 }
 
 // The painting's frame: light oak
@@ -951,84 +951,8 @@ $dot-center: calc(4px + 20px / 2);
 
 .bin-label {
   fill: var(--crate-ink);
-  font-size: 18px;
+  font-size: 15px;
   text-anchor: middle;
-}
-
-// The fish tank on the lower shelf
-// The glass itself is clear; the water inside does the coloring
-.tank-back,
-.tank-side {
-  fill: rgba(215, 236, 241, 0.25);
-}
-
-.tank-water {
-  fill: #b7e0e8;
-}
-
-.tank-sand-top {
-  fill: #e3cf9f;
-}
-
-.tank-sand {
-  fill: #d7bf86;
-}
-
-.tank-sand-side {
-  fill: #c9b078;
-}
-
-.tank-pebble {
-  fill: #a68a5b;
-}
-
-.tank-weed path {
-  fill: none;
-  stroke-width: 2.2;
-  stroke-linecap: round;
-}
-
-.fish path,
-.fish ellipse {
-  stroke: #1a1a18;
-  stroke-width: 0.45;
-  stroke-linejoin: round;
-}
-
-.tank-surface {
-  fill: #c4e6ed;
-  stroke: #9fcfd8;
-  stroke-width: 0.6;
-}
-
-.tank-bubble {
-  fill: rgba(255, 255, 255, 0.75);
-  stroke: rgba(255, 255, 255, 0.95);
-  stroke-width: 0.3;
-}
-
-.tank-glass {
-  fill: rgba(210, 240, 248, 0.18);
-}
-
-.tank-hood,
-.tank-hood-top,
-.tank-hood-side {
-  fill: #2b2b2a;
-}
-
-.tank-hood-top {
-  fill: #3a3a38;
-}
-
-// The tank and the pots can be slid along their shelves
-.cabinet .slides {
-  cursor: grab;
-  touch-action: pan-y;
-}
-
-.cabinet .slides.is-sliding {
-  cursor: grabbing;
 }
 
 // The crate lifts like a book when hovered, without tipping
@@ -1076,16 +1000,30 @@ $dot-center: calc(4px + 20px / 2);
   overflow: hidden;
 }
 
+// The two upright paintings side by side, their columns split by aspect so
+// they stand the same height, with the wide one beneath
 .art-row {
-  display: flex;
-  gap: 14px;
+  display: grid;
+  grid-template-columns: 0.664fr 0.864fr;
+  gap: 18px 14px;
   padding: 14px 0 4px;
 }
 
 .art-fig {
-  flex: var(--aspect) 1 0;
   min-width: 0;
   margin: 0;
+}
+
+.art-fig:nth-child(1) {
+  grid-area: 1 / 1;
+}
+
+.art-fig:nth-child(2) {
+  grid-area: 2 / 1 / 3 / 3;
+}
+
+.art-fig:nth-child(3) {
+  grid-area: 1 / 2;
 }
 
 .art-fig img {
@@ -1100,8 +1038,8 @@ $dot-center: calc(4px + 20px / 2);
   display: flex;
   flex-direction: column;
   margin-top: 8px;
-  font-size: 11px;
-  line-height: 14px;
+  font-size: 12px;
+  line-height: 15px;
 }
 
 // Titles stay on one line, running a little past a narrow painting if need be
@@ -1187,28 +1125,6 @@ $dot-center: calc(4px + 20px / 2);
   color: #a8a8a4;
 }
 
-// Narrow screens put the two upright paintings side by side, their columns
-// split by aspect so they stand the same height, with the wide one beneath
-@media screen and (max-width: 520px) {
-  .art-row {
-    display: grid;
-    grid-template-columns: 0.664fr 0.864fr;
-    row-gap: 18px;
-  }
-
-  .art-fig:nth-child(1) {
-    grid-area: 1 / 1;
-  }
-
-  .art-fig:nth-child(2) {
-    grid-area: 2 / 1 / 3 / 3;
-  }
-
-  .art-fig:nth-child(3) {
-    grid-area: 1 / 2;
-  }
-}
-
 .shelf-deco[tabindex] {
   cursor: pointer;
   outline: none;
@@ -1225,12 +1141,6 @@ $dot-center: calc(4px + 20px / 2);
   -webkit-tap-highlight-color: transparent;
   height: auto;
   overflow: visible;
-}
-
-// The vines hang down over the list under the shelf without getting in the
-// way of hovering it
-.vine {
-  pointer-events: none;
 }
 
 :root {
@@ -1336,27 +1246,6 @@ $dot-center: calc(4px + 20px / 2);
   stroke-linejoin: round;
 }
 
-.stem {
-  fill: none;
-  stroke: #3f6e30;
-  stroke-width: 1;
-  stroke-linecap: round;
-}
-
-// The pothos hangs still until the cursor brushes through it; the script
-// beside the shelf then swings each vine and lets it settle
-.vine,
-.vine .leaf-flutter {
-  transform-box: view-box;
-}
-
-
-.book-far {
-  fill: none;
-  stroke: var(--shelf-ink);
-  stroke-width: 0.7;
-}
-
 .book-title {
   font-size: 13px;
   letter-spacing: 0.1px;
@@ -1369,7 +1258,7 @@ $dot-center: calc(4px + 20px / 2);
   margin-top: 0;
 }
 
-// Only the picked book shows in the list
+// The list shows every book, or just the picked one
 .shelf-list .read {
   display: none;
 }
@@ -1442,13 +1331,6 @@ $dot-center: calc(4px + 20px / 2);
 
 .now-tag {
   color: rgb(55, 135, 240);
-}
-
-
-// The pothos's pot, a soft white
-:root {
-  --pot: #f2f0eb;
-  --pot-rim: #f7f6f2;
 }
 
 
