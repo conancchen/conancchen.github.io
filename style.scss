@@ -1383,6 +1383,35 @@ $dot-center: calc(4px + 20px / 2);
   fill-opacity: 0.08;
 }
 
+// a round on the recent graph can be pressed to graph it below
+#zm-chart {
+  cursor: pointer;
+}
+
+// the round graph: a dot for each problem, the line through them lighter,
+// and the time into the round along the bottom
+.zm-lap {
+  fill: var(--zm-line);
+}
+
+.zm-line-thin {
+  stroke-width: 1.25;
+  stroke-opacity: 0.6;
+}
+
+.zm-tick-time {
+  text-anchor: middle;
+  dominant-baseline: auto;
+}
+
+.zm-tick-time.is-first {
+  text-anchor: start;
+}
+
+.zm-tick-time.is-last {
+  text-anchor: end;
+}
+
 .zm-chart:focus-visible .zm-grid {
   stroke: var(--muted);
 }

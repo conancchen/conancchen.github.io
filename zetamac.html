@@ -34,6 +34,17 @@ permalink: /zetamac/
         <tbody></tbody>
       </table>
     </div>
+
+    <!-- How long each problem of a round took, across its two minutes: the
+         latest round's, or the one picked on the graph above -->
+    <div class="zm-history" id="zm-round" hidden>
+      <div class="zm-history-head">
+        <h2 class="block-label block-label-plain" id="zm-round-title">Last round</h2>
+        <button type="button" class="zm-clear" id="zm-round-latest" hidden>Latest</button>
+      </div>
+      <p class="zm-stats" id="zm-round-stats"></p>
+      <div class="zm-chart" id="zm-round-chart" tabindex="0" role="img"></div>
+    </div>
   </div>
 
   <div class="zm-play" id="zm-play" hidden>
@@ -65,6 +76,7 @@ permalink: /zetamac/
 
     var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var current, score, started, frame;
+    var marks;  // when each problem of this round was answered, and what it was
 
     function between(lo, hi) { return lo + Math.floor(Math.random() * (hi - lo + 1)); }
 
@@ -102,8 +114,12 @@ permalink: /zetamac/
     // The history: [score, when] for each round, oldest first (or, with
     // ?demo, made-up rounds a day apart up to today, kept only in memory)
     // 30 rounds: a climb from 30 to 100, then a fall back to 65
+    // each with made-up timings, a little slower at the start
     var demoList = [30, 29, 36, 34, 41, 43, 44, 51, 51, 57, 58, 62, 68, 75, 73, 78, 85, 92, 93, 95, 100, 99, 87, 90, 81, 77, 73, 71, 71, 65].map(function (v, i, all) {
-      return [v, Date.now() - (all.length - 1 - i) * 86400000];
+      var gaps = [], sum = 0, t = 0;
+      for (var k = 0; k < v; k++) { gaps.push((k < 5 ? 1.8 : 1) * (0.4 + Math.random() * Math.random() * 3)); sum += gaps[k]; }
+      var demoMarks = gaps.map(function (g) { t += g * 119 / sum; var p = next(); return [Math.round(t * 1000) / 1000, p.text]; });
+      return [v, Date.now() - (all.length - 1 - i) * 86400000, demoMarks, 120];
     });
     function readHistory() {
       if (demo) return demoList.slice(-KEEP);
@@ -112,9 +128,12 @@ permalink: /zetamac/
         return Array.isArray(list) ? list.filter(function (r) { return Array.isArray(r) && isFinite(r[0]); }) : [];
       } catch (e) { return []; }
     }
+    // a round: its score, when, when each problem was answered (seconds
+    // into the round) and what it was, and how long the round ran
     function remember(points) {
-      if (demo) { demoList.push([points, Date.now()]); return; }
-      var list = readHistory().concat([[points, Date.now()]]).slice(-KEEP);
+      var round = [points, Date.now(), marks, LENGTH];
+      if (demo) { demoList.push(round); return; }
+      var list = readHistory().concat([round]).slice(-KEEP);
       try { localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); } catch (e) {}
     }
 
@@ -138,6 +157,7 @@ permalink: /zetamac/
 
     function start() {
       score = 0;
+      marks = [];
       scoreEl.textContent = '0';
       scoreEl.style.visibility = '';
       zm.classList.add('is-running');
@@ -159,6 +179,7 @@ permalink: /zetamac/
     // Time up: the round goes into the history, and it's back to the start
     function finish() {
       remember(score);
+      picked = null;
       reset(score);
     }
 
@@ -169,6 +190,10 @@ permalink: /zetamac/
       if (typed && typed === String(current.value)) hit();
     });
     function hit() {
+      // to the millisecond, and always after the one before
+      var t = Math.round(performance.now() - started) / 1000;
+      if (marks.length) t = Math.max(t, marks[marks.length - 1][0] + 0.001);
+      marks.push([t, current.text]);
       score++;
       scoreEl.textContent = score;
       show(next());
@@ -195,6 +220,7 @@ permalink: /zetamac/
     var NS = 'http://www.w3.org/2000/svg';
     var points = [], at = null, tip, guide, ring, guide2, ring2, band, plotTop, plotBottom;
     var span = null;  // while dragging across the graph, the round it started on
+    var held = null;  // the round graphed below, if not the latest, whose readout stays up
     var overlays = {}, statPinned = null;  // the stats drawn on the graph, and the one pressed
 
     function svgEl(name, attrs, parent) {
@@ -249,6 +275,7 @@ permalink: /zetamac/
       chart.textContent = '';
       tbody.textContent = '';
       at = null;
+      held = null;
       points = [];
       list.forEach(function (r) {
         var row = document.createElement('tr');
@@ -281,7 +308,7 @@ permalink: /zetamac/
         });
       }
       chart.setAttribute('aria-label', !scores.length ? 'Recent scores: none yet.' : 'Recent scores: ' + scores.length + (scores.length === 1 ? ' round' : ' rounds') +
-        ', latest ' + latest + ', max ' + top + '. Use the arrow keys to read each one.');
+        ', latest ' + latest + ', max ' + top + '. Use the arrow keys to read each one, and Enter to graph its round below.');
 
       // the guide lines run the page's full width, the scores stopping short
       // of the right end to leave room for the latest score's pill
@@ -329,6 +356,7 @@ permalink: /zetamac/
         });
         overlays.mean.push(meanGroup);
       }
+      drawRound(list, drawingIn);
       if (!points.length) return;
       var last = points[points.length - 1];
       svgEl('line', { x1: 0, x2: W, y1: last.y, y2: last.y, 'class': 'zm-now zm-late' }, svg);
@@ -374,10 +402,14 @@ permalink: /zetamac/
       chart.appendChild(tip);
       tip.value = tipValue;
       tip.when = tipWhen;
+      var pickedAt = pickedIndex(list);
+      if (pickedAt !== list.length - 1) point(held = pickedAt);
     }
 
+    // with nothing pointed at, the round graphed below keeps its readout up
     function point(i) {
       if (!points.length) return;
+      if (i === null) i = held;
       at = i;
       guide2.style.display = ring2.style.display = band.style.display = 'none';
       tip.classList.remove('is-up', 'is-down');
@@ -448,9 +480,13 @@ permalink: /zetamac/
       if (span !== null) stretch(span, i);
       else if (i !== at) point(i);
     });
+    // letting go where it was pressed, without dragging to another round,
+    // graphs that round below
     function letGo(e) {
       if (span === null) return;
+      var from = span;
       span = null;
+      if (e.type === 'pointerup' && nearest(e) === from) pick(points[from].when);
       // back to the single readout if the pointer's still over the graph
       var r = chart.getBoundingClientRect();
       if (e.pointerType === 'mouse' && e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) point(nearest(e));
@@ -461,6 +497,15 @@ permalink: /zetamac/
     chart.addEventListener('pointerleave', function () { if (span === null) point(null); });
     chart.addEventListener('blur', function () { point(null); });
     chart.addEventListener('keydown', function (e) {
+      // Enter on a round graphs it below (and doesn't start a new one)
+      if (e.key === 'Enter' && at !== null) {
+        e.preventDefault();
+        e.stopPropagation();
+        var i0 = at;
+        pick(points[i0].when);
+        point(i0);
+        return;
+      }
       if (!points.length || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
       e.preventDefault();
       var i = at === null ? points.length - 1 : at + (e.key === 'ArrowLeft' ? -1 : 1);
@@ -506,10 +551,150 @@ permalink: /zetamac/
       clearTimeout(clearing);
       clearing = null;
       clear.textContent = 'Clear';
+      picked = null;
       if (demo) demoList = [];
       else try { localStorage.removeItem(HISTORY_KEY); } catch (e) {}
       drawHistory(false);
       startButton.focus();
+    });
+
+    // The round graph: a dot for each problem, at the time into the round it
+    // was answered and as high as the seconds it took, a line through them
+    // over the same fading fill, and the average dashed across in a pill.
+    // A hairline follows the pointer (or the arrow keys) to show each
+    // problem, how long it took and when
+    var roundBox = document.getElementById('zm-round');
+    var roundTitle = document.getElementById('zm-round-title');
+    var roundLatest = document.getElementById('zm-round-latest');
+    var roundStats = document.getElementById('zm-round-stats');
+    var roundChart = document.getElementById('zm-round-chart');
+    var picked = null;  // when the round graphed was played; null for the latest
+    var laps = [], lapAt = null, lapTip, lapGuide, lapRing;
+
+    function pickedIndex(list) {
+      for (var i = 0; i < list.length; i++) if (list[i][1] === picked) return i;
+      return list.length - 1;
+    }
+    function pick(t) {
+      picked = t;
+      drawHistory(false);
+    }
+    roundLatest.addEventListener('click', function () {
+      pick(null);
+      startButton.focus();
+    });
+
+    function secs(v) { return (Math.round(v * 10) / 10) + 's'; }
+    function mmss(t) { var s = Math.floor(t); return Math.floor(s / 60) + ':' + ('0' + s % 60).slice(-2); }
+
+    function drawRound(list, drawingIn) {
+      roundChart.textContent = '';
+      roundStats.textContent = '';
+      laps = [];
+      lapAt = null;
+      roundBox.hidden = !list.length;
+      if (!list.length) return;
+      var i = pickedIndex(list), r = list[i], isLatest = i === list.length - 1;
+      roundTitle.textContent = isLatest ? 'Last round' : when(r[1]);
+      roundLatest.hidden = isLatest;
+      var done = Array.isArray(r[2]) ? r[2] : null, length = r[3] || 120;
+      roundChart.setAttribute('aria-label', 'Seconds each problem took: none to show.');
+      if (!done || !done.length) {
+        roundStats.textContent = done ? 'No problems answered this round.' : 'No timings were kept for this round.';
+        return;
+      }
+      var before = 0;
+      laps = done.map(function (m, k) {
+        var lap = { t: m[0], took: m[0] - before, text: m[1], n: k + 1 };
+        before = m[0];
+        return lap;
+      });
+      var took = laps.map(function (l) { return l.took; });
+      var avg = before / laps.length, fastest = Math.min.apply(null, took), slowest = Math.max.apply(null, took);
+      roundStats.textContent = 'score: ' + laps.length + ', avg: ' + secs(avg) + ', fastest: ' + secs(fastest) + ', slowest: ' + secs(slowest);
+      roundChart.setAttribute('aria-label', 'Seconds each problem took: ' + laps.length + ' problems, ' + secs(avg) + ' on average. Use the arrow keys to read each one.');
+
+      // the seconds up the side in whole steps, the time into the round along
+      // the bottom every 30 seconds (every quarter, in a shorter round)
+      var W = roundChart.clientWidth, H = 140, R = 44, T = 18, B = 24;
+      var step = slowest <= 4 ? 1 : slowest <= 10 ? 2 : 5, hi = Math.max(step, Math.ceil(slowest / step) * step);
+      var x = function (t) { return (W - R) * t / length; };
+      var y = function (v) { return T + (H - T - B) * (1 - v / hi); };
+      var svg = svgEl('svg', { width: W, height: H, viewBox: '0 0 ' + W + ' ' + H, 'aria-hidden': 'true', 'class': drawingIn && !still ? 'is-drawing' : '' }, roundChart);
+      var reveal = svgEl('clipPath', { id: 'zm-round-reveal' }, svgEl('defs', {}, svg));
+      svgEl('rect', { x: -10, y: -10, width: W + 20, height: H + 20, 'class': 'zm-reveal' }, reveal);
+      var avgY = y(avg);
+      for (var v = 0; v <= hi; v += step) {
+        svgEl('line', { x1: 0, x2: W, y1: y(v), y2: y(v), 'class': 'zm-grid' }, svg);
+        if (Math.abs(y(v) - 7 - avgY) > 14) svgEl('text', { x: W, y: y(v) - 7, 'class': 'zm-tick' }, svg).textContent = v + 's';
+      }
+      var every = length >= 60 ? 30 : length / 4;
+      for (var t = 0; t <= length; t += every) {
+        svgEl('text', { x: x(t), y: H - 6, 'class': 'zm-tick zm-tick-time' + (t === 0 ? ' is-first' : t + every > length ? ' is-last' : '') }, svg).textContent = mmss(t);
+      }
+      laps.forEach(function (l) { l.x = x(l.t); l.y = y(l.took); });
+      svgEl('line', { x1: 0, x2: W, y1: avgY, y2: avgY, 'class': 'zm-now zm-late' }, svg);
+      var drawn = svgEl('g', { 'clip-path': 'url(#zm-round-reveal)' }, svg);
+      if (laps.length > 1) {
+        var linePath = smooth(laps);
+        svgEl('path', { d: linePath + ' L' + laps[laps.length - 1].x + ',' + (H - B) + ' L' + laps[0].x + ',' + (H - B) + ' Z', 'class': 'zm-area' }, drawn);
+        svgEl('path', { d: linePath, 'class': 'zm-line zm-line-thin' }, drawn);
+      }
+      laps.forEach(function (l) { svgEl('circle', { cx: l.x, cy: l.y, r: 2.5, 'class': 'zm-lap' }, drawn); });
+      // the average in a pill at the right, on its dashed line
+      var badge = svgEl('g', { 'class': 'zm-badge zm-late' }, svg);
+      var pill = svgEl('rect', { y: avgY - 9, height: 18, rx: 9 }, badge);
+      var label = svgEl('text', { y: avgY }, badge);
+      label.textContent = secs(avg);
+      var pillW = label.getComputedTextLength() + 16;
+      pill.setAttribute('width', pillW);
+      pill.setAttribute('x', W - pillW);
+      label.setAttribute('x', W - pillW + 8);
+      lapGuide = svgEl('line', { y1: T, y2: H - B, 'class': 'zm-guide' }, svg);
+      lapRing = svgEl('circle', { r: 4, 'class': 'zm-dot' }, svg);
+      lapGuide.style.display = lapRing.style.display = 'none';
+      lapTip = document.createElement('div');
+      lapTip.className = 'zm-tip';
+      lapTip.hidden = true;
+      lapTip.value = lapTip.appendChild(document.createElement('strong'));
+      lapTip.when = lapTip.appendChild(document.createElement('span'));
+      roundChart.appendChild(lapTip);
+    }
+
+    function lap(i) {
+      if (!laps.length) return;
+      lapAt = i;
+      if (i === null) {
+        lapTip.hidden = true;
+        lapGuide.style.display = lapRing.style.display = 'none';
+        return;
+      }
+      var l = laps[i];
+      lapGuide.setAttribute('x1', l.x);
+      lapGuide.setAttribute('x2', l.x);
+      lapRing.setAttribute('cx', l.x);
+      lapRing.setAttribute('cy', l.y);
+      lapGuide.style.display = lapRing.style.display = '';
+      lapTip.value.textContent = secs(l.took);
+      lapTip.when.textContent = l.text + ', at ' + mmss(l.t);
+      lapTip.hidden = false;
+      var w = lapTip.offsetWidth;
+      lapTip.style.left = (l.x + 10 + w > roundChart.clientWidth ? l.x - 10 - w : l.x + 10) + 'px';
+      lapTip.style.top = Math.max(0, l.y - lapTip.offsetHeight / 2) + 'px';
+    }
+    roundChart.addEventListener('pointermove', function (e) {
+      if (!laps.length) return;
+      var mx = e.clientX - roundChart.getBoundingClientRect().left, best = 0;
+      laps.forEach(function (l, i) { if (Math.abs(l.x - mx) < Math.abs(laps[best].x - mx)) best = i; });
+      if (best !== lapAt) lap(best);
+    });
+    roundChart.addEventListener('pointerleave', function () { lap(null); });
+    roundChart.addEventListener('blur', function () { lap(null); });
+    roundChart.addEventListener('keydown', function (e) {
+      if (!laps.length || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
+      e.preventDefault();
+      var i = lapAt === null ? laps.length - 1 : lapAt + (e.key === 'ArrowLeft' ? -1 : 1);
+      lap(Math.max(0, Math.min(laps.length - 1, i)));
     });
 
     var resizing;
