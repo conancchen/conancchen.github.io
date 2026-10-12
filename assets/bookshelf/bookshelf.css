@@ -9,7 +9,7 @@
   --bs-bg: #fff;
   /* how far the books, the bookend, the crate and the list's lines blur and
      fade when they step back */
-  --bs-recede-blur: 2.5px;
+  --bs-recede-blur: 1px;
   --bs-recede-opacity: 0.6;
   /* the shadows on the wall behind the shelf: their color, and how dark */
   --bs-shadow: #000;
