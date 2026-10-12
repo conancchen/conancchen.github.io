@@ -31,7 +31,7 @@ permalink: /zetamac/
     <span class="zm-last" id="zm-last" hidden></span>
     <button type="button" class="zm-start" id="zm-start">Space to Start</button>
 
-    <!-- The last rounds played in this browser, oldest to latest -->
+    <!-- Every round played in this browser, oldest to latest -->
     <div class="zm-history" id="zm-history">
       <div class="zm-history-head">
         <h2 class="block-label block-label-plain">Recent</h2>
@@ -66,7 +66,6 @@ permalink: /zetamac/
     var demo = /[?&]demo\b/.test(location.search);
     var LENGTH = demo ? 15 : 120;  // seconds in a round
     var HISTORY_KEY = 'zetamac-history';
-    var KEEP = 30;  // rounds kept in the history
 
     var zm = document.getElementById('zm');
     var time = document.getElementById('zm-time');
@@ -126,7 +125,7 @@ permalink: /zetamac/
       return [v, Date.now() - (all.length - 1 - i) * 86400000, demoMarks, 120];
     });
     function readHistory() {
-      if (demo) return demoList.slice(-KEEP);
+      if (demo) return demoList;
       try {
         var list = JSON.parse(localStorage.getItem(HISTORY_KEY));
         return Array.isArray(list) ? list.filter(function (r) { return Array.isArray(r) && isFinite(r[0]); }) : [];
@@ -137,7 +136,7 @@ permalink: /zetamac/
     function remember(points) {
       var round = [points, Date.now(), marks, LENGTH];
       if (demo) { demoList.push(round); return; }
-      var list = readHistory().concat([round]).slice(-KEEP);
+      var list = readHistory().concat([round]);
       try { localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); } catch (e) {}
     }
 
