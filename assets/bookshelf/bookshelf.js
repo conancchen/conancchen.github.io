@@ -38,9 +38,9 @@
     onReorder: null,
     labels: {
       shelf: "A shelf of what I'm reading now and just finished",
-      reading: 'Recent reading',
+      reading: 'Recent Reading',
       current: 'Currently reading',
-      art: 'Selected art',
+      art: 'Selected Art',
       crate: 'Art'
     }
   };
@@ -486,8 +486,8 @@
       });
     }
 
-    // Hovering (or focusing) a book on the shelf pops it up, and the other
-    // lines in the list blur back; pressing a book pins it out that way until
+    // Hovering (or focusing) a book on the shelf picks it, and the other
+    // books and lines in the list blur back; pressing a book pins it that way until
     // it's pressed again, Esc, or a click anywhere else. Hovering or pressing
     // a line in the list does the same as hovering or pressing its book.
     // Hovering the crate pops its prints up a little; pressing it sends them

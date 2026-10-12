@@ -76,9 +76,8 @@
   fill: transparent;
 }
 
-/* The shadows on the wall slide along with their books and pop up and tip
-   with them (see .bs-book-lift), a little fainter for a book that's out,
-   off the wall */
+/* The shadows on the wall slide along with their books and come up with
+   them while they're dragged (see .bs-book-lift) */
 .bs-shadows {
   fill: var(--bs-shadow);
   opacity: var(--bs-shadow-strength);
@@ -86,10 +85,6 @@
 
 .bs-shadow {
   transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.bs-shadow.is-lifted {
-  opacity: 0.6;
 }
 
 .bs-shadow-lift {
@@ -140,17 +135,12 @@
   -webkit-user-select: none;
 }
 
-/* A hovered (or pinned) book pops up out of the row and tips back 10°,
-   pivoting on its bottom corner */
+/* A hovered (or pinned) book stays put on the shelf; only the others blur
+   back (see .bs-book-art) */
 .bs-book-lift {
   transform-box: fill-box;
   transform-origin: 0% 100%;
   transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.bs-book.is-picked .bs-book-lift,
-.bs-shadow.is-lifted .bs-shadow-lift {
-  transform: translate(-4px, -14px) rotate(-10deg);
 }
 
 /* A book being dragged comes up straight and forward off the shelf, out in
@@ -441,7 +431,7 @@
 .bs-label {
   margin: 28px 0 0;
   padding-bottom: 8px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: inherit;
 }
 
