@@ -1051,7 +1051,7 @@ $dot-center: calc(4px + 20px / 2);
 
 .zm-ready {
   position: relative;
-  padding-top: 16px;
+  padding-top: 18px;
 }
 
 // During a round the problem sits where the score and Start were, and all
@@ -1062,7 +1062,7 @@ $dot-center: calc(4px + 20px / 2);
   top: 0;
   left: 0;
   right: 0;
-  padding-top: 16px;
+  padding-top: 28px;
 }
 
 .zm.is-running .zm-ready > :not(.zm-play):not(#zm-round) {
@@ -1079,7 +1079,7 @@ $dot-center: calc(4px + 20px / 2);
   align-items: baseline;
   gap: 0.35em;
   font-size: 52px;
-  line-height: 60px;
+  line-height: 56px;
   letter-spacing: -0.5px;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -1129,21 +1129,17 @@ $dot-center: calc(4px + 20px / 2);
 
 // the last round's score, above Start
 .zm-last {
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   font-size: 52px;
-  line-height: 60px;
+  line-height: 56px;
   letter-spacing: -0.5px;
   font-variant-numeric: tabular-nums;
 }
 
-// before any round, the score's room is kept, empty
-.zm-last {
-  min-height: 60px;
-}
-
+// before any round there's no score, and no room kept for one: the problem
+// covers Start and the top of the history, both out of sight during a round
 .zm-last[hidden] {
-  display: block;
-  visibility: hidden;
+  display: none;
 }
 
 // Start: plain text, a little lighter under the pointer
@@ -1172,6 +1168,11 @@ $dot-center: calc(4px + 20px / 2);
 .zm-history {
   align-self: stretch;
   margin-top: 32px;
+}
+
+// Start sits midway between the time above it and Recent below it
+.zm-start + .zm-history {
+  margin-top: 18px;
 }
 
 .zm-history .block-label {
