@@ -3,13 +3,14 @@ layout: default
 title: Coursework
 subtitle: Coursework
 permalink: /coursework/
+sort: true
 ---
-<div class="courses">
+<div class="courses" id="by-semester">
   <div class="term">
     <span class="term-name">Fall 2026</span>
     <div class="term-courses">
       <div class="course">
-        <span class="course-title">Introduction to Real Analysis</span>
+        <span class="course-title">Intro to Real Analysis</span>
         <span class="course-code">mat320</span>
       </div>
       <div class="course">
@@ -30,25 +31,25 @@ permalink: /coursework/
   <div class="term">
     <span class="term-name">Spring 2026</span>
     <div class="term-courses">
-      <div class="course">
-        <span class="course-title">Theory of Games</span>
-        <span class="course-code">mat378</span>
+      <div class="course is-top">
+        <span class="course-title">Intro to Financial Mathematics <span class="course-grade">(A+)</span></span>
+        <span class="course-code">orf335</span>
       </div>
       <div class="course">
         <span class="course-title">Optimization</span>
         <span class="course-code">orf307</span>
       </div>
       <div class="course">
-        <span class="course-title">Introduction to Financial Mathematics</span>
-        <span class="course-code">orf335</span>
-      </div>
-      <div class="course">
-        <span class="course-title">Genomics</span>
-        <span class="course-code">qcb311</span>
+        <span class="course-title">Theory of Games</span>
+        <span class="course-code">mat378</span>
       </div>
       <div class="course">
         <span class="course-title">Data Intelligence: Modern Data Science</span>
         <span class="course-code">sml301</span>
+      </div>
+      <div class="course">
+        <span class="course-title">Genomics</span>
+        <span class="course-code">qcb311</span>
       </div>
     </div>
   </div>
@@ -57,24 +58,24 @@ permalink: /coursework/
     <span class="term-name">Fall 2025</span>
     <div class="term-courses">
       <div class="course">
-        <span class="course-title">The Roman Empire, 31 BC to AD 337</span>
-        <span class="course-code">cla219</span>
-      </div>
-      <div class="course">
         <span class="course-title">Algorithms & Data Structures</span>
         <span class="course-code">cos226</span>
-      </div>
-      <div class="course">
-        <span class="course-title">Econometrics: A Mathematical Approach</span>
-        <span class="course-code">eco312</span>
       </div>
       <div class="course">
         <span class="course-title">Probability & Stochastic Systems</span>
         <span class="course-code">orf309</span>
       </div>
       <div class="course">
-        <span class="course-title">Introductory Logic</span>
+        <span class="course-title">Econometrics: A Mathematical Approach</span>
+        <span class="course-code">eco312</span>
+      </div>
+      <div class="course is-top">
+        <span class="course-title">Introductory Logic <span class="course-grade">(A+)</span></span>
         <span class="course-code">phi201</span>
+      </div>
+      <div class="course">
+        <span class="course-title">The Roman Empire, 31 BC to AD 337</span>
+        <span class="course-code">cla219</span>
       </div>
     </div>
   </div>
@@ -82,25 +83,25 @@ permalink: /coursework/
   <div class="term">
     <span class="term-name">Spring 2025</span>
     <div class="term-courses">
+      <div class="course is-top">
+        <span class="course-title">Fundamentals of Statistics <span class="course-grade">(A+)</span></span>
+        <span class="course-code">orf245</span>
+      </div>
       <div class="course">
         <span class="course-title">Computer Science: An Interdisciplinary Approach</span>
         <span class="course-code">cos126</span>
-      </div>
-      <div class="course">
-        <span class="course-title">Introduction to Macroeconomics</span>
-        <span class="course-code">eco101</span>
       </div>
       <div class="course">
         <span class="course-title">Linear Algebra with Applications</span>
         <span class="course-code">mat202</span>
       </div>
       <div class="course">
-        <span class="course-title">Fundamentals of Statistics</span>
-        <span class="course-code">orf245</span>
-      </div>
-      <div class="course">
         <span class="course-title">General Physics II</span>
         <span class="course-code">phy104</span>
+      </div>
+      <div class="course">
+        <span class="course-title">Intro to Macroeconomics</span>
+        <span class="course-code">eco101</span>
       </div>
     </div>
   </div>
@@ -108,10 +109,6 @@ permalink: /coursework/
   <div class="term">
     <span class="term-name">Fall 2024</span>
     <div class="term-courses">
-      <div class="course">
-        <span class="course-title">American & Russian Science Fiction</span>
-        <span class="course-code">frs197</span>
-      </div>
       <div class="course">
         <span class="course-title">Multivariable Calculus</span>
         <span class="course-code">mat201</span>
@@ -121,9 +118,72 @@ permalink: /coursework/
         <span class="course-code">phy103</span>
       </div>
       <div class="course">
+        <span class="course-title">American & Russian Science Fiction</span>
+        <span class="course-code">frs197</span>
+      </div>
+      <div class="course">
         <span class="course-title">Writing Seminar</span>
         <span class="course-code">wri183</span>
       </div>
     </div>
   </div>
 </div>
+
+<div class="courses" id="by-subject" hidden></div>
+
+<script>
+  // The same courses grouped by subject instead, built from the semesters
+  // above. Within a subject they come in the order its list gives, and any
+  // not listed follow, newest first. The choice of grouping is remembered on
+  // this device.
+  (function () {
+    // A course not listed anywhere lands in the last subject
+    var SUBJECTS = [
+      { name: 'ORFE', codes: ['orf418', 'orf455', 'orf375', 'orf335', 'orf307', 'orf309', 'orf245'] },
+      { name: 'Math & CS', codes: ['mat320', 'mat378', 'sml301', 'cos226', 'cos126', 'mat202', 'mat201'] },
+      { name: 'Other', codes: ['eco312', 'qcb311'] }
+    ];
+    var bySemester = document.getElementById('by-semester');
+    var bySubject = document.getElementById('by-subject');
+    var groups = SUBJECTS.map(function () { return []; });
+
+    bySemester.querySelectorAll('.term').forEach(function (term) {
+      term.querySelectorAll('.course').forEach(function (course) {
+        var code = course.querySelector('.course-code').textContent.trim();
+        var i = SUBJECTS.findIndex(function (s) { return s.codes.indexOf(code) !== -1; });
+        var at = i === -1 ? SUBJECTS.length - 1 : i;
+        var rank = SUBJECTS[at].codes.indexOf(code);
+        groups[at].push({ node: course.cloneNode(true), rank: rank === -1 ? Infinity : rank, seen: groups[at].length });
+      });
+    });
+
+    SUBJECTS.forEach(function (subject, i) {
+      if (!groups[i].length) return;
+      var term = document.createElement('div');
+      term.className = 'term';
+      term.innerHTML = '<span class="term-name"></span><div class="term-courses"></div>';
+      term.querySelector('.term-name').textContent = subject.name;
+      groups[i].sort(function (a, b) { return a.rank - b.rank || a.seen - b.seen; });
+      groups[i].forEach(function (course) { term.querySelector('.term-courses').appendChild(course.node); });
+      bySubject.appendChild(term);
+    });
+
+    // The funnel by the back button flips between the two groupings
+    var button = document.getElementById('sort-button');
+    function show(view) {
+      var bySubjectNow = view === 'subject';
+      bySemester.hidden = bySubjectNow;
+      bySubject.hidden = !bySubjectNow;
+      var label = bySubjectNow ? 'Group by semester' : 'Group by subject';
+      button.setAttribute('aria-pressed', bySubjectNow);
+      button.setAttribute('aria-label', label);
+      button.title = label;
+    }
+    button.addEventListener('click', function () {
+      var view = bySubject.hidden ? 'subject' : 'semester';
+      show(view);
+      try { localStorage.setItem('course-view', view); } catch (e) {}
+    });
+    try { if (localStorage.getItem('course-view') === 'subject') show('subject'); } catch (e) {}
+  })();
+</script>

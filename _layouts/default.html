@@ -45,6 +45,11 @@
       <div class="header-row">
         <h1 translate="no">{{ page.heading | default: site.name }}</h1>
         <div class="header-actions">
+        {% if page.sort %}<button type="button" class="icon-button" id="sort-button" aria-pressed="false" aria-label="Group by subject" title="Group by subject">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+          </svg>
+        </button>{% endif %}
         {% unless page.home %}<a class="icon-button" href="{{ site.baseurl }}/" aria-label="Back to the home page" title="Back">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="7 3 3 7 7 11"></polyline>
@@ -152,7 +157,7 @@
     // Staggers the fade-in: numbers each piece in page order so the CSS can
     // delay it, then starts them all at once.
     if (document.documentElement.classList.contains('anim-hide')) {
-      var pieces = document.querySelectorAll('.subtitle, .header-actions, .bio, .block, .rule, .updated, .webring, .term');
+      var pieces = document.querySelectorAll('.subtitle, .header-actions, .bio, .block, .bs-cabinet, .bs-list, .rule, .updated, .webring, .term');
       for (var i = 0; i < pieces.length; i++) pieces[i].style.setProperty('--i', Math.min(i, 12));
       document.documentElement.classList.add('anim-play');
       document.documentElement.classList.remove('anim-hide');

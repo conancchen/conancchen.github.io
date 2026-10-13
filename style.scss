@@ -12,6 +12,7 @@
   --muted: #8a8a8a;
   --rule: #e0dfdb;
   --link: #6f6e6a;
+  --top: #2f74d0;  // the A+ courses: the site's blue, a shade deeper to read as text
   --swim: #2a78d6;  // the sports' colors
   --bike: #006e00;
   --run: #e8605f;
@@ -144,7 +145,7 @@ a:focus {
 // The layout's script numbers the pieces (--i) and swaps anim-hide for anim-play.
 // The name in the header isn't one of them: it holds still, so moving between
 // here, /strava and /study only changes what's under it
-$reveal: '.subtitle, .header-actions, .bio, .block, .rule, .updated, .webring, .term';
+$reveal: '.subtitle, .header-actions, .bio, .block, .bs-cabinet, .bs-list, .rule, .updated, .webring, .term';
 
 .anim-hide {
   #{$reveal} {
@@ -227,7 +228,8 @@ $reveal: '.subtitle, .header-actions, .bio, .block, .rule, .updated, .webring, .
   flex-shrink: 0;
 }
 
-.icon-button:hover {
+.icon-button:hover,
+.icon-button[aria-pressed="true"] {
   color: var(--text);
 }
 
@@ -657,11 +659,15 @@ $dot-center: calc(4px + 20px / 2);
 /**************/
 /* COURSEWORK */
 /**************/
-// Each term is a row: its name in a gutter on the left, its courses stacked
-// beside it. The rule above a term spans both columns; courses inside a term
-// are separated by space alone.
+// Each semester (or subject) is a row: its name in a gutter on the left, its
+// courses stacked beside it with their codes on the right; the rows are set
+// apart by space alone
 .courses {
   margin-top: 16px;
+}
+
+.courses[hidden] {
+  display: none;
 }
 
 .term {
@@ -670,11 +676,6 @@ $dot-center: calc(4px + 20px / 2);
   gap: 8px;
   align-items: start;
   padding: 12px 0;
-}
-
-// A thin rule between one semester and the next
-.term + .term {
-  border-top: 1px solid var(--rule);
 }
 
 .term-name {
@@ -697,9 +698,14 @@ $dot-center: calc(4px + 20px / 2);
 
 .course-code {
   color: var(--muted);
-  font-size: 14px;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+
+// The A+ courses are set in blue, name and code, and say so after the name
+.is-top .course-title,
+.is-top .course-code {
+  color: var(--top);
 }
 
 #copy-toast {
@@ -723,7 +729,7 @@ $dot-center: calc(4px + 20px / 2);
     padding: 32px 24px 40px;
   }
 
-  // No room for a gutter, so the term name sits above its courses
+  // No room for a gutter, so a semester's name sits above its courses
   .term {
     grid-template-columns: 1fr;
     gap: 0;
