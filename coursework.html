@@ -3,8 +3,9 @@ layout: default
 title: Coursework
 subtitle: Coursework
 permalink: /coursework/
-sort: true
 ---
+<p class="sort-line">sort by <button type="button" id="sort-toggle" aria-label="Group by subject instead" title="Group by subject instead">semester</button></p>
+
 <div class="courses" id="by-semester">
   <div class="term">
     <span class="term-name" title="Fall 2026">F26</span>
@@ -168,20 +169,39 @@ sort: true
       bySubject.appendChild(term);
     });
 
-    // The funnel by the back button flips between the two groupings
-    var button = document.getElementById('sort-button');
-    function show(view) {
-      var bySubjectNow = view === 'subject';
-      bySemester.hidden = bySubjectNow;
-      bySubject.hidden = !bySubjectNow;
-      var label = bySubjectNow ? 'Group by semester' : 'Group by subject';
-      button.setAttribute('aria-pressed', bySubjectNow);
-      button.setAttribute('aria-label', label);
-      button.title = label;
+    // The word in the line above the courses names the grouping showing;
+    // pressing it scrambles into the other one as the courses switch over
+    var toggle = document.getElementById('sort-toggle');
+
+    // Switching takes this long: the word scrambles while the rows of the
+    // grouping coming in all fade in together, and both finish at once
+    var SWITCH_MS = 1000;
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function fadeIn(list) {
+      if (reduceMotion) return;
+      list.querySelectorAll('.term').forEach(function (term) {
+        term.style.animation = 'none';
+        void term.offsetWidth;  // lets the fade start over
+        term.style.animation = 'blur-in ' + SWITCH_MS + 'ms ease-in-out';
+      });
     }
-    button.addEventListener('click', function () {
+
+    function show(view, animate) {
+      bySemester.hidden = view === 'subject';
+      bySubject.hidden = view !== 'subject';
+      var other = view === 'subject' ? 'semester' : 'subject';
+      toggle.setAttribute('aria-label', 'Group by ' + other + ' instead');
+      toggle.title = 'Group by ' + other + ' instead';
+      if (animate) {
+        fadeIn(view === 'subject' ? bySubject : bySemester);
+        window.scrambleSwap([[toggle, view]], SWITCH_MS);
+      } else {
+        toggle.textContent = view;
+      }
+    }
+    toggle.addEventListener('click', function () {
       var view = bySubject.hidden ? 'subject' : 'semester';
-      show(view);
+      show(view, true);
       try { localStorage.setItem('course-view', view); } catch (e) {}
     });
     try { if (localStorage.getItem('course-view') === 'subject') show('subject'); } catch (e) {}

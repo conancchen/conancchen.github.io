@@ -196,7 +196,7 @@ a:focus {
 // The layout's script numbers the pieces (--i) and swaps anim-hide for anim-play.
 // The name in the header isn't one of them: it holds still, so moving between
 // here, /strava and /study only changes what's under it
-$reveal: '.subtitle, .header-actions, .bio, .block, .bs-cabinet, .bs-list, .rule, .updated, .webring, .term';
+$reveal: '.subtitle, .header-actions, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .updated, .webring, .term';
 
 .anim-hide {
   #{$reveal} {
@@ -785,6 +785,26 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 /**************/
 /* COURSEWORK */
 /**************/
+// Above the courses, a line in muted gray names the grouping showing; pressing the
+// name switches to the other
+.sort-line {
+  color: var(--muted);
+  margin: 16px 0 0;
+}
+
+.sort-line button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sort-line button:hover {
+  color: var(--text);
+}
+
 // Each semester (or subject) is a row: its name in a gutter on the left, its
 // courses stacked beside it with their codes on the right; the rows are set
 // apart by space alone
