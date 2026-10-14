@@ -26,7 +26,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100..800&display=swap">
 
   <!-- Build timestamp busts the browser cache whenever the site is rebuilt -->
   <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/style.css?v={{ site.time | date: '%s' }}" />
@@ -162,6 +162,101 @@
       document.documentElement.classList.add('anim-play');
       document.documentElement.classList.remove('anim-hide');
     }
+  </script>
+
+  <script>
+    // Font picker, only when the site is served locally: a menu in the corner
+    // that loads a font from Google Fonts and swaps it in, remembered across
+    // pages, for trying fonts against the one style.scss sets (--font)
+    (function () {
+      if (!/^(localhost|127\.0\.0\.1|0\.0\.0\.0)$/.test(location.hostname)) return;
+
+      var SANS = ", -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif";
+      var MONO = ", 'SF Mono', Menlo, Consolas, monospace";
+      // Each choice sets the text's font, and optionally a second font for
+      // the small data-like bits (years, dates, course codes, the clock);
+      // without one, those stay in the text's font
+      var INTER = { name: 'Inter', family: 'Inter:wght@100..900', stack: SANS };
+      // A mono font's space is as wide as a letter, so its spaces are drawn
+      // in a little (spacing, a word-spacing)
+      var JETBRAINS = { name: 'JetBrains Mono', family: 'JetBrains+Mono:wght@100..800', stack: MONO, adjust: 0.53, spacing: '-0.15em' };  // 0.5px smaller: its x-height is 0.55, scaled by 13.5/14
+      var FIRA = { name: 'Fira Code', family: 'Fira+Code:wght@300..700', stack: MONO, spacing: '-0.15em' };
+      var FONTS = [
+        { label: 'Inter', text: INTER },
+        { label: 'Inter + mono accents', text: INTER, accent: JETBRAINS },
+        { label: 'JetBrains Mono', text: JETBRAINS },
+        { label: 'Fira Code', text: FIRA }
+      ];
+      var KEY = 'dev-font';
+      var loaded = {};
+      var root = document.documentElement;
+
+      function load(font) {
+        if (loaded[font.name]) return;
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://fonts.googleapis.com/css2?family=' + font.family + '&display=swap';
+        document.head.appendChild(link);
+        loaded[font.name] = true;
+      }
+
+      function setVar(prop, value) {
+        if (value) root.style.setProperty(prop, value);
+        else root.style.removeProperty(prop);
+      }
+
+      // (A font without its own size or spacing says so outright, so the
+      // site's own JetBrains Mono settings don't carry over to it)
+      function set(prop, font) {
+        if (font) load(font);
+        setVar(prop, font && "'" + font.name + "'" + font.stack);
+        setVar(prop + '-adjust', font && (font.adjust || 'none'));
+        setVar(prop + '-spacing', font && (font.spacing || 'normal'));
+      }
+
+      function apply(choice) {
+        set('--font', choice.text);
+        set('--font-accent', choice.accent);
+        try { localStorage.setItem(KEY, choice.label); } catch (e) {}
+        window.dispatchEvent(new Event('fontchange'));
+      }
+
+      var picker = document.createElement('select');
+      picker.setAttribute('aria-label', 'Font');
+      picker.style.cssText = 'position:fixed;right:12px;bottom:12px;z-index:2147483647;' +
+        'font:13px -apple-system,BlinkMacSystemFont,sans-serif;padding:6px 8px;' +
+        'border:1px solid #d8d6d0;border-radius:8px;background:#fff;color:#16150f;' +
+        'box-shadow:0 2px 8px rgba(0,0,0,0.08)';
+      FONTS.forEach(function (font) {
+        var option = document.createElement('option');
+        option.value = font.label;
+        option.textContent = font.label;
+        picker.appendChild(option);
+      });
+      picker.addEventListener('change', function () {
+        apply(FONTS.filter(function (f) { return f.label === picker.value; })[0]);
+      });
+      document.body.appendChild(picker);
+
+      // ?font=JetBrains+Mono in the address picks one straight away (by its label)
+      var saved = new URLSearchParams(location.search).get('font');
+      if (!saved) try { saved = localStorage.getItem(KEY); } catch (e) {}
+      var start = FONTS.filter(function (f) { return f.label === saved; })[0];
+      picker.value = 'JetBrains Mono';  // what the site uses
+      if (start && start.label !== 'JetBrains Mono') {
+        picker.value = start.label;
+        apply(start);
+      }
+
+      // Arrow keys step through the fonts without opening the menu
+      document.addEventListener('keydown', function (e) {
+        if (!e.altKey || (e.key !== 'ArrowDown' && e.key !== 'ArrowUp')) return;
+        e.preventDefault();
+        var i = picker.selectedIndex + (e.key === 'ArrowDown' ? 1 : -1);
+        picker.selectedIndex = (i + FONTS.length) % FONTS.length;
+        apply(FONTS[picker.selectedIndex]);
+      });
+    })();
   </script>
 </body>
 

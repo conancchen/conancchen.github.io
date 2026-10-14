@@ -7,7 +7,13 @@
 // The site is light only
 :root {
   color-scheme: light;
-  --bg: #fff;
+  // JetBrains Mono, set half a pixel smaller than its size says (its
+  // x-height is 0.55, scaled by 13.5/14) and with its letter-wide spaces
+  // drawn in a little
+  --font: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
+  --font-adjust: 0.53;
+  --font-spacing: -0.15em;
+  --bg: #fcfbf8;  // a warm white, like paper
   --text: #16150f;
   --muted: #8a8a8a;
   --rule: #e0dfdb;
@@ -52,6 +58,49 @@ $cursor-dot: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' w
   box-sizing: border-box;
 }
 
+// A font can be set a touch smaller than its size says (--font-adjust, by
+// x-height), everywhere: forced, since controls reset it with font: inherit
+body,
+body * {
+  font-size-adjust: var(--font-adjust, none) !important;
+}
+
+// and a font's spaces drawn in a little (--font-spacing), as a mono font's
+// are as wide as a letter
+body {
+  word-spacing: var(--font-spacing, normal);
+}
+
+// The small data-like bits (dates, years, course codes, race splits, the
+// clock) can take a second font, --font-accent; without one they stay in the
+// text's own
+.subtitle,
+.subtitle *,
+.updated,
+.updated *,
+.row-year,
+.row-year *,
+.course-code,
+.course-code *,
+#by-semester .term-name,
+#by-semester .term-name *,
+.pc-date,
+.pc-date *,
+.pc-total,
+.pc-total *,
+.pc-dist,
+.pc-dist *,
+.pc-time,
+.pc-time *,
+.pc-pace,
+.pc-pace *,
+.pc-rank,
+.pc-rank * {
+  font-family: var(--font-accent, var(--font));
+  font-size-adjust: var(--font-accent-adjust, var(--font-adjust, none)) !important;
+  word-spacing: var(--font-accent-spacing, var(--font-spacing, normal));
+}
+
 // Mobile browsers otherwise inflate long paragraphs (the bio) but not short
 // lines (the heading), so the two stop matching on phones
 html {
@@ -63,9 +112,9 @@ body {
   margin: 0;
   background-color: var(--bg);
   color: var(--text);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  font-family: var(--font);
   font-size: 14px;
-  // Inter's variable weight sits just above regular, on a 20px line, a hair
+  // The variable weight sits just above regular, on a 20px line, a hair
   // tight, matching chanbin.xyz
   font-weight: 436;
   line-height: calc(20 / 14);
@@ -95,20 +144,22 @@ a:focus {
   opacity: 0.7;
 }
 
-// Bio links read as body text with a faint underline that darkens on hover
+// Bio links read as body text with a dashed underline, like a link in a
+// terminal or a man page, that turns solid and dark on hover
 .bio a {
   color: var(--text);
-  text-decoration: underline;
-  text-decoration-color: var(--rule);
+  text-decoration: underline dashed;
+  text-decoration-color: var(--muted);
   text-decoration-thickness: 1px;
   text-decoration-skip-ink: none;
-  text-underline-offset: 3px;
+  text-underline-offset: 4px;
   transition: text-decoration-color 0.15s ease;
 }
 
 .bio a:hover,
 .bio a:focus {
   opacity: 1;
+  text-decoration-style: solid;
   text-decoration-color: var(--text);
 }
 
@@ -247,8 +298,11 @@ $reveal: '.subtitle, .header-actions, .bio, .block, .bs-cabinet, .bs-list, .rule
   padding-top: 16px;
 }
 
+// The bio's lines sit a touch further apart than the rest (22px rather than
+// 20px), as running sentences read easier with room between them
 .bio p {
   margin: 0 0 14.4px;
+  line-height: calc(22 / 14);
   text-wrap: pretty;
 }
 
@@ -267,11 +321,7 @@ $reveal: '.subtitle, .header-actions, .bio, .block, .bs-cabinet, .bs-list, .rule
   font-size: 14px;
   font-weight: inherit;
   color: var(--muted);
-  margin: 0 0 8px;
-}
-
-.block-label-plain {
-  font-weight: inherit;
+  margin: 0 0 10px;
 }
 
 .row {
@@ -351,7 +401,7 @@ $reveal: '.subtitle, .header-actions, .bio, .block, .bs-cabinet, .bs-list, .rule
 
 // The experiences hang off a thin rail, one dot per entry, centred on its
 // first line: where I am now pulses in the pool's blue, what's coming is a
-// hollow dot on a dashed stretch of rail, and what's done is filled and muted
+// hollow dot on a dashed stretch of rail, and what's done is filled in black
 $dot: 7px;
 $dot-center: calc(4px + 20px / 2);
 
@@ -369,13 +419,23 @@ $dot-center: calc(4px + 20px / 2);
   border-left: 1px solid var(--rule);
 }
 
+// The rail stops at the edge of each dot instead of running behind it, so it
+// never shows through a dot dimmed by a hover
+$dot-top: calc(#{$dot-center} - #{$dot} / 2);
+$dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
+
+.timeline .entry:not(:first-of-type):not(:last-of-type)::before {
+  -webkit-mask-image: linear-gradient(to bottom, #000 $dot-top, transparent $dot-top, transparent $dot-bottom, #000 $dot-bottom);
+  mask-image: linear-gradient(to bottom, #000 $dot-top, transparent $dot-top, transparent $dot-bottom, #000 $dot-bottom);
+}
+
 .timeline .entry:first-of-type::before {
-  top: $dot-center;
+  top: $dot-bottom;
 }
 
 .timeline .entry:last-of-type::before {
   bottom: auto;
-  height: $dot-center;
+  height: $dot-top;
 }
 
 // The rail on to what's coming is a row of round dots
@@ -392,7 +452,9 @@ $dot-center: calc(4px + 20px / 2);
 // The dots run all the way to the next dot, so its own solid rail starts
 // from there
 .timeline .entry.is-next + .entry::before {
-  top: $dot-center;
+  top: $dot-bottom;
+  -webkit-mask-image: none;
+  mask-image: none;
 }
 
 .timeline .entry::after {
@@ -407,9 +469,9 @@ $dot-center: calc(4px + 20px / 2);
   transition: transform 0.18s ease, opacity 0.1s ease-in-out;
 }
 
-// What's done is green, like a finished task
+// What's done is filled in, in the text's black
 .timeline .entry.is-past::after {
-  background: rgb(52, 168, 83);
+  background: var(--text);
 }
 
 .timeline .entry.is-next::after {
@@ -587,24 +649,88 @@ $dot-center: calc(4px + 20px / 2);
 }
 
 .updated {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
   color: var(--muted);
   font-size: 12px;
   margin: 0;
   font-variant-numeric: tabular-nums;
 }
 
+// The swimmer's lap count, at the right end of the clock's line, just under
+// the water, flush with the years above it
+.lap-preview {
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.laps {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.laps:hover,
+.laps:focus-visible,
+.lap-preview.is-open .laps {
+  outline: none;
+  color: var(--text);
+}
+
+// The counter's card: a small one, opening up out of the counter and kept to
+// the right, flush with it, as the counter sits at the page's right edge
+.lap-preview .lap-card {
+  left: auto;
+  right: 0;
+  gap: 4px;
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  transform-origin: calc(100% - 20px) calc(100% + 16px);
+}
+
+.lc-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  line-height: 16px;
+}
+
+.lc-value {
+  color: var(--text);
+}
+
+// An odometer's dial in front of the count, sitting on the text's line
+.laps-icon {
+  width: 12px;
+  height: 12px;
+  margin-right: 4px;
+  vertical-align: -1.5px;
+}
+
 // The clock and the Princeton webring share the last line: clock on the
 // left, the ring's prev / home / next links on the right
 .footer {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
 }
 
 // Kept on the page for the ring's widget, but shrunk to a few pixels and
 // made fully transparent
+// Laid over the footer's right end rather than beside it, so it takes no room
+// and the lap count runs right to the edge
 .webring {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   align-items: center;
   gap: 0;
@@ -683,6 +809,12 @@ $dot-center: calc(4px + 20px / 2);
   padding: 4px 0;
 }
 
+// Semesters go by short names (F26, S25), so their gutter is narrow; the
+// subjects' longer names keep the wide one
+#by-semester .term {
+  grid-template-columns: 40px 1fr;
+}
+
 .course {
   display: flex;
   align-items: baseline;
@@ -758,11 +890,11 @@ $dot-center: calc(4px + 20px / 2);
   color: var(--text);
   font: inherit;
   cursor: pointer;
-  text-decoration: underline;
-  text-decoration-color: var(--rule);
+  text-decoration: underline dashed;
+  text-decoration-color: var(--muted);
   text-decoration-thickness: 1px;
   text-decoration-skip-ink: none;
-  text-underline-offset: 3px;
+  text-underline-offset: 4px;
   transition: text-decoration-color 0.15s ease;
 }
 
@@ -770,6 +902,7 @@ $dot-center: calc(4px + 20px / 2);
 .bio .preview-link:focus-visible,
 .preview.is-open .preview-link {
   outline: none;
+  text-decoration-style: solid;
   text-decoration-color: var(--text);
 }
 
@@ -781,7 +914,11 @@ $dot-center: calc(4px + 20px / 2);
   display: flex;
   flex-direction: column;
   gap: 10px;
-  width: 296px;
+  // As wide as its widest row needs, in whatever font, but never narrower
+  // than it was laid out for or wider than the screen
+  width: max-content;
+  min-width: 296px;
+  max-width: calc(100vw - 32px);
   padding: 16px 18px;
   border: 1px solid var(--rule);
   border-radius: 14px;
@@ -868,15 +1005,21 @@ $dot-center: calc(4px + 20px / 2);
 // pace beside it. Each time the card opens, the dots pop in one after another as the line
 // draws down to them.
 .pc-legs {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  display: grid;
+  // Each column as wide as its longest entry, lined up across the three legs
+  // (which share these columns), with an even gap between them and any room
+  // to spare before the pace. The figures are right-aligned, like a results
+  // sheet, so the units and the seconds line up down the card.
+  grid-template-columns: auto auto auto 1fr;
+  column-gap: 2ch;
+  row-gap: 6px;
 }
 
 .pc-leg {
   position: relative;
   display: grid;
-  grid-template-columns: 40px 52px 1fr auto;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
   padding-left: 18px;
 }
 
@@ -949,6 +1092,8 @@ $dot-center: calc(4px + 20px / 2);
   color: var(--text);
 }
 
+.pc-dist,
+.pc-time,
 .pc-pace {
   text-align: right;
 }
@@ -1249,6 +1394,7 @@ $dot-center: calc(4px + 20px / 2);
   text-anchor: end;
   fill: var(--muted);
   font-family: var(--zm-mono);
+  font-size-adjust: none !important;
   font-size: 10px;
   font-variant-numeric: tabular-nums;
   dominant-baseline: central;
@@ -1339,6 +1485,7 @@ $dot-center: calc(4px + 20px / 2);
 .zm-badge text {
   fill: #fff;
   font-family: var(--zm-mono);
+  font-size-adjust: none !important;
   font-size: 11px;
   font-variant-numeric: tabular-nums;
   dominant-baseline: central;

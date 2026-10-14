@@ -126,6 +126,28 @@
     if (!root) throw new Error('Bookshelf: no element to mount on');
     var o = merge(options);
     var uid = 'bs' + (++mounts);
+
+    // The spine titles, fitted again whenever the page's font changes (a
+    // different font sets the same title longer or shorter)
+    var titles = [];
+    function fitTitle(title, L, w, h) {
+      var size = Math.min(13, w * 0.55);
+      title.style.fontSize = size + 'px';
+      while (size > 7 && title.getComputedTextLength() > h - 18) {
+        size -= 0.5;
+        title.style.fontSize = size + 'px';
+      }
+      // centered across the spine at whatever size it came out
+      title.setAttribute('transform', 'translate(' + (L + w / 2 + size * 0.35) + ',' + (LINE - 9) + ') rotate(-90)');
+    }
+    function refitTitles() {
+      titles.forEach(function (t) { fitTitle(t[0], t[1], t[2], t[3]); });
+    }
+    if (document.fonts) {
+      document.fonts.ready.then(refitTitles);
+      document.fonts.addEventListener('loadingdone', refitTitles);
+    }
+    window.addEventListener('fontchange', refitTitles);
     var BOOKS = (o.books || []).map(function (b) { return normalizeBook(b, o.coverBase); });
     var ART = (o.art || []).map(function (a, i) { return normalizeArt(a, i, o.artBase); });
     var hasArt = ART.length > 0;
@@ -319,14 +341,8 @@
       var title = el('text', { x: 0, y: 0, 'class': 'bs-book-title' }, holder);
       title.textContent = b.title;
       title.style.fill = b.ink === 'dark' ? '#1a1a18' : '#fff';
-      var size = Math.min(13, w * 0.55);
-      title.style.fontSize = size + 'px';
-      while (size > 7 && title.getComputedTextLength() > h - 18) {
-        size -= 0.5;
-        title.style.fontSize = size + 'px';
-      }
-      // centered across the spine at whatever size it came out
-      title.setAttribute('transform', 'translate(' + (L + w / 2 + size * 0.35) + ',' + (LINE - 9) + ') rotate(-90)');
+      fitTitle(title, L, w, h);
+      titles.push([title, L, w, h]);
       groups[i] = g;
       widths[i] = w;
       x += w + GAP;

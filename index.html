@@ -1,7 +1,7 @@
 ---
 layout: default
 home: true
-subtitle: Updated Sep 2026
+subtitle: ORFE @ Princeton
 ---
 <section class="bio">
   <p>
@@ -11,24 +11,24 @@ subtitle: Updated Sep 2026
     Currently, I research humanoid robots in the <a href="https://pvl.cs.princeton.edu/" data-exp="pvl">Princeton Vision &amp; Learning Lab</a>. Previously, I interned at <a href="https://scale.com/" data-exp="scale">Scale AI</a>.
   </p>
   <p>
-    I also compete as a Division I swimmer and recreational triathlete. This summer, I finished my first <span class="preview"><button type="button" class="preview-link" aria-expanded="false" aria-controls="im-card">Ironman 70.3</button><span class="preview-card" id="im-card" role="tooltip">
+    I also compete as a Division I swimmer and recreational triathlete. Recently, I finished my first <span class="preview"><button type="button" class="preview-link" aria-expanded="false" aria-controls="im-card">Ironman 70.3</button><span class="preview-card" id="im-card" role="tooltip">
       <span class="pc-head"><span class="pc-title">Musselman 70.3</span><span class="pc-date">Jul 2026</span></span>
       <span class="pc-total">4:57:16</span>
       <span class="pc-legs">
-        <span class="pc-leg pc-swim"><span class="pc-name">Swim</span><span class="pc-dist">1.2 mi</span><span class="pc-time">27:45</span><span class="pc-pace">1:19 /100yd</span></span>
+        <span class="pc-leg pc-swim"><span class="pc-name">Swim</span><span class="pc-dist">1.2 mi</span><span class="pc-time">27:45</span><span class="pc-pace">1:19/100yd</span></span>
         <span class="pc-leg pc-bike"><span class="pc-name">Bike</span><span class="pc-dist">56 mi</span><span class="pc-time">2:38:56</span><span class="pc-pace">21.1 mph</span></span>
-        <span class="pc-leg pc-run"><span class="pc-name">Run</span><span class="pc-dist">13.1 mi</span><span class="pc-time">1:44:40</span><span class="pc-pace">7:59 /mi</span></span>
+        <span class="pc-leg pc-run"><span class="pc-name">Run</span><span class="pc-dist">13.1 mi</span><span class="pc-time">1:44:40</span><span class="pc-pace">7:59/mi</span></span>
       </span>
       <span class="pc-rank">159th of 1,943 overall</span>
-    </span></span> in under 5 hours.
+    </span></span>.
   </p>
   <p>
-    Find me on <a class="chip chip-rotating" id="social-link" href="https://www.linkedin.com/in/conan-chen"><span class="chip-icon-slot" id="social-icon"><svg class="chip-icon" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="3" fill="#0a66c2"/><path fill="#fff" d="M5.3 9.2h3v9.6h-3zM6.8 4.4a1.7 1.7 0 1 1 0 3.5 1.7 1.7 0 0 1 0-3.5zM10.2 9.2h2.9v1.3c.4-.8 1.4-1.6 2.9-1.6 3.1 0 3.6 2 3.6 4.6v5.3h-3v-4.7c0-1.1 0-2.6-1.6-2.6s-1.8 1.2-1.8 2.5v4.8h-3z"/></svg></span><span id="social-text">LinkedIn</span></a> or reach me <a class="chip email-link" href="#" id="email-link" onclick="copyEmail(event)"><svg class="chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span id="email-text">by email</span></a>.
+    Follow my <a class="chip chip-rotating" id="social-link" href="https://www.linkedin.com/in/conan-chen"><span class="chip-icon-slot" id="social-icon"><svg class="chip-icon" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="3" fill="#0a66c2"/><path fill="#fff" d="M5.3 9.2h3v9.6h-3zM6.8 4.4a1.7 1.7 0 1 1 0 3.5 1.7 1.7 0 0 1 0-3.5zM10.2 9.2h2.9v1.3c.4-.8 1.4-1.6 2.9-1.6 3.1 0 3.6 2 3.6 4.6v5.3h-3v-4.7c0-1.1 0-2.6-1.6-2.6s-1.8 1.2-1.8 2.5v4.8h-3z"/></svg></span><span id="social-text">LinkedIn</span></a> or reach me <a class="chip email-link" href="#" id="email-link" onclick="copyEmail(event)"><svg class="chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span id="email-text">by email</span></a>.
   </p>
 </section>
 
 <script>
-  // The "Find me on" chip turns over every few seconds between the places I
+  // The "Follow my" chip turns over every few seconds between the places I
   // can be found: the label scrambles into the next name while the icon pops
   // in and the chip eases to its new width. It holds still while hovered or
   // focused, so it never changes under a click, and stays on LinkedIn for
@@ -263,6 +263,41 @@ subtitle: Updated Sep 2026
     // side of the pool; after that the pool is left empty.
     (function () {
       var lane = document.getElementById('lane');
+      // The lap counter under the water, on the right, four digits like a
+      // pool's pace clock counting yards in 25s (a length of a short-course
+      // pool). A length is counted as it pushes off the wall at the end of
+      // it, however it began. Each length is timed push-off to push-off, for
+      // the average pace on the counter's card; one it was picked up or
+      // dropped into partway doesn't count toward the average. (The counter
+      // comes later in the page, so it's looked up there; the lengths swum
+      // ahead of time to fit the pace don't count.)
+      var laps = 0, timedLaps = 0, timedTotal = 0, lengthStart = null, rehearsing = false;
+      function show(id, text) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = text;
+      }
+      function lapDone() {
+        if (rehearsing) return;
+        laps++;
+        if (lengthStart !== null) {
+          timedLaps++;
+          timedTotal += time - lengthStart;
+        }
+        show('laps-count', String(laps * 25).padStart(4, '0'));
+        show('lc-laps', laps);
+        show('lc-yards', laps * 25);
+        if (timedLaps) {
+          var per100 = timedTotal / timedLaps * 4;
+          var m = Math.floor(per100 / 60), sec = per100 - 60 * m;
+          show('lc-pace', m + ':' + (sec < 10 ? '0' : '') + sec.toFixed(1));
+        }
+      }
+      // A fresh length: timed from here, and swum at a new pace
+      function pushOff(timed) {
+        if (rehearsing) return;
+        lengthStart = timed ? time : null;
+        newPace();
+      }
       var canvas = document.createElement('canvas');
       canvas.className = 'swimmer';
       lane.appendChild(canvas);
@@ -272,7 +307,10 @@ subtitle: Updated Sep 2026
       // the header, so the swimmer can be lifted that high; size() measures it
       var H = 81, WATER = 60, DEPTH_BELOW = 36;
       var MAX_LIFT = WATER - 16;   // px: shoulders as high as the canvas has room for
-      var LAP = 10;                // s for one length, turn included
+      // s for one length, turn included: each length is swum at a pace
+      // picked at random between 0:58 and 1:03 per 100 yards (four lengths)
+      var LAP_FAST = 58 / 4, LAP_SLOW = 63 / 4;
+      var LAP = (LAP_FAST + LAP_SLOW) / 2;
       var CYCLE = 1.9;             // s per stroke cycle (both arms)
       var RECOVERY = 0.26;         // share of each arm's cycle spent over the water
       // Each arm waits out front until the other has come back up nearly to
@@ -316,6 +354,17 @@ subtitle: Updated Sep 2026
       var TAU = 2 * Math.PI;
 
       var SPEED = 30;              // px/s swimming pace, fitted to LAP in size()
+      // The swimming paces that make a length take LAP_FAST and LAP_SLOW, and
+      // where between them this length is (a length's time goes as one over
+      // the pace, so it's that that's picked between)
+      var SPEED_FAST = 30, SPEED_SLOW = 30, paceAt = Math.random();
+      function setPace() {
+        SPEED = 1 / (1 / SPEED_FAST + (1 / SPEED_SLOW - 1 / SPEED_FAST) * paceAt);
+      }
+      function newPace() {
+        paceAt = Math.random();
+        setPace();
+      }
       var W = 0, x = ENTRY_X, dir = 1, mode = 'dive', modeTime = 0, phase = 0, pivot = 0;
       var entering = false;        // still sinking from the dive into the glide
       var splashed = false;        // the hands have hit the water on the dive
@@ -383,25 +432,34 @@ subtitle: Updated Sep 2026
         for (var t = 0; t < UNDER; t += 0.01) under += underwater(t) * 0.01;
         UNDER_DIST = under;
         var drift = 0.9 * FLIP / 2;
-        // (The length runs from 16px off one wall to 16px off the other, and
-        // the somersault itself sets the shoulders back a body length.)
-        SPEED = (W - 32 + BODY) / (drift + under + LAP - FLIP - UNDER);
-        // That estimate ignores where in the stroke each length starts and
-        // ends, which the uneven pulls of the gallop make matter, so search
-        // around it, timing a simulated length at each pace, for the pace
-        // that comes out right
-        var slow = SPEED / 2, fast = SPEED * 2;
-        for (var i = 0; i < 14; i++) {
-          SPEED = (slow + fast) / 2;
-          if (timeLength() > LAP) slow = SPEED;
-          else fast = SPEED;
+        // Done for the fastest and slowest a length can be, and each length's
+        // pace picked between them
+        function fit(lap) {
+          // (The length runs from 16px off one wall to 16px off the other,
+          // and the somersault itself sets the shoulders back a body length.)
+          SPEED = (W - 32 + BODY) / (drift + under + lap - FLIP - UNDER);
+          // That estimate ignores where in the stroke each length starts and
+          // ends, which the uneven pulls of the gallop make matter, so search
+          // around it, timing a simulated length at each pace, for the pace
+          // that comes out right
+          var slow = SPEED / 2, fast = SPEED * 2;
+          for (var i = 0; i < 14; i++) {
+            SPEED = (slow + fast) / 2;
+            if (timeLength() > lap) slow = SPEED;
+            else fast = SPEED;
+          }
+          return SPEED;
         }
+        SPEED_FAST = fit(LAP_FAST);
+        SPEED_SLOW = fit(LAP_SLOW);
+        setPace();
       }
 
       // Swims a length off-screen, from one turn to the next, and returns how
       // long it took; the swimmer is put back where it was afterwards
       function timeLength() {
         var saved = [x, dir, mode, modeTime, phase, pivot, time, pace, entering];
+        rehearsing = true;
         x = W / 2; dir = 1; mode = 'swim'; modeTime = 0; phase = 0; pace = 1; entering = false;
         var flips = [], clock = 0, was = mode;
         while (flips.length < 2 && clock < 120) {
@@ -410,6 +468,7 @@ subtitle: Updated Sep 2026
           if (mode === 'flip' && was !== 'flip') flips.push(clock);
           was = mode;
         }
+        rehearsing = false;
         x = saved[0]; dir = saved[1]; mode = saved[2]; modeTime = saved[3];
         phase = saved[4]; pivot = saved[5]; time = saved[6]; pace = saved[7]; entering = saved[8];
         return flips.length < 2 ? LAP : flips[1] - flips[0];
@@ -1075,6 +1134,7 @@ subtitle: Updated Sep 2026
           }
           if (modeTime >= FLIGHT) {
             mode = 'glide';
+            pushOff(true);
             modeTime = 0;
             x = ENTRY_X;
             dir = 1;
@@ -1175,7 +1235,8 @@ subtitle: Updated Sep 2026
                 entrySpeed = Math.min(Math.max(Math.abs(fall[0]) / SPEED, 1), 1.7);
                 drift = dir * fall[0] / SPEED;
                 mode = 'glide';
-                modeTime = 0;
+                pushOff(false);
+                    modeTime = 0;
                 entering = true;
                 breast = true;
               }
@@ -1197,6 +1258,7 @@ subtitle: Updated Sep 2026
             plunging = [-lift, fall[1]];
             lift = hang = swing = swingV = 0;
             mode = 'glide';
+            pushOff(false);
             modeTime = 0;
             entering = true;
           }
@@ -1224,6 +1286,8 @@ subtitle: Updated Sep 2026
             dir = -dir;
             x = pivot + dir * BODY / 2;
             mode = 'glide';
+            lapDone();
+            pushOff(true);
             modeTime = 0;
           }
         } else if (breast) {
@@ -1285,8 +1349,8 @@ subtitle: Updated Sep 2026
         }
       }
 
-      // It survives a fall from anywhere below the bio's last line ("Find me
-      // on"), measured as it lands, since that line rewraps as its chip
+      // It survives a fall from anywhere below the bio's last line ("Follow
+      // my"), measured as it lands, since that line rewraps as its chip
       // changes; from any higher, it's hurt
       function hurtHeight() {
         var last = document.querySelector('.bio p:last-child');
@@ -1373,6 +1437,25 @@ subtitle: Updated Sep 2026
         draw();
         return;
       }
+      // The counter shows once the swimmer's going. Hovering it, or pressing
+      // it, opens its card (laps, yards, average pace) above it; pressing
+      // again, anywhere else, or Esc closes it.
+      document.addEventListener('DOMContentLoaded', function () {
+        var counter = document.getElementById('laps');
+        var button = counter.querySelector('.laps');
+        counter.hidden = false;
+        function toggle(on) {
+          counter.classList.toggle('is-open', on);
+          button.setAttribute('aria-expanded', on);
+        }
+        button.addEventListener('click', function () { toggle(!counter.classList.contains('is-open')); });
+        document.addEventListener('click', function (e) {
+          if (!counter.contains(e.target)) toggle(false);
+        });
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape') toggle(false);
+        });
+      });
 
       // The water answers the pointer. A quick click drops a splash where it
       // lands. Pressing and holding freezes the swimmer where it is, and
@@ -1394,6 +1477,7 @@ subtitle: Updated Sep 2026
         // press has nothing to grab with
         if (!press || mode === 'hurt') return;
         held = true;
+        lengthStart = null;  // this length's time no longer counts
         injured = false;
         // Caught mid-somersault, it's held the right way up
         flip = flipTo = 0;
@@ -1553,7 +1637,7 @@ subtitle: Updated Sep 2026
     })();
   </script>
   <div class="footer">
-    <p class="updated" id="clock"><span id="clock-time"></span><span id="clock-in"> in </span><button type="button" class="clock-place" id="clock-place" title="Somewhere else">Princeton</button><span id="clock-diff"></span></p>
+    <p class="updated" id="clock"><span><span id="clock-time"></span><span id="clock-in"> in </span><button type="button" class="clock-place" id="clock-place" title="Somewhere else">Princeton</button><span id="clock-diff"></span></span><span class="preview lap-preview" id="laps" hidden><button type="button" class="laps" aria-expanded="false" aria-controls="lap-card" aria-label="Yards swum"><svg class="laps-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg><span id="laps-count">0000</span></button><span class="preview-card lap-card" id="lap-card" role="tooltip"><span class="lc-row"><span>Laps</span><span class="lc-value" id="lc-laps">0</span></span><span class="lc-row"><span>Yards</span><span class="lc-value" id="lc-yards">0</span></span><span class="lc-row"><span>Avg/100</span><span class="lc-value" id="lc-pace">&ndash;</span></span></span></span></p>
     <nav class="webring" aria-label="Princeton webring" data-princeton-webring>
       <a data-ring-prev href="https://firestoners.vercel.app/#https%3A%2F%2Fconancchen.github.io?nav=prev" aria-label="Previous website">&larr;</a>
       <a href="https://firestoners.vercel.app/#https%3A%2F%2Fconancchen.github.io" aria-label="Explore the Princeton webring">
