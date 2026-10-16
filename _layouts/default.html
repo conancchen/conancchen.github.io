@@ -37,10 +37,20 @@
   <link rel="icon" type="image/png" sizes="16x16" href="{{ site.baseurl }}/images/favicon-16.png">
   <link rel="icon" type="image/png" sizes="192x192" href="{{ site.baseurl }}/images/favicon-192.png">
   <link rel="apple-touch-icon" href="{{ site.baseurl }}/images/apple-touch-icon.png">
+
+  <!-- Loads the site's other pages ahead of a click (all of them as soon as
+       the page is up, and fully renders one when the pointer rests on its
+       link), so switching to it is near instant -->
+  <script type="speculationrules">
+  {
+    "prefetch": [{ "where": { "href_matches": "/*" }, "eagerness": "eager" }],
+    "prerender": [{ "where": { "href_matches": "/*" }, "eagerness": "moderate" }]
+  }
+  </script>
 </head>
 
 <body>
-  <div class="page">
+  <div class="page{% if page.quick_entrance %} quick-entrance{% endif %}">
     <header class="header">
       <div class="header-row">
         <h1 translate="no">{{ page.heading | default: site.name }}</h1>
@@ -152,20 +162,50 @@
 
     // Staggers the fade-in: numbers each piece in page order so the CSS can
     // delay it, then starts them all at once.
-    if (document.documentElement.classList.contains('anim-hide')) {
-      var pieces = document.querySelectorAll('.subtitle, .header-actions, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .updated, .webring, .term');
+    var root = document.documentElement;
+    // The name only types itself out on arriving at the site, not on coming
+    // back to the home page from one of its other pages
+    var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+    var fromSite = false;
+    try { fromSite = new URL(document.referrer).origin === location.origin; } catch (e) {}
+    var returning = fromSite || (nav && nav.type === 'back_forward');
+    function playEntrance() {
+      var pieces = document.querySelectorAll('.subtitle, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .updated, .webring, .term');
       for (var i = 0; i < pieces.length; i++) pieces[i].style.setProperty('--i', Math.min(i, 12));
-      document.documentElement.classList.add('anim-play');
-      document.documentElement.classList.remove('anim-hide');
-      {% if page.home %}typeName();{% endif %}
+      root.classList.add('anim-play');
+      root.classList.remove('anim-hide');
+      {% if page.home %}if (!returning) typeName();{% endif %}
+    }
+
+    if (root.classList.contains('anim-hide')) {
+      // A page loaded ahead of the click waits until it's actually shown,
+      // so the switch cuts straight to it and the entrance plays from there
+      if (document.prerendering) {
+        document.addEventListener('prerenderingchange', playEntrance, { once: true });
+      } else {
+        playEntrance();
+      }
+
+      // Coming back to a page the browser kept in memory plays it again too
+      window.addEventListener('pageshow', function (event) {
+        if (!event.persisted) return;
+        returning = true;
+        root.classList.add('anim-hide');
+        root.classList.remove('anim-play');
+        void root.offsetWidth;  // lets the restart take
+        playEntrance();
+      });
     }
 
     // On the home page the name types itself out, a letter at a time behind
     // a caret, which blinks twice once it's done and goes (only there: on the other pages the name holds still, as the page
     // changes under it)
+    var typeTimers = [];
     function typeName() {
+      typeTimers.forEach(clearInterval);  // a replay starts the typing over
       var h1 = document.querySelector('.header h1');
-      var name = h1.textContent;
+      // The label holds the whole name if it's replayed mid-type
+      var name = h1.getAttribute('aria-label') || h1.textContent;
       var TYPE_MS = 75;  // per letter
       h1.setAttribute('aria-label', name);
       h1.textContent = '';
@@ -190,7 +230,9 @@
           h1.textContent = name;
           h1.removeAttribute('aria-label');
         }, 400);
+        typeTimers.push(blink);
       }, TYPE_MS);
+      typeTimers = [id];
     }
   </script>
 </body>

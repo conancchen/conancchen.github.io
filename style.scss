@@ -178,9 +178,9 @@ a:focus {
 
 // The page comes in piece by piece, each one coming into focus a beat after the last.
 // The layout's script numbers the pieces (--i) and swaps anim-hide for anim-play.
-// The name in the header isn't one of them: it holds still, so moving between
-// here, /strava and /study only changes what's under it
-$reveal: '.subtitle, .header-actions, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .updated, .webring, .term';
+// The name in the header and the back arrow aren't among them: they hold still,
+// so moving between here, /strava and /study only changes what's under them
+$reveal: '.subtitle, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .updated, .webring, .term';
 
 .anim-hide {
   #{$reveal} {
@@ -192,6 +192,15 @@ $reveal: '.subtitle, .header-actions, .sort-line, .bio, .block, .bs-cabinet, .bs
   #{$reveal} {
     animation: enter 0.6s backwards;
     animation-delay: calc(var(--i, 0) * 120ms);
+  }
+}
+
+// Pages that set quick_entrance in their front matter (coursework) play it
+// three times as fast: each piece in 0.2s, 40ms after the one before
+.anim-play .quick-entrance {
+  #{$reveal} {
+    animation-duration: 0.2s;
+    animation-delay: calc(var(--i, 0) * 40ms);
   }
 }
 
@@ -287,16 +296,6 @@ $reveal: '.subtitle, .header-actions, .sort-line, .bio, .block, .bs-cabinet, .bs
 .icon-button:hover,
 .icon-button[aria-pressed="true"] {
   color: var(--text);
-}
-
-// Moving between pages on this site (and /strava, /study) keeps the name in
-// place while the rest swaps
-@view-transition {
-  navigation: auto;
-}
-
-.header h1 {
-  view-transition-name: site-name;
 }
 
 // The name sits as far above the bio as its paragraphs sit apart (14.4px):
