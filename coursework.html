@@ -4,7 +4,7 @@ title: Coursework
 subtitle: Coursework
 permalink: /coursework/
 ---
-<p class="sort-line">sort by <button type="button" id="sort-toggle" aria-label="Group by subject instead" title="Group by subject instead">semester</button></p>
+<p class="sort-line"><button type="button" id="sort-toggle" aria-label="Group by subject instead" title="Group by subject instead"><span id="sort-label">sort by</span> <span id="sort-view">semester</span></button></p>
 
 <div class="courses" id="by-semester">
   <div class="term">
@@ -169,9 +169,12 @@ permalink: /coursework/
       bySubject.appendChild(term);
     });
 
-    // The word in the line above the courses names the grouping showing;
-    // pressing it scrambles into the other one as the courses switch over
+    // The line above the courses names the grouping showing; it's one
+    // button, and pressing it scrambles the whole line into the other
+    // grouping as the courses switch over
     var toggle = document.getElementById('sort-toggle');
+    var label = document.getElementById('sort-label');
+    var viewName = document.getElementById('sort-view');
 
     // Switching takes this long: the word scrambles while the rows of the
     // grouping coming in all fade in together, and both finish at once
@@ -194,9 +197,9 @@ permalink: /coursework/
       toggle.title = 'Group by ' + other + ' instead';
       if (animate) {
         fadeIn(view === 'subject' ? bySubject : bySemester);
-        window.scrambleSwap([[toggle, view]], SWITCH_MS);
+        window.scrambleSwap([[label, 'sort by'], [viewName, view]], SWITCH_MS);
       } else {
-        toggle.textContent = view;
+        viewName.textContent = view;
       }
     }
     toggle.addEventListener('click', function () {

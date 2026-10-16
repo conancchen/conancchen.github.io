@@ -1,12 +1,14 @@
 # What's on the bookshelf: what I'm reading now, then what I just finished.
 # Each book is drawn as a spine on the shelf (only the title is required):
-#   author  shown under the title in the list
+#   author  shown under the title in the list, and its last name up the spine
+#   spine   what's printed up the spine instead, for a surname of more than
+#           one word
 #   cover   the cover picture shown in the list, in images/books
 #   color   the spine's color, as #rrggbb
 #   ink     light or dark text on it (picked from the color if left out)
 #   pages   how many pages it has (its thickness on the shelf follows)
 #   height  how tall it stands, 90 to 180 (the shelf is 190 high)
-#   current true while I'm still reading it ("Currently reading" in the list)
+#   current true while I'm still reading it (listed under Current Reading)
 #   rating  out of 5, in half stars, shown as stars under it in the list
 #   note    an optional line shown under it in the list
 - title: Flash Boys
@@ -44,6 +46,7 @@
 - title: One Hundred Years of Solitude
   cover: one-hundred-years-of-solitude.jpg
   author: Gabriel García Márquez
+  spine: García Márquez
   color: "#46794f"
   ink: light
   pages: 417

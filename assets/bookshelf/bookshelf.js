@@ -39,7 +39,7 @@
     labels: {
       shelf: "A shelf of what I'm reading now and just finished",
       reading: 'Recent Reading',
-      current: 'Currently reading',
+      now: 'Current Reading',  // the list's heading while it shows what's being read now
       art: 'Selected Art',
       crate: 'Art'
     }
@@ -97,6 +97,9 @@
     return {
       title: String(b.title || 'Untitled'),
       author: b.author ? String(b.author) : '',
+      // what's printed up the spine: the author's last name, unless it's
+      // given outright (for a surname of more than one word)
+      spine: String(b.spine || (b.author ? String(b.author).trim().split(/\s+/).pop() : '') || b.title || 'Untitled'),
       cover: b.cover ? (isUrl(b.cover) ? b.cover : base + b.cover) : null,
       color: color,
       ink: b.ink === 'dark' || b.ink === 'light' ? b.ink : inkFor(color),
@@ -127,8 +130,8 @@
     var o = merge(options);
     var uid = 'bs' + (++mounts);
 
-    // The spine titles, fitted again whenever the page's font changes (a
-    // different font sets the same title longer or shorter)
+    // The spine titles, fitted again once the page's font has loaded (it
+    // sets the same title longer or shorter than the fallback)
     var titles = [];
     function fitTitle(title, L, w, h) {
       var size = Math.min(13, w * 0.55);
@@ -147,7 +150,6 @@
       document.fonts.ready.then(refitTitles);
       document.fonts.addEventListener('loadingdone', refitTitles);
     }
-    window.addEventListener('fontchange', refitTitles);
     var BOOKS = (o.books || []).map(function (b) { return normalizeBook(b, o.coverBase); });
     var ART = (o.art || []).map(function (a, i) { return normalizeArt(a, i, o.artBase); });
     var hasArt = ART.length > 0;
@@ -196,7 +198,7 @@
 
     var list = html('div', 'bs-list', root);
     list.id = uid + '-list';
-    html('h2', 'bs-label', list, o.labels.reading);
+    var listLabel = html('h2', 'bs-label', list, o.labels.now);
     var readList = html('ul', 'bs-reads', list);
     var reads = BOOKS.map(function (b) {
       var li = html('li', 'bs-read' + (b.current ? ' is-current' : ''), readList);
@@ -215,7 +217,6 @@
       var text = html('span', 'bs-read-text', li);
       html('span', 'bs-read-title', text, b.title);
       if (b.author) html('span', 'bs-read-by', text, b.author);
-      if (b.current) html('span', 'bs-now', text, o.labels.current);
       if (b.rating !== null) {
         // five stars greyed, with the filled ones laid over them as far as
         // the rating goes (so a half star is half filled), and the number
@@ -334,12 +335,12 @@
       el('path', { d: line([at(board, 1), at(0, 1), at(0, 0)]) + ' ' + line([at(board, 1), at(board, near), at(w - board, near), at(w - board, 1), at(w, 1), at(w, 0)]), 'class': 'bs-book-edge' }, art);
       var spine = el('rect', { x: L, y: top, width: w, height: h, 'class': 'bs-book-spine' }, art);
       spine.style.fill = b.color;
-      // The title runs up the spine, shrinking if it's too long for it
+      // The author's name runs up the spine, shrinking if it's too long for it
       var clip = el('clipPath', { id: uid + '-spine-' + i }, art);
       el('rect', { x: L, y: top + 5, width: w, height: h - 10 }, clip);
       var holder = el('g', { 'clip-path': 'url(#' + uid + '-spine-' + i + ')' }, art);
       var title = el('text', { x: 0, y: 0, 'class': 'bs-book-title' }, holder);
-      title.textContent = b.title;
+      title.textContent = b.spine;
       title.style.fill = b.ink === 'dark' ? '#1a1a18' : '#fff';
       fitTitle(title, L, w, h);
       titles.push([title, L, w, h]);
@@ -522,16 +523,23 @@
         shadows[j].classList.toggle('is-lifted', j === book);
         g.setAttribute('aria-pressed', j === pinned);
       });
-      // The bookend stands in front of the last book, but when that book's
-      // out it comes up in front of the bookend instead of through it (the
-      // bookend moves rather than the book, which would lose focus)
-      if (!drag && !sort && order.length) {
+      // The bookend stands in front of the last book, even while that book's
+      // out
+      if (!drag && order.length) {
         var last = groups[order[order.length - 1]];
-        if (book === order[order.length - 1]) svg.insertBefore(bookend, last);
-        else if (last.nextSibling !== bookend) svg.insertBefore(bookend, last.nextSibling);
+        if (last.nextSibling !== bookend) svg.insertBefore(bookend, last.nextSibling);
       }
-      // the other lines in the list blur back, as the shelf's books do
+      // The list shows what's being read now, or, while a book on the shelf
+      // is hovered or pressed, that book alone (hovering a line in the list
+      // leaves it be); the other lines blur back, as the shelf's books do
+      var shown = hovered !== null ? hovered : pinned;
+      // headed Current Reading, with a blue dot, unless the book out is one
+      // already finished
+      var now = shown === null || BOOKS[shown].current;
+      listLabel.textContent = now ? o.labels.now : o.labels.reading;
+      listLabel.classList.toggle('is-now', now);
       reads.forEach(function (r, j) {
+        r.hidden = shown !== null ? j !== shown : !BOOKS[j].current;
         r.classList.toggle('is-dimmed', book !== null && j !== book);
       });
       list.hidden = art;
@@ -663,9 +671,8 @@
     // A pulled-out book also goes back with a click or tap anywhere but on a
     // book, its line or the crate (they handle their own), unless it ends a
     // drag
-    var sorted = false;
     document.addEventListener('click', function (e) {
-      if (pinned === null || dragged || sorted) return;
+      if (pinned === null || dragged) return;
       if (crate && crate.contains(e.target)) return;
       if (bookend.contains(e.target)) return;
       if (groups.concat(reads).some(function (g) { return g.contains(e.target); })) return;
@@ -793,130 +800,28 @@
       drag = null;
     }
 
-    // Dragging a line up or down the list: it follows the pointer, the
-    // others slide aside, and the books on the shelf move along with it. On
-    // a touch screen a line is held a moment before it comes loose, so a
-    // swipe still scrolls the page.
-    var sort = null;
-    function startSort(i, e) {
-      sort = { i: i, x0: e.clientX, y0: e.clientY, dy: 0, from: order.slice(), moving: false,
-        touch: e.pointerType !== 'mouse',
-        rects: order.map(function (j) { return reads[j].getBoundingClientRect(); }) };
-      if (sort.touch) sort.timer = setTimeout(function () { if (sort) beginSort(); }, 250);
-    }
-    function beginSort() {
-      sort.moving = true;
-      reads[sort.i].classList.add('is-sorting');
-      readList.classList.add('is-sorting');
-      // its book on the shelf comes up out of the row and is carried over
-      // the others to its new place, in front of everything
-      groups[sort.i].classList.add('is-carried');
-      shadows[sort.i].classList.add('is-carried');
-      makeRoom(true);
-      svg.appendChild(groups[sort.i]);
-      document.documentElement.classList.add('bookshelf-dragging');
-      try { window.getSelection().removeAllRanges(); } catch (e) {}
-      listHovered = sort.i;
-      update();
-    }
-    function moveSort(e) {
-      var dy = e.clientY - sort.y0;
-      if (!sort.moving) {
-        if (Math.abs(dy) < 4 && Math.abs(e.clientX - sort.x0) < 4) return;
-        // a finger that moves before it's been held is scrolling
-        if (sort.touch) { clearTimeout(sort.timer); sort = null; return; }
-        beginSort();
-      }
-      var i = sort.i, from = sort.from, rects = sort.rects, n = from.length, p = from.indexOf(i);
-      dy = Math.max(rects[0].top - rects[p].top, Math.min(rects[n - 1].bottom - rects[p].bottom, dy));
-      sort.dy = dy;
-      reads[i].style.transform = 'translateY(' + dy + 'px)';
-      // past each other line it has been dragged a fifth of the way over
-      var top = rects[p].top + dy, bottom = rects[p].bottom + dy, k = 0;
-      from.forEach(function (j, q) {
-        if (j === i) return;
-        var r = rects[q];
-        if (dy > 0 ? bottom > r.top + r.height * GIVE : top > r.bottom - r.height * GIVE) k++;
-      });
-      order = from.filter(function (j) { return j !== i; });
-      order.splice(k, 0, i);
-      // the others slide to their new places
-      var gap = n > 1 ? rects[1].top - rects[0].bottom : 0, at = rects[0].top;
-      order.forEach(function (j) {
-        var r = rects[from.indexOf(j)];
-        if (j !== i) reads[j].style.transform = 'translateY(' + (at - r.top) + 'px)';
-        at += r.height + gap;
-      });
-      place();
-    }
-    function endSort(keep, e) {
-      clearTimeout(sort.timer);
-      if (sort.moving) {
-        var i = sort.i, p = sort.from.indexOf(i), was = sort.rects[p].top + sort.dy;
-        reads[i].classList.remove('is-sorting');
-        readList.classList.remove('is-sorting');
-        groups[i].classList.remove('is-carried');
-        shadows[i].classList.remove('is-carried');
-        makeRoom(false);
-        document.documentElement.classList.remove('bookshelf-dragging');
-        if (!keep) order = sort.from;
-        // Put the lines in their new order at once, then let the dropped one
-        // glide the last bit from where it was let go into its place
-        readList.classList.add('no-slide');
-        reads.forEach(function (r) { r.style.transform = ''; });
-        settle(!same(order, sort.from));
-        reads[i].style.transform = 'translateY(' + (was - reads[i].getBoundingClientRect().top) + 'px)';
-        reads[i].getBoundingClientRect();
-        readList.classList.remove('no-slide');
-        reads[i].style.transform = '';
-        listHovered = e.pointerType === 'mouse' && reads[i].contains(e.target) ? i : null;
-        update();
-        // the click that ends it doesn't put a pulled-out book back
-        sorted = true;
-        setTimeout(function () { sorted = false; }, 0);
-      }
-      sort = null;
-    }
-
     if (o.reorder) {
-      document.addEventListener('pointermove', function (e) {
-        if (drag) moveDrag(e);
-        if (sort) moveSort(e);
-      });
-      document.addEventListener('pointerup', function (e) {
-        if (drag) endDrag(true, e);
-        if (sort) endSort(true, e);
-      });
-      document.addEventListener('pointercancel', function (e) {
-        if (drag) endDrag(false, e);
-        if (sort) endSort(false, e);
-      });
-      // once a line is loose, a finger moving it doesn't scroll the page
-      document.addEventListener('touchmove', function (e) { if (sort && sort.moving) e.preventDefault(); }, { passive: false });
+      document.addEventListener('pointermove', function (e) { if (drag) moveDrag(e); });
+      document.addEventListener('pointerup', function (e) { if (drag) endDrag(true, e); });
+      document.addEventListener('pointercancel', function (e) { if (drag) endDrag(false, e); });
     }
     // the covers aren't dragged off as pictures
     readList.addEventListener('dragstart', function (e) { e.preventDefault(); });
 
     reads.forEach(function (r, j) {
-      function on() { if (!drag && !sort) { listHovered = j; update(); } }
-      function off() { if (!sort && listHovered === j) { listHovered = null; update(); } }
+      function on() { if (!drag) { listHovered = j; update(); } }
+      function off() { if (listHovered === j) { listHovered = null; update(); } }
       r.addEventListener('mouseenter', on);
       r.addEventListener('focus', on);
       r.addEventListener('mouseleave', off);
       r.addEventListener('blur', off);
       // pressing a line pulls its book out, as pressing the book does
-      r.addEventListener('click', function () { if (!sorted) pin(j); });
+      r.addEventListener('click', function () { pin(j); });
       r.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pin(j); }
       });
-      if (!o.reorder) return;
-      r.addEventListener('pointerdown', function (e) { if (e.button === 0 && !drag) startSort(j, e); });
-      r.addEventListener('keydown', function (e) {
-        if (e.shiftKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
-          e.preventDefault();
-          nudge(j, e.key === 'ArrowUp' ? -1 : 1, r);
-        }
-      });
+      // (the list only ever shows some of the books, so its lines aren't
+      // dragged into a new order; the books on the shelf still are)
     });
 
     groups.forEach(function (g, i) {
@@ -937,7 +842,7 @@
       });
       if (o.reorder) {
         g.setAttribute('aria-roledescription', 'draggable book');
-        g.addEventListener('pointerdown', function (e) { if (e.button === 0 && !sort) startDrag(i, e); });
+        g.addEventListener('pointerdown', function (e) { if (e.button === 0) startDrag(i, e); });
       }
     });
 
@@ -945,7 +850,7 @@
     // further it goes, and snaps back against them when it's let go
     var pull = null;
     bookend.addEventListener('pointerdown', function (e) {
-      if (e.button !== 0 || drag || sort) return;
+      if (e.button !== 0 || drag) return;
       pull = { x0: e.clientX, scale: W / svg.getBoundingClientRect().width };
       bookend.classList.add('is-pulled');
       wedgeShadow.classList.add('is-pulled');

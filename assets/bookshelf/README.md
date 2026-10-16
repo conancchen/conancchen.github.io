@@ -22,12 +22,12 @@ Your recent reading, drawn as books on a shelf with a list underneath, plus an o
 ## Options
 
 **`books`**: only `title` is required.
-`author`, `cover`, `color` (`#rrggbb`), `ink` (`'dark'`/`'light'`, otherwise picked from the color), `pages` (sets thickness), `height` (90–180), `current` (shows "Currently reading"), `rating` (out of 5, in half stars), `note`.
+`author` (its last name runs up the spine), `spine` (printed up the spine instead, e.g. a two-word surname), `cover`, `color` (`#rrggbb`), `ink` (`'dark'`/`'light'`, otherwise picked from the color), `pages` (sets thickness), `height` (90–180), `current` (listed under Current Reading), `rating` (out of 5, in half stars), `note`.
 
 **`art`** (optional; leave it out for no crate):
 `src`, `title`, `by`, `aspect` (width ÷ height), `row` (paintings in the same row come out the same height), `crate: { x, width, height, back }` (exact place in the crate; otherwise placed automatically).
 
-**Other options:** `coverBase` and `artBase` (put in front of relative paths), `reorder` (default `true`), `storageKey` (where each visitor's order is saved; `null` to not save it), `onReorder(titles)`, and `labels: { reading, current, art, crate, shelf }`.
+**Other options:** `coverBase` and `artBase` (put in front of relative paths), `reorder` (default `true`), `storageKey` (where each visitor's order is saved; `null` to not save it), `onReorder(titles)`, and `labels: { now, reading, art, crate, shelf }` (`now` heads the list while it shows the books being read, `reading` while it shows one already finished).
 
 Visitors' reordering is saved only in their own browser. The order of `books` is the default everyone else sees.
 

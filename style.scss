@@ -71,34 +71,18 @@ body {
   word-spacing: var(--font-spacing, normal);
 }
 
-// The small data-like bits (dates, years, course codes, race splits, the
-// clock) can take a second font, --font-accent; without one they stay in the
-// text's own
-.subtitle,
-.subtitle *,
-.updated,
-.updated *,
-.row-year,
-.row-year *,
-.course-code,
-.course-code *,
-#by-semester .term-name,
-#by-semester .term-name *,
-.pc-date,
-.pc-date *,
-.pc-total,
-.pc-total *,
-.pc-dist,
-.pc-dist *,
-.pc-time,
-.pc-time *,
-.pc-pace,
-.pc-pace *,
-.pc-rank,
-.pc-rank * {
-  font-family: var(--font-accent, var(--font));
-  font-size-adjust: var(--font-accent-adjust, var(--font-adjust, none)) !important;
-  word-spacing: var(--font-accent-spacing, var(--font-spacing, normal));
+// Nothing on the page can be selected (no highlight on a drag or a double
+// click), and a tap on a phone doesn't flash a highlight either; the
+// Zetamac answer box still takes its typing as usual
+body {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+input {
+  user-select: text;
+  -webkit-user-select: text;
 }
 
 // Mobile browsers otherwise inflate long paragraphs (the bio) but not short
@@ -206,11 +190,22 @@ $reveal: '.subtitle, .header-actions, .sort-line, .bio, .block, .bs-cabinet, .bs
 
 .anim-play {
   #{$reveal} {
-    animation: blur-in 1.35s cubic-bezier(0.22, 1, 0.36, 1) backwards;
-    animation-delay: calc(var(--i, 0) * 70ms);
+    animation: enter 0.6s backwards;
+    animation-delay: calc(var(--i, 0) * 120ms);
   }
 }
 
+// As on paco.me: each piece fades in as it rises 10px, a beat after the one
+// before it
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+// Coursework's rows, switching between semester and subject, blur in out of
+// a fade
 @keyframes blur-in {
   from {
     opacity: 0;
@@ -240,9 +235,19 @@ $reveal: '.subtitle, .header-actions, .sort-line, .bio, .block, .bs-cabinet, .bs
   gap: 14px;
 }
 
+// The caret the name types out behind on the home page
+.caret {
+  display: inline-block;
+  width: 1px;
+  height: 1.1em;
+  margin-left: 1px;
+  vertical-align: -0.2em;
+  background: currentColor;
+}
+
 .header h1 {
   font-size: 14px;
-  font-weight: 474;
+  font-weight: inherit;  // the same weight as the text below it
   margin: 0;
 }
 
@@ -294,8 +299,11 @@ $reveal: '.subtitle, .header-actions, .sort-line, .bio, .block, .bs-cabinet, .bs
   view-transition-name: site-name;
 }
 
+// The name sits as far above the bio as its paragraphs sit apart (14.4px):
+// less the header's 8px below it, and the 1px more the bio's taller lines
+// leave above their first
 .bio {
-  padding-top: 16px;
+  padding-top: 5.4px;
 }
 
 // The bio's lines sit a touch further apart than the rest (22px rather than
@@ -511,8 +519,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 @keyframes entry-in {
   from {
     opacity: 0;
-    filter: blur(4px);
-    transform: translateY(-6px);
+    transform: translateY(10px);
   }
 }
 
@@ -603,8 +610,6 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   position: relative;
   z-index: 1;
   touch-action: none;
-  user-select: none;
-  -webkit-user-select: none;
   height: 2px;
   margin: 40px 0 16px;
 }
@@ -628,13 +633,10 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   cursor: grabbing;
 }
 
-// While a press on the water is down, nothing on the page selects, so
-// dragging the swimmer (or a long press on a phone) can't highlight the
-// text around the pool
+// While a press on the water is down, a long press on a phone doesn't open
+// the callout menu over the text around the pool
 .pool-pressed,
 .pool-pressed * {
-  user-select: none !important;
-  -webkit-user-select: none !important;
   -webkit-touch-callout: none !important;
 }
 
@@ -818,7 +820,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 
 .term {
   display: grid;
-  grid-template-columns: 108px 1fr;
+  grid-template-columns: 93px 1fr;
   gap: 8px;
   align-items: start;
   padding: 12px 0;
@@ -1399,9 +1401,6 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   --zm-line: rgb(55, 135, 240);
   // dragging across it compares two rounds, so it doesn't scroll sideways
   touch-action: pan-y;
-  user-select: none;
-  -webkit-user-select: none;
-  --zm-mono: 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
 }
 
 .zm-grid {
@@ -1413,8 +1412,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 .zm-tick {
   text-anchor: end;
   fill: var(--muted);
-  font-family: var(--zm-mono);
-  font-size-adjust: none !important;
+  font-family: var(--font);  // the site's own, as everywhere else
   font-size: 10px;
   font-variant-numeric: tabular-nums;
   dominant-baseline: central;
@@ -1504,8 +1502,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 
 .zm-badge text {
   fill: #fff;
-  font-family: var(--zm-mono);
-  font-size-adjust: none !important;
+  font-family: var(--font);  // the site's own, as everywhere else
   font-size: 11px;
   font-variant-numeric: tabular-nums;
   dominant-baseline: central;
