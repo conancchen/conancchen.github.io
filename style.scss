@@ -13,7 +13,7 @@
   --font: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
   --font-adjust: 0.53;
   --font-spacing: -0.15em;
-  --bg: #fcfbf8;  // a warm white, like paper
+  --bg: #fafaf8;  // a near white, with just a breath of warmth
   --text: #16150f;
   --muted: #8a8a8a;
   --rule: #e0dfdb;
@@ -260,42 +260,14 @@ $reveal: '.subtitle, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .up
   margin: 0;
 }
 
+// On the other pages the name links home, looking just as it does there
+.name-link {
+  color: inherit;
+}
+
 // A click shouldn't leave a focus ring behind; a keyboard tab still should
-.icon-button:focus:not(:focus-visible),
 .entry > summary:focus:not(:focus-visible) {
   outline: none;
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  flex-shrink: 0;
-  margin-left: auto;  // stays on the right on pages without a title
-  // The buttons' padding and the moon's inset inside its icon would leave it
-  // short of the column's right edge; this pulls its rim onto that edge
-  margin-right: -5.5px;
-  // The 26px buttons would stretch the title's 20px line and push the
-  // subtitle down, so they overhang it instead
-  margin-top: -3px;
-  margin-bottom: -3px;
-}
-
-.icon-button {
-  display: inline-flex;
-  background: transparent;
-  border: none;
-  padding: 4px;
-  margin: 0;
-  line-height: 0;
-  color: var(--muted);
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-.icon-button:hover,
-.icon-button[aria-pressed="true"] {
-  color: var(--text);
 }
 
 // The name sits as far above the bio as its paragraphs sit apart (14.4px):
@@ -329,6 +301,11 @@ $reveal: '.subtitle, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .up
   font-weight: inherit;
   color: var(--muted);
   margin: 0 0 10px;
+}
+
+// A section's title sits as far above its first row as the rows sit apart
+.block > .block-label {
+  margin-bottom: 4px;
 }
 
 .row {
@@ -810,30 +787,23 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 // courses stacked beside it with their codes on the right; the rows are set
 // apart by space alone
 .courses {
-  margin-top: 16px;
+  margin: 28px 0 12px;
 }
 
 .courses[hidden] {
   display: none;
 }
 
-.term {
-  display: grid;
-  grid-template-columns: 93px 1fr;
-  gap: 8px;
-  align-items: start;
-  padding: 12px 0;
+// A semester's (or subject's) name sits above its courses, every row the
+// same 28px, with one blank row between groups
+.term + .term {
+  margin-top: 28px;
 }
 
 .term-name {
+  display: block;
   color: var(--muted);
   padding: 4px 0;
-}
-
-// Semesters go by short names (F26, S25), so their gutter is narrow; the
-// subjects' longer names keep the wide one
-#by-semester .term {
-  grid-template-columns: 40px 1fr;
 }
 
 .course {
@@ -880,16 +850,6 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 @media screen and (max-width: 639px) {
   .page {
     padding: 32px 24px 40px;
-  }
-
-  // No room for a gutter, so a semester's name sits above its courses
-  .term {
-    grid-template-columns: 1fr;
-    gap: 0;
-  }
-
-  .term-name {
-    padding-bottom: 2px;
   }
 }
 

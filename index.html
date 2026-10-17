@@ -10,7 +10,7 @@ home: true
     Currently, I research humanoid robots in the <a href="https://pvl.cs.princeton.edu/" data-exp="pvl">Vision &amp; Learning Lab</a>. Previously, I interned at <a href="https://scale.com/" data-exp="scale">Scale AI</a>.
   </p>
   <p>
-    I also compete as a Division I swimmer and recreational triathlete. Recently, I finished my first <span class="preview"><button type="button" class="preview-link" aria-expanded="false" aria-controls="im-card">Ironman 70.3</button><span class="preview-card" id="im-card" role="tooltip">
+    I also compete as a Division I swimmer and enjoy doing triathlons. Recently, I finished my first <span class="preview"><button type="button" class="preview-link" aria-expanded="false" aria-controls="im-card">Ironman 70.3</button><span class="preview-card" id="im-card" role="tooltip">
       <span class="pc-head"><span class="pc-title">Musselman 70.3</span><span class="pc-date">Jul 2026</span></span>
       <span class="pc-total">4:57:16</span>
       <span class="pc-legs">
@@ -148,7 +148,7 @@ home: true
         <span class="row-label"><img class="row-icon row-icon-mono" src="{{ site.baseurl }}/images/logos/scale.png" alt="" width="14" height="14">Scale AI</span>
         <span class="row-year">2025</span>
       </summary>
-      <p class="row-note">Technical Advisor Intern (GenAI)</p>
+      <p class="row-note">Intern (GenAI)</p>
     </details>
   </section>
   <script>
@@ -1636,7 +1636,7 @@ home: true
     })();
   </script>
   <div class="footer">
-    <p class="updated" id="clock"><span><span id="clock-time"></span><span id="clock-in"> in </span><button type="button" class="clock-place" id="clock-place" title="Somewhere else">Princeton</button><span id="clock-diff"></span></span><span class="preview lap-preview" id="laps" hidden><button type="button" class="laps" aria-expanded="false" aria-controls="lap-card" aria-label="Yards swum"><svg class="laps-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg><span id="laps-count">0000</span></button><span class="preview-card lap-card" id="lap-card" role="tooltip"><span class="lc-row"><span>Laps</span><span class="lc-value" id="lc-laps">0</span></span><span class="lc-row"><span>Yards</span><span class="lc-value" id="lc-yards">0</span></span><span class="lc-row"><span>Avg/100</span><span class="lc-value" id="lc-pace">&ndash;</span></span></span></span></p>
+    <p class="updated" id="clock"><span><span id="clock-time"></span><span id="clock-in"> in </span><button type="button" class="clock-place" id="clock-place" title="Somewhere else">Princeton</button><span id="clock-diff"></span></span><span class="preview lap-preview" id="laps" hidden><button type="button" class="laps" aria-expanded="false" aria-controls="lap-card" aria-label="Yards swum"><svg class="laps-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg><span id="laps-count">0000</span></button><span class="preview-card lap-card" id="lap-card" role="tooltip"><span class="lc-row"><span>Laps</span><span class="lc-value" id="lc-laps">0</span></span><span class="lc-row"><span>Yards</span><span class="lc-value" id="lc-yards">0</span></span><span class="lc-row"><span>Pace</span><span class="lc-value" id="lc-pace">&ndash;</span></span></span></span></p>
     <nav class="webring" aria-label="Princeton webring" data-princeton-webring>
       <a data-ring-prev href="https://firestoners.vercel.app/#https%3A%2F%2Fconancchen.github.io?nav=prev" aria-label="Previous website">&larr;</a>
       <a href="https://firestoners.vercel.app/#https%3A%2F%2Fconancchen.github.io" aria-label="Explore the Princeton webring">
@@ -2226,7 +2226,7 @@ home: true
         scrambling = true;
         if (!setZone(i)) { scrambling = false; continue; }
         // The whole line scrambles, time and all, into the new place
-        window.scrambleSwap([[timeEl, now], [inEl, ' in '], [placeEl, PLACES[i].label], [diffEl, diff]], 700, function () {
+        window.scrambleSwap([[timeEl, now], [inEl, ' in '], [placeEl, PLACES[i].label], [diffEl, diff]], 350, function () {
           scrambling = false;
         });
         return;

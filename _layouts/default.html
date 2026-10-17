@@ -53,16 +53,7 @@
   <div class="page{% if page.quick_entrance %} quick-entrance{% endif %}">
     <header class="header">
       <div class="header-row">
-        <h1 translate="no">{{ page.heading | default: site.name }}</h1>
-        <div class="header-actions">
-        {% unless page.home %}<a class="icon-button" href="{{ site.baseurl }}/" aria-label="Back to the home page" title="Back">
-          <!-- A plain arrow pointing back, its strokes as light as the text's -->
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M19 12H5"></path>
-            <path d="M11 6l-6 6 6 6"></path>
-          </svg>
-        </a>{% endunless %}
-        </div>
+        {% if page.home %}<h1 translate="no" id="site-name" title="Retype">{{ page.heading | default: site.name }}</h1>{% else %}<h1 translate="no"><a class="name-link" href="{{ site.baseurl }}/">{{ page.heading | default: site.name }}</a></h1>{% endif %}
       </div>
       {% if page.subtitle %}<p class="subtitle" translate="no">{{ page.subtitle }}</p>{% endif %}
     </header>
@@ -197,43 +188,82 @@
       });
     }
 
-    // On the home page the name types itself out, a letter at a time behind
-    // a caret, which blinks twice once it's done and goes (only there: on the other pages the name holds still, as the page
-    // changes under it)
-    var typeTimers = [];
-    function typeName() {
-      typeTimers.forEach(clearInterval);  // a replay starts the typing over
-      var h1 = document.querySelector('.header h1');
-      // The label holds the whole name if it's replayed mid-type
-      var name = h1.getAttribute('aria-label') || h1.textContent;
-      var TYPE_MS = 75;  // per letter
-      h1.setAttribute('aria-label', name);
-      h1.textContent = '';
+    // Types an element's text out, a letter at a time behind a caret, which
+    // blinks twice once it's done and goes. Each element keeps its own
+    // timers, so a replay starts its typing over
+    function stopTyping(el) {
+      (el._typing || []).forEach(clearInterval);
+      el._typing = [];
+    }
+
+    // Swaps the element's text for the typed part and a caret, keeping the
+    // whole text as its label for screen readers meanwhile
+    function setUpTyping(el, shown) {
+      var text = el.getAttribute('aria-label') || el.textContent;
+      el.setAttribute('aria-label', text);
+      el.textContent = '';
       var typed = document.createElement('span');
       typed.setAttribute('aria-hidden', 'true');
+      typed.textContent = shown;
       var caret = document.createElement('span');
       caret.className = 'caret';
       caret.setAttribute('aria-hidden', 'true');
-      h1.appendChild(typed);
-      h1.appendChild(caret);
+      el.appendChild(typed);
+      el.appendChild(caret);
+      return { text: text, typed: typed, caret: caret };
+    }
+
+    function typeOut(el) {
+      stopTyping(el);
+      var parts = setUpTyping(el, '');
       var n = 0;
       var id = setInterval(function () {
-        typed.textContent = name.slice(0, ++n);
-        if (n < name.length) return;
+        parts.typed.textContent = parts.text.slice(0, ++n);
+        if (n < parts.text.length) return;
         clearInterval(id);
         // off, on, off, on, then gone
         var blinks = 0;
         var blink = setInterval(function () {
-          caret.style.visibility = ++blinks % 2 ? 'hidden' : '';
+          parts.caret.style.visibility = ++blinks % 2 ? 'hidden' : '';
           if (blinks < 5) return;
           clearInterval(blink);
-          h1.textContent = name;
-          h1.removeAttribute('aria-label');
+          el.textContent = parts.text;
+          el.removeAttribute('aria-label');
         }, 400);
-        typeTimers.push(blink);
-      }, TYPE_MS);
-      typeTimers = [id];
+        el._typing.push(blink);
+      }, 75);
+      el._typing.push(id);
     }
+
+    // Backspaces the text away from where it stands (even mid-type), then
+    // after a beat on the empty line types it back out
+    function retype(el) {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var typedNow = el.querySelector('span');
+      var shown = typedNow ? typedNow.textContent : el.textContent;
+      stopTyping(el);
+      var parts = setUpTyping(el, shown);
+      var id = setInterval(function () {
+        parts.typed.textContent = parts.typed.textContent.slice(0, -1);
+        if (parts.typed.textContent) return;
+        clearInterval(id);
+        el._typing.push(setTimeout(function () { typeOut(el); }, 300));
+      }, 45);
+      el._typing.push(id);
+    }
+
+    // On the home page the name types itself out on arriving (on the other
+    // pages it holds still, as the page changes under it)
+    function typeName() {
+      typeOut(document.querySelector('.header h1'));
+    }
+
+    {% if page.home %}
+    // Pressing the name, or a section's title, retypes it
+    document.querySelectorAll('#site-name, .block > .block-label').forEach(function (el) {
+      el.addEventListener('click', function () { retype(el); });
+    });
+    {% endif %}
   </script>
 </body>
 
