@@ -73,7 +73,7 @@
           var saved = JSON.parse(localStorage.getItem(KEY));
           if (Array.isArray(saved)) return saved.filter(function (t) { return bar.querySelector('[data-tab="' + t + '"]'); });
         } catch (e) {}
-        return all.map(function (tab) { return tab.dataset.tab; });
+        return [];  // to start, only the page showing is open
       }
       function save() {
         try { localStorage.setItem(KEY, JSON.stringify(open)); } catch (e) {}

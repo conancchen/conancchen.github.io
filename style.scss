@@ -857,15 +857,6 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
     padding: 32px 24px 40px;
   }
 
-  // The tabs keep to the column's wider phone gutter too
-  .tabbar {
-    padding-left: 12px;
-  }
-
-  .statusline {
-    padding-left: 24px;
-    padding-right: 24px;
-  }
 }
 
 /**************/
@@ -937,22 +928,20 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   // by a hairline the width of the window, which the tab showing breaks to
   // join the page. The first name lines up with the page's text (less the
   // 12px its tab leads in with)
-  padding: 6px 0 1px calc(max(16px, (100% - 550px) / 2) - 12px);
+  padding: 6px 8px 1px calc(max(16px, (100% - 550px) / 2) - 13px);
   background: linear-gradient(var(--rule), var(--rule)) bottom / 100% 1px no-repeat, var(--bg);
   font-size: 12px;
   line-height: 16px;
   white-space: nowrap;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.tabbar::-webkit-scrollbar {
-  display: none;
+  overflow: hidden;
 }
 
 // The tabs not showing sit back in the strip
 .tab {
-  flex: none;
+  // Tabs share out the strip: when they don't all fit, each narrows (its
+  // name trailing off) rather than the text shrinking or the strip scrolling
+  flex: 0 1 auto;
+  min-width: 0;
   display: flex;
   align-items: center;
   height: 30px;
@@ -980,6 +969,9 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 
 // Every tab keeps the same room, its × included, so they're evenly spaced
 .tab a {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   padding: 0 6px 0 12px;
   line-height: 30px;
   color: inherit;
@@ -1002,6 +994,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 // The ×, after the name, shown on the active tab and on any tab under the
 // pointer; the last tab open can't close
 .tab-close {
+  flex: none;
   width: 16px;
   height: 16px;
   margin-right: 8px;
@@ -1065,6 +1058,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 }
 
 .tab-new {
+  flex: none;
   position: relative;
   display: flex;
   align-items: center;
@@ -1182,9 +1176,10 @@ body {
     padding-left: calc(max(16px, (100% - 550px) / 2) - 36px);
   }
 
-  // and the tabs start right above it (less the 12px a tab leads in with)
+  // and the tabs start right above it (less the 12px a tab leads in with,
+  // and its 1px edge)
   .tabbar {
-    padding-left: calc(max(16px, (100% - 550px) / 2) - 36px - 12px);
+    padding-left: calc(max(16px, (100% - 550px) / 2) - 36px - 13px);
   }
 }
 
@@ -1199,6 +1194,18 @@ body {
 #status-lines {
   min-width: 9ch;  // 999 lines
   text-align: right;
+}
+
+// On phones both bars keep to the column's wider 24px gutter
+@media screen and (max-width: 639px) {
+  .tabbar {
+    padding-left: 11px;  // 24px, less the tab's 12px lead-in and 1px edge
+  }
+
+  .statusline {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
 }
 
 // Room at the bottom so the status bar never covers the last line
