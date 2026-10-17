@@ -50,134 +50,6 @@
 </head>
 
 <body>
-  <!-- The site's pages as tabs, like files open in an editor; the one
-       showing is the active tab. Tabs close with their ×, and reopen from
-       the + at the end (or by going to the page); which are open is kept in
-       this browser -->
-  <nav class="tabbar" id="tabbar" aria-label="Pages">
-    {% assign tabs = "index.html|coursework.html|bookshelf.html|zetamac.html" | split: "|" %}
-    {% for tab in tabs %}{% assign tab_url = tab | replace: "index.html", "" | replace: ".html", "/" %}{% assign tab_name = tab %}<span class="tab{% if page.path == tab %} is-active{% endif %}" data-tab="{{ tab }}" draggable="true"><a draggable="false" href="{{ site.baseurl }}/{{ tab_url }}"{% if page.path == tab %} aria-current="page"{% endif %}>{{ tab_name }}</a><button type="button" class="tab-close" aria-label="Close {{ tab_name }}" title="Close">&times;</button></span>{% endfor %}
-    <span class="tab-new"><button type="button" class="tab-add" id="tab-add" aria-label="Reopen a closed page" aria-expanded="false" title="Reopen">+</button><span class="tab-menu" id="tab-menu" hidden></span></span>
-  </nav>
-  <script>
-    (function () {
-      var KEY = 'open-tabs';
-      var bar = document.getElementById('tabbar');
-      var all = Array.prototype.slice.call(bar.querySelectorAll('.tab'));
-      var here = '{{ page.path }}';
-      var addButton = document.getElementById('tab-add');
-      var menu = document.getElementById('tab-menu');
-
-      function load() {
-        try {
-          var saved = JSON.parse(localStorage.getItem(KEY));
-          if (Array.isArray(saved)) return saved.filter(function (t) { return bar.querySelector('[data-tab="' + t + '"]'); });
-        } catch (e) {}
-        return [];  // to start, only the page showing is open
-      }
-      function save() {
-        try { localStorage.setItem(KEY, JSON.stringify(open)); } catch (e) {}
-      }
-      function tab(name) { return bar.querySelector('[data-tab="' + name + '"]'); }
-
-      var open = load();
-      // The page showing always has its tab open, at the end if it was closed
-      if (here && tab(here) && open.indexOf(here) === -1) open.push(here);
-      save();
-
-      function render() {
-        all.forEach(function (t) { t.hidden = open.indexOf(t.dataset.tab) === -1; });
-        open.forEach(function (name) { bar.insertBefore(tab(name), addButton.parentNode); });
-        bar.classList.toggle('is-single', open.length < 2);  // the last tab can't close
-        var closed = all.filter(function (t) { return t.hidden; });
-        addButton.parentNode.hidden = !closed.length;
-        menu.innerHTML = '';
-        closed.forEach(function (t) {
-          var link = t.querySelector('a').cloneNode(true);
-          link.removeAttribute('aria-current');
-          link.addEventListener('click', function () {
-            open.push(t.dataset.tab);
-            save();
-          });
-          menu.appendChild(link);
-        });
-      }
-
-      // Closing the tab showing moves to the one after it (or before it, at
-      // the end), as an editor does
-      function close(name) {
-        var i = open.indexOf(name);
-        if (i === -1 || open.length < 2) return;
-        open.splice(i, 1);
-        save();
-        if (name === here) {
-          location.href = tab(open[Math.min(i, open.length - 1)]).querySelector('a').href;
-        } else {
-          render();
-        }
-      }
-
-      all.forEach(function (t) {
-        t.querySelector('.tab-close').addEventListener('click', function () { close(t.dataset.tab); });
-        // A middle click closes a tab too
-        t.addEventListener('auxclick', function (e) {
-          if (e.button === 1) { e.preventDefault(); close(t.dataset.tab); }
-        });
-        t.addEventListener('mousedown', function (e) { if (e.button === 1) e.preventDefault(); });
-      });
-
-      // Tabs drag into a new order, the others making way as one passes
-      // over them; the order is kept with the rest
-      var dragging = null;
-      all.forEach(function (t) {
-        t.addEventListener('dragstart', function (e) {
-          dragging = t;
-          t.classList.add('is-dragging');
-          e.dataTransfer.effectAllowed = 'move';
-          e.dataTransfer.setData('text/plain', t.dataset.tab);
-        });
-        t.addEventListener('dragend', function () {
-          t.classList.remove('is-dragging');
-          dragging = null;
-          open = Array.prototype.map.call(bar.querySelectorAll('.tab:not([hidden])'), function (x) { return x.dataset.tab; });
-          save();
-        });
-        t.addEventListener('dragover', function (e) {
-          if (!dragging || dragging === t) return;
-          e.preventDefault();
-          var box = t.getBoundingClientRect();
-          var after = e.clientX > box.left + box.width / 2;
-          bar.insertBefore(dragging, after ? t.nextSibling : t);
-        });
-      });
-      bar.addEventListener('dragover', function (e) { if (dragging) e.preventDefault(); });
-      bar.addEventListener('drop', function (e) { if (dragging) e.preventDefault(); });
-
-      function showMenu(show) {
-        if (show) {
-          // Hung just under the +, left edges lined up
-          var box = addButton.getBoundingClientRect();
-          menu.style.top = bar.getBoundingClientRect().bottom + 4 + 'px';
-          menu.style.left = box.left + 'px';
-        }
-        menu.hidden = !show;
-        addButton.setAttribute('aria-expanded', show);
-      }
-      addButton.addEventListener('click', function (e) {
-        e.stopPropagation();
-        showMenu(menu.hidden);
-      });
-      document.addEventListener('click', function (e) {
-        if (!menu.hidden && !menu.contains(e.target)) showMenu(false);
-      });
-      document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') showMenu(false);
-      });
-
-      render();
-    })();
-  </script>
-
   <div class="page{% if page.quick_entrance %} quick-entrance{% endif %}">
     <header class="header">
       <div class="header-row">
@@ -244,27 +116,9 @@
     <span class="statusline-left">
       <span class="status-branch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="5" r="2.2"/><circle cx="6" cy="19" r="2.2"/><circle cx="18" cy="7" r="2.2"/><path d="M6 7.2v9.6"/><path d="M18 9.2c0 4.8-6 4.3-11.2 7.6"/></svg>{{ site.branch }}</span>
       <span class="status-file">{{ page.path }}</span>
-      <span class="status-saved" id="status-saved" data-time="{{ site.time | date_to_xmlschema }}"></span>
     </span>
     <span class="statusline-right"><span id="status-pos">ln 1, col 1</span><span id="status-lines"></span><span>utf-8</span></span>
   </footer>
-  <script>
-    (function () {
-      // When the site was last built, as "saved 2d ago": the page showing is
-      // its unsaved copy
-      var saved = document.getElementById('status-saved');
-      var built = new Date(saved.dataset.time);
-      function ago() {
-        var s = Math.max(0, (Date.now() - built) / 1000);
-        var text = s < 60 ? 'just now'
-          : s < 3600 ? Math.floor(s / 60) + 'm ago'
-          : s < 86400 ? Math.floor(s / 3600) + 'h ago'
-          : Math.floor(s / 86400) + 'd ago';
-        saved.textContent = 'saved ' + text;
-      }
-      if (!isNaN(built)) { ago(); setInterval(ago, 60000); }
-    })();
-  </script>
 
   <div id="copy-toast">Copied to clipboard</div>
 
@@ -577,19 +431,22 @@
       document.documentElement.addEventListener('pointerleave', function () { pointer = null; track(); });
       window.addEventListener('scroll', track, { passive: true });
 
-      // Off the home page, a press anywhere along the name's line (the whole
-      // width its highlight takes, gutter and all) goes home, as the name does
+      // A press anywhere along the name's line (the whole width its
+      // highlight takes, gutter and all) does what pressing the name does:
+      // off the home page it goes home, and on it the name retypes
       var nameLink = document.querySelector('.name-link');
-      if (nameLink) {
+      var siteName = document.getElementById('site-name');
+      if (nameLink || siteName) {
         document.addEventListener('click', function (e) {
-          if (e.button !== 0 || e.defaultPrevented || e.target.closest('a, button, input')) return;
+          if (e.button !== 0 || e.defaultPrevented || e.target.closest('a, button, input, #site-name')) return;
           var line = lines[0];
           if (!line || line.block !== document.querySelector('.header h1')) return;
           var box = band.getBoundingClientRect();
           var origin = page.getBoundingClientRect();
           var y = e.clientY - origin.top;
           if (y < line.top || y >= line.bottom || e.clientX < origin.left - 64 || e.clientX > box.right) return;
-          if (e.metaKey || e.ctrlKey) window.open(nameLink.href);
+          if (siteName) siteName.click();
+          else if (e.metaKey || e.ctrlKey) window.open(nameLink.href);
           else location.href = nameLink.href;
         });
       }
