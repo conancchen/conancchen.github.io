@@ -107,7 +107,18 @@
     </script>
 
     {{ content }}
+
+    <div class="gutter" id="gutter" aria-hidden="true"></div>
+    <div class="line-band" id="line-band" aria-hidden="true"></div>
   </div>
+
+  <footer class="statusline" aria-hidden="true">
+    <span class="statusline-left">
+      <span class="status-branch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="5" r="2.2"/><circle cx="6" cy="19" r="2.2"/><circle cx="18" cy="7" r="2.2"/><path d="M6 7.2v9.6"/><path d="M18 9.2c0 4.8-6 4.3-11.2 7.6"/></svg>{{ site.branch }}</span>
+      <span class="status-file">{{ page.path }}</span>
+    </span>
+    <span class="statusline-right"><span id="status-pos">ln 1, col 1</span><span id="status-lines"></span><span>utf-8</span></span>
+  </footer>
 
   <div id="copy-toast">Copied to clipboard</div>
 
@@ -264,6 +275,195 @@
       el.addEventListener('click', function () { retype(el); });
     });
     {% endif %}
+  </script>
+
+  <script>
+    // The editor dressing: finds every line of the bio's paragraphs (and the
+    // coursework list) as it's laid out, numbers each in the gutter, and lights the one under the pointer,
+    // with its line and column in the status bar. Measured again whenever the
+    // page changes (a resize, the font arriving). The numbers are there from
+    // the first frame: the bio's rise-in is taken back out of what's measured,
+    // so they sit where its lines come to rest.
+    (function () {
+      var page = document.querySelector('.page');
+      var gutter = document.getElementById('gutter');
+      var band = document.getElementById('line-band');
+      var pos = document.getElementById('status-pos');
+      var count = document.getElementById('status-lines');
+      var lines = [];
+      var current = -1;
+      var pointer = null;  // where the mouse last was, in the window
+      var charWidth = 8;
+
+      // How far the element is shifted down by anything moving it (the bio
+      // rising in), to take back out
+      function shift(el) {
+        var y = 0;
+        for (; el && el !== page; el = el.parentElement) {
+          var t = getComputedStyle(el).transform;
+          if (t && t !== 'none') y += new DOMMatrix(t).m42;
+        }
+        return y;
+      }
+
+      function measure() {
+        var origin = page.getBoundingClientRect();
+        var walker = document.createTreeWalker(page, NodeFilter.SHOW_TEXT, {
+          acceptNode: function (node) {
+            var el = node.parentElement;
+            if (!/\S/.test(node.data)) return NodeFilter.FILTER_REJECT;
+            if (el.closest('.gutter, .preview-card, svg, script, style')) return NodeFilter.FILTER_REJECT;
+            return NodeFilter.FILTER_ACCEPT;
+          }
+        });
+        var range = document.createRange();
+        var boxes = [];
+        var shifts = new Map();
+        for (var node; (node = walker.nextNode());) {
+          var el = node.parentElement;
+          if (!el.closest('.subtitle, .bio p, .sort-line, .courses, .block > .block-label, .block .row, ' +
+            '.zm-meta, .zm-problem, .zm-last, .zm-start, .zm-history-head .block-label')) continue;
+          // Only the main text is numbered: the page's title, the bio's
+          // paragraphs, the home page's sections (titles, experiences,
+          // links), the coursework's grouping line and list,
+          // and Zetamac's clock, problem, Start and titles. An experience's
+          // note opening doesn't count, nor anything kept out of sight
+          if (getComputedStyle(el).visibility !== 'visible') continue;
+          if (!shifts.has(el)) shifts.set(el, shift(el));
+          var dy = origin.top + shifts.get(el);
+          var block = el.closest('.bio p, .term, .block-label, .row');  // the paragraph (or semester, or title) it's in
+          range.selectNodeContents(node);
+          var rects = range.getClientRects();
+          for (var i = 0; i < rects.length; i++) {
+            if (rects[i].width < 1 || rects[i].height < 1) continue;
+            boxes.push({ top: rects[i].top - dy, bottom: rects[i].bottom - dy, block: block });
+          }
+        }
+        // The name is line 1 on every page. It's measured as a whole line,
+        // since on the home page its text may still be typing itself out
+        var name = document.querySelector('.header h1');
+        if (name) {
+          var r = name.getBoundingClientRect();
+          var dyName = origin.top + shift(name);
+          boxes.push({ top: r.top - dyName, bottom: r.bottom - dyName, block: name });
+        }
+
+        // Boxes whose middles fall within one another's spans share a line
+        boxes.sort(function (a, b) { return a.top - b.top; });
+        var found = [];
+        boxes.forEach(function (box) {
+          var mid = (box.top + box.bottom) / 2;
+          var last = found[found.length - 1];
+          if (last && mid < last.bottom && mid > last.top) {
+            last.top = Math.min(last.top, box.top);
+            last.bottom = Math.max(last.bottom, box.bottom);
+          } else {
+            found.push({ top: box.top, bottom: box.bottom, block: box.block });
+          }
+        });
+        // A blank line, numbered like any other, between one semester (or
+        // subject) and the next, in the middle of the gap
+        lines = [];
+        found.forEach(function (line, i) {
+          var prev = found[i - 1];
+          var h = prev ? prev.bottom - prev.top : 0;
+          if (prev && line.block !== prev.block && prev.block && prev.block.classList.contains('term') && line.block && line.block.classList.contains('term')) {
+            var mid = (prev.bottom + line.top) / 2;
+            lines.push({ top: mid - h / 2, bottom: mid + h / 2 });
+          }
+          lines.push(line);
+        });
+
+        var probe = document.createElement('span');
+        probe.textContent = '0000000000';
+        probe.style.cssText = 'position:absolute;visibility:hidden;white-space:pre';
+        document.body.appendChild(probe);  // outside the page, so measuring doesn't count as a change to it
+        charWidth = probe.getBoundingClientRect().width / 10 || charWidth;
+        document.body.removeChild(probe);
+
+        var html = '';
+        lines.forEach(function (line, i) {
+          var h = line.bottom - line.top;
+          html += '<span style="top:' + line.top + 'px;height:' + h + 'px;line-height:' + h + 'px">' + (i + 1) + '</span>';
+        });
+        gutter.innerHTML = html;
+        count.textContent = lines.length ? lines.length + ' lines' : '';
+        current = -1;
+        track();
+      }
+
+      function light(i, x) {
+        if (i !== current) {
+          var spans = gutter.children;
+          if (spans[current]) spans[current].classList.remove('is-current');
+          current = i;
+          if (i < 0) { band.classList.remove('is-on'); return; }
+          spans[i].classList.add('is-current');
+          band.style.top = lines[i].top + 'px';
+          band.style.height = (lines[i].bottom - lines[i].top) + 'px';
+          band.classList.add('is-on');
+        }
+        if (i >= 0) {
+          var left = page.getBoundingClientRect().left + parseFloat(getComputedStyle(page).paddingLeft);
+          var col = Math.max(1, Math.floor((x - left) / charWidth) + 1);
+          pos.textContent = 'ln ' + (i + 1) + ', col ' + col;
+        }
+      }
+
+      // Lights whichever line is under the pointer, wherever it last was:
+      // on a move, and again whenever the lines move under it (a scroll, a
+      // note sliding open on a click), so the highlight never drops out
+      function track() {
+        if (!pointer) { light(-1); return; }
+        var y = pointer.y - page.getBoundingClientRect().top;
+        var hit = -1;
+        for (var i = 0; i < lines.length; i++) {
+          if (y >= lines[i].top && y < lines[i].bottom) { hit = i; break; }
+        }
+        light(hit, pointer.x);
+      }
+
+      document.addEventListener('pointermove', function (e) {
+        if (e.pointerType !== 'mouse') return;
+        pointer = { x: e.clientX, y: e.clientY };
+        track();
+      });
+      document.documentElement.addEventListener('pointerleave', function () { pointer = null; track(); });
+      window.addEventListener('scroll', track, { passive: true });
+
+      // A press anywhere along the name's line (the whole width its
+      // highlight takes, gutter and all) does what pressing the name does:
+      // off the home page it goes home, and on it the name retypes
+      var nameLink = document.querySelector('.name-link');
+      var siteName = document.getElementById('site-name');
+      if (nameLink || siteName) {
+        document.addEventListener('click', function (e) {
+          if (e.button !== 0 || e.defaultPrevented || e.target.closest('a, button, input, #site-name')) return;
+          var line = lines[0];
+          if (!line || line.block !== document.querySelector('.header h1')) return;
+          var box = band.getBoundingClientRect();
+          var origin = page.getBoundingClientRect();
+          var y = e.clientY - origin.top;
+          if (y < line.top || y >= line.bottom || e.clientX < origin.left - 64 || e.clientX > box.right) return;
+          if (siteName) siteName.click();
+          else if (e.metaKey || e.ctrlKey) window.open(nameLink.href);
+          else location.href = nameLink.href;
+        });
+      }
+
+      // Only a change to the layout (a list swapping in, a note opening, a
+      // resize) moves the lines, and they're measured again right then, in
+      // the same frame; text changing in place, like a scramble, doesn't
+
+      new ResizeObserver(function () { measure(); }).observe(page);
+      new MutationObserver(function () { measure(); })
+        .observe(page, { subtree: true, attributes: true, attributeFilter: ['hidden', 'open'] });
+      // Zetamac hides and shows its pieces by a class as a round starts and ends
+      var zm = document.getElementById('zm');
+      if (zm) new MutationObserver(function () { measure(); }).observe(zm, { attributes: true, attributeFilter: ['class'] });
+      if (document.fonts) document.fonts.ready.then(measure);
+      measure();
+    })();
   </script>
 </body>
 

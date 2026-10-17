@@ -17,6 +17,8 @@
   --text: #16150f;
   --muted: #8a8a8a;
   --rule: #e0dfdb;
+  --gutter: #c2c1bc;  // the line numbers, a step lighter than the muted text
+  --current-line: rgba(22, 21, 15, 0.035);  // the band behind the line under the pointer
   --link: #6f6e6a;
   --top: #2f74d0;  // the A+ courses: the site's blue, a shade deeper to read as text
   --swim: #2a78d6;  // the sports' colors
@@ -303,7 +305,8 @@ $reveal: '.subtitle, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .up
   margin: 0 0 10px;
 }
 
-// A section's title sits as far above its first row as the rows sit apart
+// A section's title sits a row above its first row, the same 28px apart as
+// the rows below it, so the numbered lines run on evenly
 .block > .block-label {
   margin-bottom: 4px;
 }
@@ -794,8 +797,10 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   display: none;
 }
 
-// A semester's (or subject's) name sits above its courses, every row the
-// same 28px, with one blank row between groups
+// A semester's (or subject's) name sits above its courses. Every row, name
+// or course, is 28px, and a group sits one blank 28px row after the last, so
+// the list keeps to one grid: a line number stays put when the grouping
+// switches
 .term + .term {
   margin-top: 28px;
 }
@@ -834,7 +839,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 #copy-toast {
   position: fixed;
   left: 50%;
-  bottom: 32px;
+  bottom: 48px;  // clear of the status bar
   transform: translateX(-50%);
   background: var(--toast-bg);
   color: var(--toast-text);
@@ -851,6 +856,136 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   .page {
     padding: 32px 24px 40px;
   }
+
+}
+
+/**************/
+/* EDITOR     */
+/**************/
+// The page dressed as a file open in a text editor: each line of text gets a
+// number in a gutter to its left, the line under the pointer is lit, and a
+// status bar along the bottom names the file and where the pointer is in it.
+// The layout's script measures the lines and places the numbers.
+.page {
+  position: relative;
+  z-index: 0;  // so the lit line's band can sit behind the text
+}
+
+.gutter {
+  position: absolute;
+  top: 0;
+  right: calc(100% - 16px + 20px);  // 20px left of the column
+  width: 40px;
+  color: var(--gutter);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+.gutter span {
+  position: absolute;
+  right: 0;
+  white-space: nowrap;
+}
+
+.gutter span.is-current {
+  color: var(--muted);
+}
+
+.line-band {
+  position: absolute;
+  left: -64px;
+  right: 0;
+  z-index: -1;
+  background: var(--current-line);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.line-band.is-on {
+  opacity: 1;
+}
+
+// No room beside the column for the gutter on narrow screens (phones),
+// and with no pointer there to track, the status bar just names the file
+@media (max-width: 699px) {
+  .gutter,
+  .line-band,
+  .statusline .statusline-right {
+    display: none;
+  }
+}
+
+.statusline {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 900;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  // Plain text over the page's white, spanning the page's 550px text column
+  padding: 6px max(16px, (100% - 550px) / 2) 10px;
+  border-top: 1px solid var(--rule);  // ruled off from the page
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.statusline-left,
+.statusline-right {
+  display: flex;
+  gap: 16px;
+}
+
+.status-branch {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-branch svg {
+  width: 12px;
+  height: 12px;
+}
+
+// Where there's a gutter, the bar starts out in it, under where a two-digit
+// line number does (36px out from the text)
+@media (min-width: 700px) {
+  .statusline {
+    padding-left: calc(max(16px, (100% - 550px) / 2) - 36px);
+  }
+}
+
+// The status bar holds still from page to page: each piece that changes
+// keeps one width, so the pieces after it stay put
+.status-file {
+  min-width: 15ch;  // coursework.html, the longest
+}
+
+#status-pos {
+  min-width: 14ch;  // ln 99, col 999
+}
+
+#status-lines {
+  min-width: 9ch;  // 999 lines
+  text-align: right;
+}
+
+// On phones the bar keeps to the column's wider 24px gutter
+@media screen and (max-width: 639px) {
+  .statusline {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+// Room at the bottom so the status bar never covers the last line
+body {
+  padding-bottom: 33px;
 }
 
 /**************/
