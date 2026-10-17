@@ -13,10 +13,12 @@
   --font: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
   --font-adjust: 0.53;
   --font-spacing: -0.15em;
-  --bg: #fcfbf8;  // a warm white, like paper
+  --bg: #fafaf8;  // a near white, with just a breath of warmth
   --text: #16150f;
   --muted: #8a8a8a;
   --rule: #e0dfdb;
+  --gutter: #c2c1bc;  // the line numbers, a step lighter than the muted text
+  --current-line: rgba(22, 21, 15, 0.035);  // the band behind the line under the pointer
   --link: #6f6e6a;
   --top: #2f74d0;  // the A+ courses: the site's blue, a shade deeper to read as text
   --swim: #2a78d6;  // the sports' colors
@@ -230,7 +232,7 @@ $reveal: '.subtitle, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .up
   width: 100%;
   max-width: 582px;  // a 550px text column plus the 16px gutters, matching /strava and /study
   margin: 0 auto;
-  padding: 80px 16px 40px;
+  padding: 60px 16px 40px;
 }
 
 .header {
@@ -260,42 +262,14 @@ $reveal: '.subtitle, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .up
   margin: 0;
 }
 
+// On the other pages the name links home, looking just as it does there
+.name-link {
+  color: inherit;
+}
+
 // A click shouldn't leave a focus ring behind; a keyboard tab still should
-.icon-button:focus:not(:focus-visible),
 .entry > summary:focus:not(:focus-visible) {
   outline: none;
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  flex-shrink: 0;
-  margin-left: auto;  // stays on the right on pages without a title
-  // The buttons' padding and the moon's inset inside its icon would leave it
-  // short of the column's right edge; this pulls its rim onto that edge
-  margin-right: -5.5px;
-  // The 26px buttons would stretch the title's 20px line and push the
-  // subtitle down, so they overhang it instead
-  margin-top: -3px;
-  margin-bottom: -3px;
-}
-
-.icon-button {
-  display: inline-flex;
-  background: transparent;
-  border: none;
-  padding: 4px;
-  margin: 0;
-  line-height: 0;
-  color: var(--muted);
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-.icon-button:hover,
-.icon-button[aria-pressed="true"] {
-  color: var(--text);
 }
 
 // The name sits as far above the bio as its paragraphs sit apart (14.4px):
@@ -329,6 +303,12 @@ $reveal: '.subtitle, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .up
   font-weight: inherit;
   color: var(--muted);
   margin: 0 0 10px;
+}
+
+// A section's title sits a row above its first row, the same 28px apart as
+// the rows below it, so the numbered lines run on evenly
+.block > .block-label {
+  margin-bottom: 4px;
 }
 
 .row {
@@ -810,30 +790,25 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 // courses stacked beside it with their codes on the right; the rows are set
 // apart by space alone
 .courses {
-  margin-top: 16px;
+  margin: 28px 0 12px;
 }
 
 .courses[hidden] {
   display: none;
 }
 
-.term {
-  display: grid;
-  grid-template-columns: 93px 1fr;
-  gap: 8px;
-  align-items: start;
-  padding: 12px 0;
+// A semester's (or subject's) name sits above its courses. Every row, name
+// or course, is 28px, and a group sits one blank 28px row after the last, so
+// the list keeps to one grid: a line number stays put when the grouping
+// switches
+.term + .term {
+  margin-top: 28px;
 }
 
 .term-name {
+  display: block;
   color: var(--muted);
   padding: 4px 0;
-}
-
-// Semesters go by short names (F26, S25), so their gutter is narrow; the
-// subjects' longer names keep the wide one
-#by-semester .term {
-  grid-template-columns: 40px 1fr;
 }
 
 .course {
@@ -864,7 +839,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 #copy-toast {
   position: fixed;
   left: 50%;
-  bottom: 32px;
+  bottom: 48px;  // clear of the status bar
   transform: translateX(-50%);
   background: var(--toast-bg);
   color: var(--toast-text);
@@ -882,15 +857,353 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
     padding: 32px 24px 40px;
   }
 
-  // No room for a gutter, so a semester's name sits above its courses
-  .term {
-    grid-template-columns: 1fr;
-    gap: 0;
+  // The tabs keep to the column's wider phone gutter too
+  .tabbar {
+    padding-left: 12px;
   }
 
-  .term-name {
-    padding-bottom: 2px;
+  .statusline {
+    padding-left: 24px;
+    padding-right: 24px;
   }
+}
+
+/**************/
+/* EDITOR     */
+/**************/
+// The page dressed as a file open in a text editor: each line of text gets a
+// number in a gutter to its left, the line under the pointer is lit, and a
+// status bar along the bottom names the file and where the pointer is in it.
+// The layout's script measures the lines and places the numbers.
+.page {
+  position: relative;
+  z-index: 0;  // so the lit line's band can sit behind the text
+}
+
+.gutter {
+  position: absolute;
+  top: 0;
+  right: calc(100% - 16px + 20px);  // 20px left of the column
+  width: 40px;
+  color: var(--gutter);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+.gutter span {
+  position: absolute;
+  right: 0;
+  white-space: nowrap;
+}
+
+.gutter span.is-current {
+  color: var(--muted);
+}
+
+.line-band {
+  position: absolute;
+  left: -64px;
+  right: 0;
+  z-index: -1;
+  background: var(--current-line);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.line-band.is-on {
+  opacity: 1;
+}
+
+// No room beside the column for the gutter on narrow screens (phones),
+// and with no pointer there to track, the status bar just names the file
+@media (max-width: 699px) {
+  .gutter,
+  .line-band,
+  .statusline .statusline-right {
+    display: none;
+  }
+}
+
+.tabbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 900;
+  display: flex;
+  align-items: flex-end;
+  // An editor's tab strip on the page's own white, ruled off from the page
+  // by a hairline the width of the window, which the tab showing breaks to
+  // join the page. The first name lines up with the page's text (less the
+  // 12px its tab leads in with)
+  padding: 6px 0 1px calc(max(16px, (100% - 550px) / 2) - 12px);
+  background: linear-gradient(var(--rule), var(--rule)) bottom / 100% 1px no-repeat, var(--bg);
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabbar::-webkit-scrollbar {
+  display: none;
+}
+
+// The tabs not showing sit back in the strip
+.tab {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 30px;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  color: var(--muted);
+}
+
+// The tab showing is outlined, and stands on the hairline's gap, opening
+// into the page
+.tab.is-active {
+  position: relative;
+  z-index: 1;
+  height: 31px;
+  margin-bottom: -1px;
+  border-color: var(--rule);
+  border-radius: 4px 4px 0 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.tab[hidden] {
+  display: none;
+}
+
+// Every tab keeps the same room, its × included, so they're evenly spaced
+.tab a {
+  padding: 0 6px 0 12px;
+  line-height: 30px;
+  color: inherit;
+}
+
+.tab a:hover,
+.tab a:focus {
+  opacity: 1;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+// The tab being dragged fades back, leaving its place among the others
+.tab.is-dragging {
+  opacity: 0.4;
+}
+
+// The ×, after the name, shown on the active tab and on any tab under the
+// pointer; the last tab open can't close
+.tab-close {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: none;
+  color: inherit;
+  font-size: 13px;
+  line-height: 16px;
+  visibility: hidden;
+}
+
+.tab.is-active .tab-close,
+.tab:hover .tab-close,
+.tab-close:focus-visible {
+  visibility: visible;
+}
+
+.tab-close:hover {
+  background: var(--rule);
+}
+
+// The page showing is marked unsaved, as in an editor: a dot ahead of its
+// name, in the blue of the "now" dot in Experiences, pulsing like it
+.tab.is-active a::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 7px;
+  vertical-align: 0.5px;
+  border-radius: 50%;
+  background: rgb(55, 135, 240);
+  animation: tab-pulse 2.4s ease-out infinite;
+}
+
+// The "now" dot's pulse, its ring a little smaller and fainter at tab size
+@keyframes tab-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(55, 135, 240, 0.35);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 4px rgba(55, 135, 240, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab.is-active a::before {
+    animation: none;
+  }
+}
+
+.is-single .tab-close {
+  display: none;
+}
+
+.is-single .tab a {
+  padding-right: 12px;
+}
+
+.tab-new {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 30px;
+}
+
+.tab-new[hidden] {
+  display: none;
+}
+
+.tab-add {
+  width: 22px;
+  height: 22px;
+  margin-left: 4px;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: none;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.tab-add:hover,
+.tab-add[aria-expanded="true"] {
+  background: var(--rule);
+  color: var(--text);
+}
+
+// The closed pages, listed under the + to reopen
+.tab-menu {
+  position: fixed;
+  z-index: 950;
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: var(--bg);
+  box-shadow: 0 6px 20px rgba(22, 21, 15, 0.08);
+}
+
+.tab-menu[hidden] {
+  display: none;
+}
+
+.tab-menu a {
+  padding: 3px 10px;
+  border-radius: 3px;
+  color: var(--text);
+}
+
+.tab-menu a:hover,
+.tab-menu a:focus {
+  opacity: 1;
+  background: var(--rule);
+  color: var(--text);
+}
+
+// The page starts below the tabs, keeping all its own room above the name
+body {
+  padding-top: 37px;
+}
+
+.statusline {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 900;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  // Like the tabs: plain text over the page's white, spanning the page's
+  // 550px text column
+  padding: 6px max(16px, (100% - 550px) / 2) 10px;
+  border-top: 1px solid var(--rule);  // ruled off from the page, as the tabs are
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.statusline-left,
+.statusline-right {
+  display: flex;
+  gap: 16px;
+}
+
+.status-branch {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-branch svg {
+  width: 12px;
+  height: 12px;
+}
+
+// Phones keep just the branch and the file
+@media (max-width: 699px) {
+  .status-saved {
+    display: none;
+  }
+}
+
+// The status bar holds still from page to page: on screens with the gutter
+// it starts under where a two-digit line number does (36px out from the
+// text) whatever the page's numbers, and each piece that changes keeps one
+// width, so the pieces after it stay put
+@media (min-width: 700px) {
+  .statusline {
+    padding-left: calc(max(16px, (100% - 550px) / 2) - 36px);
+  }
+
+  // and the tabs start right above it (less the 12px a tab leads in with)
+  .tabbar {
+    padding-left: calc(max(16px, (100% - 550px) / 2) - 36px - 12px);
+  }
+}
+
+.status-file {
+  min-width: 15ch;  // coursework.html, the longest
+}
+
+#status-pos {
+  min-width: 14ch;  // ln 99, col 999
+}
+
+#status-lines {
+  min-width: 9ch;  // 999 lines
+  text-align: right;
+}
+
+// Room at the bottom so the status bar never covers the last line
+body {
+  padding-bottom: 33px;
 }
 
 /**************/

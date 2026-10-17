@@ -5,3 +5,6 @@ url: "https://conancchen.github.io"
 
 # Keeps the "Updated" date on Princeton time
 timezone: America/New_York
+
+# The git branch the site is built from, shown in the status bar
+branch: master
