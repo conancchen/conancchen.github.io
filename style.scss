@@ -261,8 +261,25 @@ $reveal: '.subtitle, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .up
   margin: 0;
 }
 
+// The name takes its whole line, out to the edges of the band that lights
+// it, so a press anywhere along it does what pressing the name does: off the
+// home page it goes home, and on it the name retypes
+.header h1 {
+  flex: 1;
+  margin: 0 -16px;
+  padding: 0 16px;
+}
+
 // On the other pages the name links home, looking just as it does there
+.header h1:has(> .name-link) {
+  margin: 0;
+  padding: 0;
+}
+
 .name-link {
+  display: block;
+  margin: 0 -16px;
+  padding: 0 16px;
   color: inherit;
 }
 
