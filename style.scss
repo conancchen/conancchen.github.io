@@ -1116,6 +1116,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   --bs-bg: var(--bg);
   --bs-muted: var(--muted);
   --bs-title-weight: 474;
+  --bs-recede-blur: 0px;  // what steps back only fades, without blurring
   margin-top: 24px;
 }
 
