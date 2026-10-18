@@ -334,16 +334,6 @@ $reveal: '.subtitle, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .up
   padding: 4px 0;
 }
 
-// Hovering a row dims the others in its list, so the one under the pointer
-// stands out
-.block .row {
-  transition: opacity 0.1s ease-in-out;
-}
-
-.block:not(.timeline):has(.row:hover) .row:not(:hover) {
-  opacity: 0.4;
-}
-
 // Each experience stays on one line, logo and year included; a name too
 // long for the screen trails off instead of wrapping
 .row-label {
@@ -491,15 +481,13 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   transform: scale(1.3);
 }
 
-// Hovering anywhere in an experience, its note included, dims every other
-// one: name, year, note and dot. The rail stays put, so the line never breaks.
-// Hovering its name in the bio does the same (the script marks it hot).
+// Hovering a place named in the bio dims every other experience: name,
+// year, note and dot (the script marks it hot). The rail stays put, so the
+// line never breaks.
 .timeline .entry > * {
   transition: opacity 0.1s ease-in-out;
 }
 
-.timeline:has(.entry:hover) .entry:not(:hover) > *,
-.timeline:has(.entry:hover) .entry:not(:hover)::after,
 .timeline.is-linked .entry:not(.is-hot) > *,
 .timeline.is-linked .entry:not(.is-hot)::after {
   opacity: 0.4;
