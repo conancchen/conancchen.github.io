@@ -143,6 +143,13 @@
   transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* A pressed book tips up off the shelf, its shadow with it, and stays up
+   until it's pressed again (hovering alone leaves it on the shelf) */
+.bs-book[aria-pressed="true"] .bs-book-lift,
+.bs-shadow.is-pinned .bs-shadow-lift {
+  transform: translate(-4px, -14px) rotate(-10deg);
+}
+
 /* A book being dragged comes up straight and forward off the shelf, out in
    front of the row, so it's carried across the front of the other books */
 .bs-book.is-dragging .bs-book-lift,

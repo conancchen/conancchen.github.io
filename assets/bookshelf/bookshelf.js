@@ -521,6 +521,7 @@
       groups.forEach(function (g, j) {
         g.classList.toggle('is-picked', j === book);
         shadows[j].classList.toggle('is-lifted', j === book);
+        shadows[j].classList.toggle('is-pinned', j === pinned);
         g.setAttribute('aria-pressed', j === pinned);
       });
       // The bookend stands in front of the last book, even while that book's
