@@ -574,7 +574,17 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   }
 }
 
+// A link's row is all link: it fills the line, its padding included, out to
+// the edges of the band that lights it, so a press anywhere along it follows
+// the link
+.row:has(> .row-link) {
+  padding: 0;
+}
+
 .row-link {
+  flex: 1;
+  margin: 0 -16px;
+  padding: 4px 16px;
   color: var(--text);
 }
 
