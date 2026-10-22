@@ -108,7 +108,6 @@
 
     {{ content }}
 
-    <div class="line-band" id="line-band" aria-hidden="true"></div>
   </div>
 
   <div id="copy-toast">Copied to clipboard</div>
@@ -266,128 +265,6 @@
       el.addEventListener('click', function () { retype(el); });
     });
     {% endif %}
-  </script>
-  <script>
-    // Lights the line of text under the pointer, like the current line in an
-    // editor: finds every line of the main text (the page's title, the bio's
-    // paragraphs, the home page's sections, the coursework's grouping line
-    // and list, and Zetamac's clock, problem, Start and titles) as it's laid
-    // out, and lays a faint band behind whichever one the pointer is on.
-    // Measured again whenever the page changes (a resize, the font arriving,
-    // a note opening). The bio's rise-in is taken back out of what's
-    // measured, so the lines sit where they come to rest.
-    (function () {
-      var page = document.querySelector('.page');
-      var band = document.getElementById('line-band');
-      var lines = [];
-      var current = -1;
-      var pointer = null;  // where the mouse last was, in the window
-
-      // How far the element is shifted down by anything moving it (the bio
-      // rising in), to take back out
-      function shift(el) {
-        var y = 0;
-        for (; el && el !== page; el = el.parentElement) {
-          var t = getComputedStyle(el).transform;
-          if (t && t !== 'none') y += new DOMMatrix(t).m42;
-        }
-        return y;
-      }
-
-      function measure() {
-        var origin = page.getBoundingClientRect();
-        var walker = document.createTreeWalker(page, NodeFilter.SHOW_TEXT, {
-          acceptNode: function (node) {
-            var el = node.parentElement;
-            if (!/\S/.test(node.data)) return NodeFilter.FILTER_REJECT;
-            if (el.closest('.preview-card, svg, script, style')) return NodeFilter.FILTER_REJECT;
-            return NodeFilter.FILTER_ACCEPT;
-          }
-        });
-        var range = document.createRange();
-        var boxes = [];
-        var shifts = new Map();
-        for (var node; (node = walker.nextNode());) {
-          var el = node.parentElement;
-          if (!el.closest('.subtitle, .bio p, .sort-line, .courses, .block > .block-label, .block .row, ' +
-            '.zm-meta, .zm-problem, .zm-last, .zm-start, .zm-history-head .block-label')) continue;
-          // An experience's note opening doesn't count, nor anything kept
-          // out of sight
-          if (getComputedStyle(el).visibility !== 'visible') continue;
-          if (!shifts.has(el)) shifts.set(el, shift(el));
-          var dy = origin.top + shifts.get(el);
-          range.selectNodeContents(node);
-          var rects = range.getClientRects();
-          for (var i = 0; i < rects.length; i++) {
-            if (rects[i].width < 1 || rects[i].height < 1) continue;
-            boxes.push({ top: rects[i].top - dy, bottom: rects[i].bottom - dy });
-          }
-        }
-        // The name is measured as a whole line, since on the home page its
-        // text may still be typing itself out
-        var name = document.querySelector('.header h1');
-        if (name) {
-          var r = name.getBoundingClientRect();
-          var dyName = origin.top + shift(name);
-          boxes.push({ top: r.top - dyName, bottom: r.bottom - dyName });
-        }
-
-        // Boxes whose middles fall within one another's spans share a line
-        boxes.sort(function (a, b) { return a.top - b.top; });
-        lines = [];
-        boxes.forEach(function (box) {
-          var mid = (box.top + box.bottom) / 2;
-          var last = lines[lines.length - 1];
-          if (last && mid < last.bottom && mid > last.top) {
-            last.top = Math.min(last.top, box.top);
-            last.bottom = Math.max(last.bottom, box.bottom);
-          } else {
-            lines.push({ top: box.top, bottom: box.bottom });
-          }
-        });
-        current = -1;
-        track();
-      }
-
-      function light(i) {
-        if (i === current) return;
-        current = i;
-        if (i < 0) { band.classList.remove('is-on'); return; }
-        band.style.top = lines[i].top + 'px';
-        band.style.height = (lines[i].bottom - lines[i].top) + 'px';
-        band.classList.add('is-on');
-      }
-
-      // Lights whichever line is under the pointer, wherever it last was:
-      // on a move, and again whenever the lines move under it (a scroll, a
-      // note sliding open on a click), so the highlight never drops out
-      function track() {
-        if (!pointer) { light(-1); return; }
-        var y = pointer.y - page.getBoundingClientRect().top;
-        var hit = -1;
-        for (var i = 0; i < lines.length; i++) {
-          if (y >= lines[i].top && y < lines[i].bottom) { hit = i; break; }
-        }
-        light(hit);
-      }
-
-      document.addEventListener('pointermove', function (e) {
-        if (e.pointerType !== 'mouse') return;
-        pointer = { x: e.clientX, y: e.clientY };
-        track();
-      });
-      document.documentElement.addEventListener('pointerleave', function () { pointer = null; track(); });
-      window.addEventListener('scroll', track, { passive: true });
-
-      new ResizeObserver(function () { measure(); }).observe(page);
-      new MutationObserver(function () { measure(); })
-        .observe(page, { subtree: true, attributes: true, attributeFilter: ['hidden', 'open'] });
-      // Zetamac hides and shows its pieces by a class as a round starts and ends
-      var zm = document.getElementById('zm');
-      if (zm) new MutationObserver(function () { measure(); }).observe(zm, { attributes: true, attributeFilter: ['class'] });
-      if (document.fonts) document.fonts.ready.then(measure);
-      measure();
-    })();
   </script>
 </body>
 
