@@ -7,12 +7,9 @@
 // The site is light only
 :root {
   color-scheme: light;
-  // JetBrains Mono, set half a pixel smaller than its size says (its
-  // x-height is 0.55, scaled by 13.5/14) and with its letter-wide spaces
-  // drawn in a little
-  --font: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
-  --font-adjust: 0.53;
-  --font-spacing: -0.15em;
+  // The system's own sans: San Francisco on Apple devices, Segoe UI on
+  // Windows, Roboto on Android
+  --font: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --bg: #fafaf8;  // a near white, with just a breath of warmth
   --text: #16150f;
   --muted: #8a8a8a;
@@ -58,19 +55,6 @@ $cursor-dot: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' w
   box-sizing: border-box;
 }
 
-// A font can be set a touch smaller than its size says (--font-adjust, by
-// x-height), everywhere: forced, since controls reset it with font: inherit
-body,
-body * {
-  font-size-adjust: var(--font-adjust, none) !important;
-}
-
-// and a font's spaces drawn in a little (--font-spacing), as a mono font's
-// are as wide as a letter
-body {
-  word-spacing: var(--font-spacing, normal);
-}
-
 // Nothing on the page can be selected (no highlight on a drag or a double
 // click), and a tap on a phone doesn't flash a highlight either; the
 // Zetamac answer box still takes its typing as usual
@@ -97,7 +81,7 @@ body {
   background-color: var(--bg);
   color: var(--text);
   font-family: var(--font);
-  font-size: 14px;
+  font-size: 14.5px;
   // The variable weight sits just above regular, on a 20px line, a hair
   // tight, matching chanbin.xyz
   font-weight: 436;
@@ -128,22 +112,21 @@ a:focus {
   opacity: 0.7;
 }
 
-// Bio links read as body text with a dashed underline, like a link in a
-// terminal or a man page, that turns solid and dark on hover
+// Bio links read as body text with a thin, light underline that breaks
+// around the descenders and darkens on hover
 .bio a {
   color: var(--text);
-  text-decoration: underline dashed;
-  text-decoration-color: var(--muted);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--muted) 20%, transparent);
   text-decoration-thickness: 1px;
-  text-decoration-skip-ink: none;
-  text-underline-offset: 4px;
+  text-decoration-skip-ink: auto;
+  text-underline-offset: 3px;
   transition: text-decoration-color 0.15s ease;
 }
 
 .bio a:hover,
 .bio a:focus {
   opacity: 1;
-  text-decoration-style: solid;
   text-decoration-color: var(--text);
 }
 
@@ -228,7 +211,7 @@ $reveal: '.subtitle, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .up
 /**************/
 .page {
   width: 100%;
-  max-width: 582px;  // a 550px text column plus the 16px gutters, matching /strava and /study
+  max-width: 532px;  // a 500px text column plus the 16px gutters
   margin: 0 auto;
   padding: 80px 16px 40px;
 }
@@ -255,7 +238,7 @@ $reveal: '.subtitle, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .up
 }
 
 .header h1 {
-  font-size: 14px;
+  font-size: 14.5px;
   font-weight: inherit;  // the same weight as the text below it
   margin: 0;
 }
@@ -314,7 +297,7 @@ $reveal: '.subtitle, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .up
 }
 
 .block-label {
-  font-size: 14px;
+  font-size: 14.5px;
   font-weight: inherit;
   color: var(--muted);
   margin: 0 0 10px;
@@ -354,7 +337,7 @@ $reveal: '.subtitle, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .up
 
 .row-year {
   color: var(--muted);
-  font-size: 13px;
+  font-size: 13.5px;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -383,7 +366,7 @@ $reveal: '.subtitle, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .up
 
 .row-note {
   color: var(--muted);
-  font-size: 13px;
+  font-size: 13.5px;
   margin: 0;
   padding: 0 0 8px;
   max-width: 60ch;
@@ -647,7 +630,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   align-items: baseline;
   gap: 16px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 12.5px;
   margin: 0;
   font-variant-numeric: tabular-nums;
 }
@@ -750,7 +733,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 // Sits under the title at the same size (body size), in muted gray
 .subtitle {
   color: var(--muted);
-  font-size: 14px;
+  font-size: 14.5px;
   font-weight: inherit;
   margin: 4px 0 0;
   font-variant-numeric: tabular-nums;
@@ -852,7 +835,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   transform: translateX(-50%);
   background: var(--toast-bg);
   color: var(--toast-text);
-  font-size: 13px;
+  font-size: 13.5px;
   padding: 6px 12px;
   border-radius: 5px;
   opacity: 0;
@@ -885,11 +868,11 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   color: var(--text);
   font: inherit;
   cursor: pointer;
-  text-decoration: underline dashed;
-  text-decoration-color: var(--muted);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--muted) 20%, transparent);
   text-decoration-thickness: 1px;
-  text-decoration-skip-ink: none;
-  text-underline-offset: 4px;
+  text-decoration-skip-ink: auto;
+  text-underline-offset: 3px;
   transition: text-decoration-color 0.15s ease;
 }
 
@@ -897,7 +880,6 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 .bio .preview-link:focus-visible,
 .preview.is-open .preview-link {
   outline: none;
-  text-decoration-style: solid;
   text-decoration-color: var(--text);
 }
 
@@ -920,7 +902,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   background: var(--bg);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 12px 40px rgba(0, 0, 0, 0.08);
   color: var(--muted);
-  font-size: 12px;
+  font-size: 12.5px;
   line-height: 16px;
   font-variant-numeric: tabular-nums;
   white-space: normal;
@@ -990,7 +972,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 
 .pc-total {
   color: var(--text);
-  font-size: 26px;
+  font-size: 26.5px;
   line-height: 30px;
   letter-spacing: -0.5px;
 }
@@ -1127,7 +1109,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   display: flex;
   justify-content: space-between;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 13.5px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -1225,7 +1207,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   display: flex;
   align-items: baseline;
   gap: 0.35em;
-  font-size: 52px;
+  font-size: 52.5px;
   line-height: 56px;
   letter-spacing: -0.5px;
   font-variant-numeric: tabular-nums;
@@ -1240,7 +1222,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 @media screen and (max-width: 479px) {
   .zm-problem,
   .zm-last {
-    font-size: 36px;
+    font-size: 36.5px;
     line-height: 44px;
   }
 }
@@ -1277,7 +1259,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 // the last round's score, above Start
 .zm-last {
   margin-bottom: 4px;
-  font-size: 52px;
+  font-size: 52.5px;
   line-height: 56px;
   letter-spacing: -0.5px;
   font-variant-numeric: tabular-nums;
@@ -1296,7 +1278,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   background: none;
   color: var(--text);
   font: inherit;
-  font-size: 14px;
+  font-size: 14.5px;
   transition: color 0.15s ease;
 }
 
@@ -1339,7 +1321,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   background: none;
   color: var(--muted);
   font: inherit;
-  font-size: 13px;
+  font-size: 13.5px;
   transition: color 0.15s ease;
 }
 
@@ -1356,7 +1338,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 .zm-stats {
   margin: -4px 0 12px;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 13.5px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -1387,7 +1369,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   text-anchor: end;
   fill: var(--muted);
   font-family: var(--font);  // the site's own, as everywhere else
-  font-size: 10px;
+  font-size: 10.5px;
   font-variant-numeric: tabular-nums;
   dominant-baseline: central;
 }
@@ -1477,7 +1459,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 .zm-badge text {
   fill: #fff;
   font-family: var(--font);  // the site's own, as everywhere else
-  font-size: 11px;
+  font-size: 11.5px;
   font-variant-numeric: tabular-nums;
   dominant-baseline: central;
 }
@@ -1610,7 +1592,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   background: var(--bg);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
   color: var(--muted);
-  font-size: 12px;
+  font-size: 12.5px;
   line-height: 16px;
   white-space: nowrap;
   pointer-events: none;

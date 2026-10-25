@@ -20,9 +20,9 @@
   aspect: 0.664
   row: 1
   crate: { x: 8, width: 66, height: 99, back: 0.6 }
-- src: sisyphus-titian.jpg
-  title: Sisyphus
-  by: Titian, 1548–49
-  aspect: 0.864
+- src: fine-wind-clear-morning-hokusai.jpg
+  title: Fine Wind, Clear Morning
+  by: Katsushika Hokusai, 1830–32
+  aspect: 1.499
   row: 1
-  crate: { x: 107, width: 77, height: 88, back: 0.35 }
+  crate: { x: 84, width: 108, height: 72, back: 0.35 }

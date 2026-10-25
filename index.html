@@ -4,10 +4,10 @@ home: true
 ---
 <section class="bio">
   <p>
-    I’m a junior at Princeton studying applied math.
+    I study applied math at Princeton.
   </p>
   <p>
-    Currently, I research humanoid robots in the <a href="https://pvl.cs.princeton.edu/" data-exp="pvl">Vision &amp; Learning Lab</a>. Previously, I interned at <a href="https://scale.com/" data-exp="scale">Scale AI</a>.
+    Currently, I research <a href="https://www.instagram.com/p/De17MaNSDC0/?vrfl=MXV4N3UwMDNqbW0xbA==">humanoid robots</a> in the <a href="https://pvl.cs.princeton.edu/" data-exp="pvl">Vision &amp; Learning Lab</a>. Previously, I interned at <a href="https://scale.com/" data-exp="scale">Scale AI</a>.
   </p>
   <p>
     I also compete as a Division I swimmer and enjoy doing triathlons. Recently, I finished my first <span class="preview"><button type="button" class="preview-link" aria-expanded="false" aria-controls="im-card">Ironman 70.3</button><span class="preview-card" id="im-card" role="tooltip">
@@ -127,7 +127,7 @@ home: true
 
 <div>
   <section class="block timeline">
-    <h2 class="block-label block-label-plain">Experiences</h2>
+    <h2 class="block-label">Experiences</h2>
 
     <details class="entry is-next">
       <summary class="row">
@@ -227,7 +227,7 @@ home: true
   </script>
 
   <section class="block">
-    <h2 class="block-label block-label-plain">More</h2>
+    <h2 class="block-label">More</h2>
 
     <div class="row">
       <a href="{{ site.baseurl }}/coursework/" class="row-link">Coursework</a>
@@ -265,12 +265,11 @@ home: true
       // The lap counter under the water, on the right, four digits like a
       // pool's pace clock counting yards in 25s (a length of a short-course
       // pool). A length is counted as it pushes off the wall at the end of
-      // it, however it began. Each length is timed push-off to push-off, for
-      // the average pace on the counter's card; one it was picked up or
-      // dropped into partway doesn't count toward the average. (The counter
-      // comes later in the page, so it's looked up there; the lengths swum
-      // ahead of time to fit the pace don't count.)
-      var laps = 0, timedLaps = 0, timedTotal = 0, lengthStart = null, rehearsing = false;
+      // it, however it began. The counter's card also keeps a running clock,
+      // to the second, from the first push-off until the swimmer's hurt.
+      // (The counter comes later in the page, so it's looked up there; the
+      // lengths swum ahead of time to fit the pace don't count.)
+      var laps = 0, swum = null, rehearsing = false;
       function show(id, text) {
         var el = document.getElementById(id);
         if (el) el.textContent = text;
@@ -278,23 +277,22 @@ home: true
       function lapDone() {
         if (rehearsing) return;
         laps++;
-        if (lengthStart !== null) {
-          timedLaps++;
-          timedTotal += time - lengthStart;
-        }
         show('laps-count', String(laps * 25).padStart(4, '0'));
         show('lc-laps', laps);
         show('lc-yards', laps * 25);
-        if (timedLaps) {
-          var per100 = timedTotal / timedLaps * 4;
-          var m = Math.floor(per100 / 60), sec = per100 - 60 * m;
-          show('lc-pace', m + ':' + (sec < 10 ? '0' : '') + sec.toFixed(1));
-        }
       }
-      // A fresh length: timed from here, and swum at a new pace
-      function pushOff(timed) {
+      // The clock as m:ss, the seconds cut rather than rounded so it never
+      // shows a time it hasn't reached
+      function tick(dt) {
+        if (swum === null || mode === 'hurt') return;
+        swum += dt;
+        var s = Math.floor(swum), m = Math.floor(s / 60), sec = s % 60;
+        show('lc-time', m + ':' + (sec < 10 ? '0' : '') + sec);
+      }
+      // A fresh length, swum at a new pace (the first starts the clock)
+      function pushOff() {
         if (rehearsing) return;
-        lengthStart = timed ? time : null;
+        if (swum === null) swum = 0;
         newPace();
       }
       var canvas = document.createElement('canvas');
@@ -1133,7 +1131,7 @@ home: true
           }
           if (modeTime >= FLIGHT) {
             mode = 'glide';
-            pushOff(true);
+            pushOff();
             modeTime = 0;
             x = ENTRY_X;
             dir = 1;
@@ -1234,7 +1232,7 @@ home: true
                 entrySpeed = Math.min(Math.max(Math.abs(fall[0]) / SPEED, 1), 1.7);
                 drift = dir * fall[0] / SPEED;
                 mode = 'glide';
-                pushOff(false);
+                pushOff();
                     modeTime = 0;
                 entering = true;
                 breast = true;
@@ -1257,7 +1255,7 @@ home: true
             plunging = [-lift, fall[1]];
             lift = hang = swing = swingV = 0;
             mode = 'glide';
-            pushOff(false);
+            pushOff();
             modeTime = 0;
             entering = true;
           }
@@ -1286,7 +1284,7 @@ home: true
             x = pivot + dir * BODY / 2;
             mode = 'glide';
             lapDone();
-            pushOff(true);
+            pushOff();
             modeTime = 0;
           }
         } else if (breast) {
@@ -1437,7 +1435,7 @@ home: true
         return;
       }
       // The counter shows once the swimmer's going. Hovering it, or pressing
-      // it, opens its card (laps, yards, average pace) above it; pressing
+      // it, opens its card (laps, yards, time) above it; pressing
       // again, anywhere else, or Esc closes it.
       document.addEventListener('DOMContentLoaded', function () {
         var counter = document.getElementById('laps');
@@ -1476,7 +1474,6 @@ home: true
         // press has nothing to grab with
         if (!press || mode === 'hurt') return;
         held = true;
-        lengthStart = null;  // this length's time no longer counts
         injured = false;
         // Caught mid-somersault, it's held the right way up
         flip = flipTo = 0;
@@ -1626,6 +1623,7 @@ home: true
           time += dt;
           holding(dt, was);
         } else step(dt);
+        tick(dt);
         if (aloft()) wet = Math.max(wet - dt / 3, 0);
         was = [x, lift];
         churn(dt);
@@ -1636,7 +1634,7 @@ home: true
     })();
   </script>
   <div class="footer">
-    <p class="updated" id="clock"><span><span id="clock-time"></span><span id="clock-in"> in </span><button type="button" class="clock-place" id="clock-place" title="Somewhere else">Princeton</button><span id="clock-diff"></span></span><span class="preview lap-preview" id="laps" hidden><button type="button" class="laps" aria-expanded="false" aria-controls="lap-card" aria-label="Yards swum"><svg class="laps-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg><span id="laps-count">0000</span></button><span class="preview-card lap-card" id="lap-card" role="tooltip"><span class="lc-row"><span>Laps</span><span class="lc-value" id="lc-laps">0</span></span><span class="lc-row"><span>Yards</span><span class="lc-value" id="lc-yards">0</span></span><span class="lc-row"><span>Pace</span><span class="lc-value" id="lc-pace">&ndash;</span></span></span></span></p>
+    <p class="updated" id="clock"><span><span id="clock-time"></span><span id="clock-in"> in </span><button type="button" class="clock-place" id="clock-place" title="Somewhere else">Princeton</button><span id="clock-diff"></span></span><span class="preview lap-preview" id="laps" hidden><button type="button" class="laps" aria-expanded="false" aria-controls="lap-card" aria-label="Yards swum"><svg class="laps-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg><span id="laps-count">0000</span></button><span class="preview-card lap-card" id="lap-card" role="tooltip"><span class="lc-row"><span>Laps</span><span class="lc-value" id="lc-laps">0</span></span><span class="lc-row"><span>Yards</span><span class="lc-value" id="lc-yards">0</span></span><span class="lc-row"><span>Time</span><span class="lc-value" id="lc-time">0:00</span></span></span></span></p>
     <nav class="webring" aria-label="Princeton webring" data-princeton-webring>
       <a data-ring-prev href="https://firestoners.vercel.app/#https%3A%2F%2Fconancchen.github.io?nav=prev" aria-label="Previous website">&larr;</a>
       <a href="https://firestoners.vercel.app/#https%3A%2F%2Fconancchen.github.io" aria-label="Explore the Princeton webring">

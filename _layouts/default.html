@@ -24,10 +24,6 @@
   <meta name="robots" content="noindex, nofollow">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100..800&display=swap">
-
   <!-- Build timestamp busts the browser cache whenever the site is rebuilt -->
   <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/style.css?v={{ site.time | date: '%s' }}" />
   <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}">
@@ -260,10 +256,9 @@
     }
 
     {% if page.home %}
-    // Pressing the name, or a section's title, retypes it
-    document.querySelectorAll('#site-name, .block > .block-label').forEach(function (el) {
-      el.addEventListener('click', function () { retype(el); });
-    });
+    // Pressing the name retypes it
+    var siteName = document.getElementById('site-name');
+    siteName.addEventListener('click', function () { retype(siteName); });
     {% endif %}
   </script>
 </body>

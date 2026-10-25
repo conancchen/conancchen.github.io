@@ -199,7 +199,7 @@
 }
 
 .bs-book-title {
-  font-size: 13px;
+  font-size: 13.5px;
   letter-spacing: 0.1px;
 }
 
@@ -243,7 +243,7 @@
 
 .bs-crate-label {
   fill: var(--bs-crate-ink);
-  font-size: 15px;
+  font-size: 15.5px;
   text-anchor: middle;
 }
 
@@ -334,7 +334,7 @@
   display: flex;
   flex-direction: column;
   margin-top: 8px;
-  font-size: 12px;
+  font-size: 12.5px;
   line-height: 15px;
 }
 
@@ -408,7 +408,7 @@
   align-items: center;
   margin-top: 12px;
   color: #f2f2f0;
-  font-size: 12px;
+  font-size: 12.5px;
   line-height: 16px;
   text-align: center;
 }
@@ -429,7 +429,7 @@
 .bs-label {
   margin: 28px 0 0;
   padding-bottom: 8px;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: inherit;
 }
 
@@ -513,7 +513,7 @@
   flex-direction: column;
   gap: 2px;
   min-width: 0;
-  font-size: 12px;
+  font-size: 12.5px;
 }
 
 .bs-read-title {
@@ -544,7 +544,7 @@
 /* The filled stars sit over the empty ones, cut off where the rating ends */
 .bs-stars {
   position: relative;
-  font-size: 13px;
+  font-size: 13.5px;
   line-height: 1;
   letter-spacing: 1px;
   white-space: nowrap;

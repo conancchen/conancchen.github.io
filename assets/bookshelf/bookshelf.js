@@ -40,7 +40,7 @@
       shelf: "A shelf of what I'm reading now and just finished",
       reading: 'Recent Reading',
       now: 'Current Reading',  // the list's heading while it shows what's being read now
-      art: 'Selected Art',
+      art: 'Art I Like',
       crate: 'Art'
     }
   };
@@ -134,7 +134,7 @@
     // sets the same title longer or shorter than the fallback)
     var titles = [];
     function fitTitle(title, L, w, h) {
-      var size = Math.min(13, w * 0.55);
+      var size = Math.min(13.5, w * 0.55);
       title.style.fontSize = size + 'px';
       while (size > 7 && title.getComputedTextLength() > h - 18) {
         size -= 0.5;
