@@ -70,6 +70,9 @@
   var SHADOW_X = 14, SHADOW_Y = 7, SHADOW_BLUR = 4;
   // The crate: how wide and tall, as drawn
   var CRATE_W = 200, CRATE_H = 60;
+  // The paintings' captions: their size, and the smallest they shrink to so
+  // each line fits under its painting
+  var CAPTION_MAX = 12.5, CAPTION_MIN = 8;
   // A line or book is moved past another once it's dragged this far over it
   var GIVE = 0.2;
 
@@ -119,6 +122,8 @@
       by: a.by ? String(a.by) : '',
       alt: a.alt || [a.title, a.by].filter(Boolean).join(', '),
       aspect: +a.aspect || 1,
+      shown: +a.shown || +a.aspect || 1,
+      focus: a.focus ? String(a.focus) : '',
       row: a.row !== undefined ? +a.row : Math.floor(i / 2),
       crate: a.crate || null
     };
@@ -184,16 +189,42 @@
       ART.forEach(function (a) {
         if (!rows[a.row]) rows[a.row] = html('div', 'bs-art-row', artInner);
         var fig = html('figure', 'bs-art-fig', rows[a.row]);
-        fig.style.flexGrow = a.aspect;
+        fig.style.flexGrow = a.shown;
         var img = html('img', '', fig);
         img.src = a.src;
         img.alt = a.alt;
-        img.style.aspectRatio = a.aspect;
+        img.style.aspectRatio = a.shown;
+        img.style.objectPosition = a.focus;
         var cap = html('figcaption', '', fig);
         html('span', 'bs-art-title', cap, a.title);
         html('span', 'bs-art-by', cap, a.by);
         a.img = img;
       });
+      // Each caption line stays on one line: the captions all come out at
+      // the largest size, up to the set one, that fits every line under its
+      // painting, fitted again whenever the section's width changes
+      var fitCaptions = function () {
+        var caps = artInner.querySelectorAll('figcaption');
+        var lines = artInner.querySelectorAll('figcaption > span');
+        var over = function () {
+          return [].some.call(lines, function (line) { return line.scrollWidth > line.clientWidth; });
+        };
+        var size = CAPTION_MAX;
+        var set = function () { [].forEach.call(caps, function (cap) { cap.style.fontSize = size + 'px'; }); };
+        set();
+        while (size > CAPTION_MIN && over()) {
+          size -= 0.5;
+          set();
+        }
+      };
+      // (only the width matters, and refitting changes the height)
+      var fittedTo = null;
+      if (window.ResizeObserver) new ResizeObserver(function () {
+        if (artInner.clientWidth === fittedTo) return;
+        fittedTo = artInner.clientWidth;
+        fitCaptions();
+      }).observe(artInner);
+      else fitCaptions();
     }
 
     var list = html('div', 'bs-list', root);
@@ -419,10 +450,9 @@
       el('text', { x: binL + binW / 2, y: binT + binH / 2 + 5, 'class': 'bs-crate-label' }, body).textContent = o.labels.crate;
     }
 
-    // A painting pressed in the art section grows out of its place there to
-    // up to three quarters of the screen, with its caption, over the page
-    // darkening behind it; pressing anywhere or Esc shrinks it back into its
-    // place
+    // A painting pressed in the art section opens at up to three quarters
+    // of the screen, with its caption, over the page darkening behind it;
+    // pressing anywhere or Esc closes it
     var box = null;
     if (hasArt) {
       box = html('div', 'bs-lightbox', root);
@@ -435,16 +465,7 @@
       var boxImg = html('img', '', boxFig);
       var boxCap = html('figcaption', '', boxFig);
       var boxTitle = html('span', 'bs-art-title', boxCap), boxBy = html('span', 'bs-art-by', boxCap);
-      var lastFocus = null, shown = null, zoom = null;
-      // the transform that puts the large painting where rect is
-      var over = function (rect) {
-        var to = boxImg.getBoundingClientRect();
-        // measured without whatever transform it has now
-        if (zoom) to = zoom.to;
-        return 'translate(' + (rect.left - to.left) + 'px, ' + (rect.top - to.top) + 'px) scale(' +
-          rect.width / to.width + ', ' + rect.height / to.height + ')';
-      };
-      var still = function () { return matchMedia('(prefers-reduced-motion: reduce)').matches; };
+      var lastFocus = null, shown = null;
       var openPainting = function (a) {
         lastFocus = document.activeElement;
         shown = a;
@@ -458,36 +479,12 @@
         box.getBoundingClientRect();
         box.classList.add('is-open');
         box.focus();
-        if (still()) return;
-        var to = boxImg.getBoundingClientRect();
-        var from = a.img.getBoundingClientRect();
-        a.img.style.visibility = 'hidden';
-        zoom = { to: to, anim: boxImg.animate([{ transform: over(from) }, { transform: 'none' }],
-          { duration: 420, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }) };
-        zoom.anim.onfinish = function () { zoom = null; };
       };
       var closePainting = function () {
-        var a = shown;
         shown = null;
         box.classList.remove('is-open');
+        box.hidden = true;
         if (lastFocus) lastFocus.focus();
-        var done = function () {
-          box.hidden = true;
-          a.img.style.visibility = '';
-        };
-        if (still()) { done(); return; }
-        // from wherever it's got to, back down into its place in the section
-        var now = boxImg.getBoundingClientRect(), to = zoom ? zoom.to : boxImg.getBoundingClientRect();
-        if (zoom) zoom.anim.cancel();
-        zoom = { to: to };
-        var back = boxImg.animate([{ transform: over(now) }, { transform: over(a.img.getBoundingClientRect()) }],
-          { duration: 320, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards' });
-        zoom.anim = back;
-        back.onfinish = function () {
-          zoom = null;
-          back.cancel();
-          done();
-        };
       };
       ART.forEach(function (a) {
         a.img.tabIndex = 0;

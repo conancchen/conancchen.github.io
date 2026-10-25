@@ -338,8 +338,8 @@
   line-height: 15px;
 }
 
-/* Titles stay on one line, running a little past a narrow painting if need be */
-.bs-art-fig .bs-art-title {
+/* Each line stays on one line; the script shrinks a row's captions to fit */
+.bs-art-fig figcaption > span {
   white-space: nowrap;
 }
 
@@ -359,8 +359,7 @@
   cursor: zoom-out;
 }
 
-/* The page darkens behind the painting while it grows, and lightens again
-   as it shrinks back */
+/* The page darkens behind the painting as it opens */
 .bs-lightbox::before {
   content: '';
   position: absolute;
@@ -394,7 +393,6 @@
   display: block;
   max-width: 100%;
   height: auto;
-  transform-origin: 0 0;
   object-fit: cover;
   border-radius: 2px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
@@ -413,7 +411,7 @@
   text-align: center;
 }
 
-/* the caption comes in once the painting's nearly grown */
+/* the caption comes in just after the painting */
 .bs-lightbox.is-open .bs-lightbox-fig figcaption {
   opacity: 1;
   transition: opacity 0.25s ease 0.2s;

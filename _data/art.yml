@@ -3,6 +3,11 @@
 #   src     the picture, in images/art
 #   title, by   its caption
 #   aspect  its width over its height
+#   shown   its width over its height in the Art section, if it's cropped
+#           there (top and bottom, or the sides) to sit wider or narrower in
+#           its row; opened large it's shown whole
+#   focus   where the crop sits, as a CSS object-position (left to right,
+#           then top to bottom: '50% 0%' keeps the top); the middle if left out
 #   row     which row of the Art section it's in (paintings in a row come
 #           out the same height and fill the width)
 #   crate   where it stands in the crate: how far in from the left, its
@@ -14,15 +19,17 @@
   aspect: 1.57
   row: 0
   crate: { x: 24, width: 162, height: 102, back: 1.2 }
-- src: zojoji-snow-hasui.jpg
-  title: Snow at Zōjō-ji Temple
-  by: Kawase Hasui, 1925
-  aspect: 0.664
-  row: 1
-  crate: { x: 8, width: 66, height: 99, back: 0.6 }
 - src: fine-wind-clear-morning-hokusai.jpg
   title: Fine Wind, Clear Morning
   by: Katsushika Hokusai, 1830–32
   aspect: 1.499
   row: 1
-  crate: { x: 84, width: 108, height: 72, back: 0.35 }
+  crate: { x: 8, width: 108, height: 72, back: 0.35 }
+- src: zojoji-snow-hasui.jpg
+  title: Snow at Zōjō-ji Temple
+  by: Kawase Hasui, 1925
+  aspect: 0.664
+  shown: 0.8
+  focus: 50% 85%
+  row: 1
+  crate: { x: 124, width: 66, height: 99, back: 0.6 }
