@@ -7,12 +7,13 @@
 // The site is light only
 :root {
   color-scheme: light;
+  // Courier New, built into Mac and Windows, falling back to
   // LinkedIn's stack: the system's own sans, San Francisco on Apple devices,
   // Segoe UI on Windows, Roboto on Android
-  --font: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', 'Fira Sans', Ubuntu, Oxygen, 'Oxygen Sans', Cantarell, 'Droid Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+  --font: 'Courier New', -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', 'Fira Sans', Ubuntu, Oxygen, 'Oxygen Sans', Cantarell, 'Droid Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
   --bg: #f5f6f7;  // a near white, with a faint cool grey
   --text: #16150f;
-  --muted: #8a8a8a;
+  --muted: #717171;  // the lightest grey that still reads at 4.5:1 on the background
   --rule: #e0dfdb;
   --link: #6f6e6a;
   --top: #2f74d0;  // the A+ courses: the site's blue, a shade deeper to read as text
@@ -85,8 +86,10 @@ body {
   // Regular weight on a 20px line, as LinkedIn sets its text
   font-weight: 400;
   line-height: calc(20 / 14);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  // Courier New's strokes are hairline thin and it has no weight between
+  // regular and bold, so a fine outline in the text's own colour fills it
+  // out, under the browser's default smoothing, which renders heavier
+  -webkit-text-stroke: 0.35px currentColor;
   text-rendering: optimizeLegibility;
 }
 
@@ -233,7 +236,7 @@ $reveal: '.subtitle, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .up
 /**************/
 .page {
   width: 100%;
-  max-width: 532px;  // a 500px text column plus the 16px gutters
+  max-width: 552px;  // a 520px text column plus the 16px gutters
   margin: 0 auto;
   padding: 80px 16px 40px;
 }
