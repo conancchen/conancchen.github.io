@@ -13,17 +13,11 @@
 #   crate   where it stands in the crate: how far in from the left, its
 #           width and height there, and how far back (leave it out and
 #           the prints are spread across the crate on their own)
-- src: monk-by-the-sea.jpg
-  title: The Monk by the Sea
-  by: Caspar David Friedrich, 1808–10
-  aspect: 1.57
-  row: 0
-  crate: { x: 24, width: 162, height: 102, back: 1.2 }
 - src: fine-wind-clear-morning-hokusai.jpg
   title: Fine Wind, Clear Morning
   by: Katsushika Hokusai, 1830–32
   aspect: 1.499
-  row: 1
+  row: 0
   crate: { x: 8, width: 108, height: 72, back: 0.35 }
 - src: zojoji-snow-hasui.jpg
   title: Snow at Zōjō-ji Temple
@@ -31,5 +25,11 @@
   aspect: 0.664
   shown: 0.8
   focus: 50% 85%
-  row: 1
+  row: 0
   crate: { x: 124, width: 66, height: 99, back: 0.6 }
+- src: monk-by-the-sea.jpg
+  title: The Monk by the Sea
+  by: Caspar David Friedrich, 1808–10
+  aspect: 1.57
+  row: 1
+  crate: { x: 24, width: 162, height: 102, back: 1.2 }

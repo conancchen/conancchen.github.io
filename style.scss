@@ -7,10 +7,10 @@
 // The site is light only
 :root {
   color-scheme: light;
-  // The system's own sans: San Francisco on Apple devices, Segoe UI on
-  // Windows, Roboto on Android
-  --font: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --bg: #fafaf8;  // a near white, with just a breath of warmth
+  // LinkedIn's stack: the system's own sans, San Francisco on Apple devices,
+  // Segoe UI on Windows, Roboto on Android
+  --font: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', 'Fira Sans', Ubuntu, Oxygen, 'Oxygen Sans', Cantarell, 'Droid Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+  --bg: #f5f6f7;  // a near white, with a faint cool grey
   --text: #16150f;
   --muted: #8a8a8a;
   --rule: #e0dfdb;
@@ -81,12 +81,10 @@ body {
   background-color: var(--bg);
   color: var(--text);
   font-family: var(--font);
-  font-size: 14.5px;
-  // The variable weight sits just above regular, on a 20px line, a hair
-  // tight, matching chanbin.xyz
-  font-weight: 436;
+  font-size: 14px;
+  // Regular weight on a 20px line, as LinkedIn sets its text
+  font-weight: 400;
   line-height: calc(20 / 14);
-  letter-spacing: -0.09px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -112,12 +110,13 @@ a:focus {
   opacity: 0.7;
 }
 
-// Bio links read as body text with a thin, light underline that breaks
-// around the descenders and darkens on hover
-.bio a {
+// Bio links read as plain body text until hovered, when a faint underline
+// (the text's black at 30%) fades in, breaking around the descenders
+.bio a,
+.bio .preview-link {
   color: var(--text);
   text-decoration: underline;
-  text-decoration-color: color-mix(in srgb, var(--muted) 20%, transparent);
+  text-decoration-color: transparent;
   text-decoration-thickness: 1px;
   text-decoration-skip-ink: auto;
   text-underline-offset: 3px;
@@ -125,19 +124,42 @@ a:focus {
 }
 
 .bio a:hover,
-.bio a:focus {
+.bio a:focus,
+.bio .preview-link:hover,
+.bio .preview-link:focus-visible,
+.preview.is-open .preview-link {
+  outline: none;
   opacity: 1;
-  text-decoration-color: var(--text);
+  text-decoration-color: color-mix(in srgb, var(--text) 30%, transparent);
 }
 
-// The LinkedIn and email links keep a small logo in front, inline with the
-// text; like the other bio links, only the words take the underline
+// The LinkedIn and email links are chips, as on chanbin.xyz: a small logo
+// and the name on a soft grey pill with no underline, a shade darker on
+// hover and pressing in a touch when clicked
 .bio .chip {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  // shorter than the bio's 22px lines it sits in
+  height: 18px;
+  line-height: 18px;
+  padding: 0 6px 0 5px;
   vertical-align: -2px;
   white-space: nowrap;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text) 6%, var(--bg));
+  text-decoration: none;
+  transition: background-color 0.18s cubic-bezier(0.23, 1, 0.32, 1), transform 0.15s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.bio .chip:hover,
+.bio .chip:focus-visible {
+  background: color-mix(in srgb, var(--text) 11%, var(--bg));
+}
+
+.bio .chip:active {
+  transition-duration: 80ms;
+  transform: scale(0.97);
 }
 
 // In em so the logo follows the chip's text size
@@ -151,7 +173,7 @@ a:focus {
 // and the scrambling letters are clipped to it while they settle
 .bio .chip-rotating {
   overflow: hidden;
-  transition: text-decoration-color 0.15s ease, width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: background-color 0.18s cubic-bezier(0.23, 1, 0.32, 1), transform 0.15s cubic-bezier(0.23, 1, 0.32, 1), width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .chip-icon-slot {
@@ -238,7 +260,7 @@ $reveal: '.subtitle, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .up
 }
 
 .header h1 {
-  font-size: 14.5px;
+  font-size: 14px;
   font-weight: inherit;  // the same weight as the text below it
   margin: 0;
 }
@@ -297,7 +319,7 @@ $reveal: '.subtitle, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .up
 }
 
 .block-label {
-  font-size: 14.5px;
+  font-size: 14px;
   font-weight: inherit;
   color: var(--muted);
   margin: 0 0 10px;
@@ -337,7 +359,7 @@ $reveal: '.subtitle, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .up
 
 .row-year {
   color: var(--muted);
-  font-size: 13.5px;
+  font-size: 12px;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -366,7 +388,7 @@ $reveal: '.subtitle, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .up
 
 .row-note {
   color: var(--muted);
-  font-size: 13.5px;
+  font-size: 13px;
   margin: 0;
   padding: 0 0 8px;
   max-width: 60ch;
@@ -377,7 +399,15 @@ $reveal: '.subtitle, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .up
 // first line: where I am now pulses in the pool's blue, what's coming is a
 // hollow dot on a dashed stretch of rail, and what's done is filled in black
 $dot: 7px;
-$dot-center: calc(4px + 20px / 2);
+// Each experience sits on a 20px line the dots are centred on
+$entry-pad: 4px;
+$entry-line: 20px;
+$dot-center: calc(#{$entry-pad} + #{$entry-line} / 2);
+
+.timeline .row {
+  padding: $entry-pad 0;
+  line-height: $entry-line;
+}
 
 .timeline .entry {
   position: relative;
@@ -463,13 +493,15 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   transform: scale(1.3);
 }
 
-// Hovering a place named in the bio dims every other experience: name,
-// year, note and dot (the script marks it hot). The rail stays put, so the
-// line never breaks.
+// Hovering anywhere in an experience, its note included, dims every other
+// one: name, year, note and dot. The rail stays put, so the line never breaks.
+// Hovering its name in the bio does the same (the script marks it hot).
 .timeline .entry > * {
   transition: opacity 0.1s ease-in-out;
 }
 
+.timeline:has(.entry:hover) .entry:not(:hover) > *,
+.timeline:has(.entry:hover) .entry:not(:hover)::after,
 .timeline.is-linked .entry:not(.is-hot) > *,
 .timeline.is-linked .entry:not(.is-hot)::after {
   opacity: 0.4;
@@ -630,63 +662,9 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   align-items: baseline;
   gap: 16px;
   color: var(--muted);
-  font-size: 12.5px;
+  font-size: 12px;
   margin: 0;
   font-variant-numeric: tabular-nums;
-}
-
-// The swimmer's lap count, at the right end of the clock's line, just under
-// the water, flush with the years above it
-.lap-preview {
-  margin-left: auto;
-  white-space: nowrap;
-}
-
-.laps {
-  padding: 0;
-  border: 0;
-  background: none;
-  color: inherit;
-  font: inherit;
-  cursor: pointer;
-}
-
-.laps:hover,
-.laps:focus-visible,
-.lap-preview.is-open .laps {
-  outline: none;
-  color: var(--text);
-}
-
-// The counter's card: a small one, opening up out of the counter and kept to
-// the right, flush with it, as the counter sits at the page's right edge
-.lap-preview .lap-card {
-  left: auto;
-  right: 0;
-  gap: 4px;
-  min-width: 0;
-  padding: 10px 12px;
-  border-radius: 10px;
-  transform-origin: calc(100% - 20px) calc(100% + 16px);
-}
-
-.lc-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  line-height: 16px;
-}
-
-.lc-value {
-  color: var(--text);
-}
-
-// An odometer's dial in front of the count, sitting on the text's line
-.laps-icon {
-  width: 12px;
-  height: 12px;
-  margin-right: 4px;
-  vertical-align: -1.5px;
 }
 
 // The clock and the Princeton webring share the last line: clock on the
@@ -700,7 +678,6 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 // Kept on the page for the ring's widget, but shrunk to a few pixels and
 // made fully transparent
 // Laid over the footer's right end rather than beside it, so it takes no room
-// and the lap count runs right to the edge
 .webring {
   position: absolute;
   right: 0;
@@ -733,7 +710,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 // Sits under the title at the same size (body size), in muted gray
 .subtitle {
   color: var(--muted);
-  font-size: 14.5px;
+  font-size: 14px;
   font-weight: inherit;
   margin: 4px 0 0;
   font-variant-numeric: tabular-nums;
@@ -835,7 +812,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   transform: translateX(-50%);
   background: var(--toast-bg);
   color: var(--toast-text);
-  font-size: 13.5px;
+  font-size: 13px;
   padding: 6px 12px;
   border-radius: 5px;
   opacity: 0;
@@ -865,22 +842,8 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   padding: 0;
   border: 0;
   background: none;
-  color: var(--text);
   font: inherit;
   cursor: pointer;
-  text-decoration: underline;
-  text-decoration-color: color-mix(in srgb, var(--muted) 20%, transparent);
-  text-decoration-thickness: 1px;
-  text-decoration-skip-ink: auto;
-  text-underline-offset: 3px;
-  transition: text-decoration-color 0.15s ease;
-}
-
-.bio .preview-link:hover,
-.bio .preview-link:focus-visible,
-.preview.is-open .preview-link {
-  outline: none;
-  text-decoration-color: var(--text);
 }
 
 .preview-card {
@@ -902,7 +865,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   background: var(--bg);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 12px 40px rgba(0, 0, 0, 0.08);
   color: var(--muted);
-  font-size: 12.5px;
+  font-size: 12px;
   line-height: 16px;
   font-variant-numeric: tabular-nums;
   white-space: normal;
@@ -972,7 +935,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 
 .pc-total {
   color: var(--text);
-  font-size: 26.5px;
+  font-size: 26px;
   line-height: 30px;
   letter-spacing: -0.5px;
 }
@@ -1109,7 +1072,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   display: flex;
   justify-content: space-between;
   color: var(--muted);
-  font-size: 13.5px;
+  font-size: 13px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -1207,7 +1170,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   display: flex;
   align-items: baseline;
   gap: 0.35em;
-  font-size: 52.5px;
+  font-size: 52px;
   line-height: 56px;
   letter-spacing: -0.5px;
   font-variant-numeric: tabular-nums;
@@ -1222,7 +1185,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 @media screen and (max-width: 479px) {
   .zm-problem,
   .zm-last {
-    font-size: 36.5px;
+    font-size: 36px;
     line-height: 44px;
   }
 }
@@ -1259,7 +1222,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 // the last round's score, above Start
 .zm-last {
   margin-bottom: 4px;
-  font-size: 52.5px;
+  font-size: 52px;
   line-height: 56px;
   letter-spacing: -0.5px;
   font-variant-numeric: tabular-nums;
@@ -1278,7 +1241,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   background: none;
   color: var(--text);
   font: inherit;
-  font-size: 14.5px;
+  font-size: 14px;
   transition: color 0.15s ease;
 }
 
@@ -1321,7 +1284,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   background: none;
   color: var(--muted);
   font: inherit;
-  font-size: 13.5px;
+  font-size: 13px;
   transition: color 0.15s ease;
 }
 
@@ -1338,7 +1301,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 .zm-stats {
   margin: -4px 0 12px;
   color: var(--muted);
-  font-size: 13.5px;
+  font-size: 13px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -1369,7 +1332,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   text-anchor: end;
   fill: var(--muted);
   font-family: var(--font);  // the site's own, as everywhere else
-  font-size: 10.5px;
+  font-size: 10px;
   font-variant-numeric: tabular-nums;
   dominant-baseline: central;
 }
@@ -1459,7 +1422,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 .zm-badge text {
   fill: #fff;
   font-family: var(--font);  // the site's own, as everywhere else
-  font-size: 11.5px;
+  font-size: 11px;
   font-variant-numeric: tabular-nums;
   dominant-baseline: central;
 }
@@ -1592,7 +1555,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   background: var(--bg);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
   color: var(--muted);
-  font-size: 12.5px;
+  font-size: 12px;
   line-height: 16px;
   white-space: nowrap;
   pointer-events: none;
