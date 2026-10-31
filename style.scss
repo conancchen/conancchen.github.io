@@ -7,10 +7,9 @@
 // The site is light only
 :root {
   color-scheme: light;
-  // Courier New, built into Mac and Windows, falling back to
   // LinkedIn's stack: the system's own sans, San Francisco on Apple devices,
   // Segoe UI on Windows, Roboto on Android
-  --font: 'Courier New', -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', 'Fira Sans', Ubuntu, Oxygen, 'Oxygen Sans', Cantarell, 'Droid Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+  --font: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', 'Fira Sans', Ubuntu, Oxygen, 'Oxygen Sans', Cantarell, 'Droid Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
   --bg: #f5f6f7;  // a near white, with a faint cool grey
   --text: #16150f;
   --muted: #717171;  // the lightest grey that still reads at 4.5:1 on the background
@@ -86,10 +85,8 @@ body {
   // Regular weight on a 20px line, as LinkedIn sets its text
   font-weight: 400;
   line-height: calc(20 / 14);
-  // Courier New's strokes are hairline thin and it has no weight between
-  // regular and bold, so a fine outline in the text's own colour fills it
-  // out, under the browser's default smoothing, which renders heavier
-  -webkit-text-stroke: 0.35px currentColor;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
@@ -113,13 +110,13 @@ a:focus {
   opacity: 0.7;
 }
 
-// Bio links read as plain body text until hovered, when a faint underline
-// (the text's black at 30%) fades in, breaking around the descenders
+// Bio links read as body text over a faint underline (the text's black at
+// 30%), breaking around the descenders, that darkens when hovered
 .bio a,
 .bio .preview-link {
   color: var(--text);
   text-decoration: underline;
-  text-decoration-color: transparent;
+  text-decoration-color: color-mix(in srgb, var(--text) 30%, transparent);
   text-decoration-thickness: 1px;
   text-decoration-skip-ink: auto;
   text-underline-offset: 3px;
@@ -133,7 +130,7 @@ a:focus {
 .preview.is-open .preview-link {
   outline: none;
   opacity: 1;
-  text-decoration-color: color-mix(in srgb, var(--text) 30%, transparent);
+  text-decoration-color: color-mix(in srgb, var(--text) 70%, transparent);
 }
 
 // The LinkedIn and email links are chips, as on chanbin.xyz: a small logo
