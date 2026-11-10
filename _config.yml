@@ -1,6 +1,9 @@
 # Name of your site (displayed in the header)
 name: Conan Chen
 
+# The line under the title when a link to the site is shared
+description: Applied math at Princeton, humanoid robots, and triathlons.
+
 url: "https://conancchen.github.io"
 
 # Keeps the "Updated" date on Princeton time

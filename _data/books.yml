@@ -11,13 +11,13 @@
 #   current true while I'm still reading it (listed under Current Reading)
 #   rating  out of 5, in half stars, shown as stars under it in the list
 #   note    an optional line shown under it in the list
-- title: Flash Boys
-  cover: flash-boys.jpg
-  author: Michael Lewis
-  color: "#ed1b2c"
-  ink: light
-  pages: 274
-  height: 171
+- title: The Complete Stories
+  cover: kafka-complete-stories.jpg
+  author: Franz Kafka
+  color: "#a2a6b4"
+  ink: dark
+  pages: 486
+  height: 164
   current: true
 - title: The Elephant Vanishes
   cover: elephant-vanishes.jpg

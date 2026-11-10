@@ -28,6 +28,17 @@
   <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/style.css?v={{ site.time | date: '%s' }}" />
   <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}">
 
+  <!-- What a pasted link shows (iMessage, Slack, LinkedIn...): the favicon as its picture -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="{{ site.name }}">
+  <meta property="og:title" content="{{ page.title | default: site.name }}">
+  <meta property="og:description" content="{{ page.description | default: site.description }}">
+  <meta property="og:url" content="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}">
+  <meta property="og:image" content="{{ '/images/favicon-512.png' | prepend: site.baseurl | prepend: site.url }}">
+  <meta property="og:image:width" content="512">
+  <meta property="og:image:height" content="512">
+  <meta name="twitter:card" content="summary">
+
   <link rel="icon" type="image/x-icon" href="{{ site.baseurl }}/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="{{ site.baseurl }}/images/favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="{{ site.baseurl }}/images/favicon-16.png">
@@ -46,7 +57,7 @@
 </head>
 
 <body>
-  <div class="page{% if page.quick_entrance %} quick-entrance{% endif %}">
+  <div class="page{% if page.quick_entrance %} quick-entrance{% endif %}{% if page.home %} home-entrance{% endif %}">
     <header class="header">
       <div class="header-row">
         {% if page.home %}<h1 translate="no" id="site-name" title="Retype">{{ page.heading | default: site.name }}</h1>{% else %}<h1 translate="no"><a class="name-link" href="{{ site.baseurl }}/">{{ page.heading | default: site.name }}</a></h1>{% endif %}
@@ -158,7 +169,8 @@
     try { fromSite = new URL(document.referrer).origin === location.origin; } catch (e) {}
     var returning = fromSite || (nav && nav.type === 'back_forward');
     function playEntrance() {
-      var pieces = document.querySelectorAll('.subtitle, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .updated, .webring, .term');
+      // On the home page each line is its own piece (see .home-entrance)
+      var pieces = document.querySelectorAll({% if page.home %}'.bio > p, .timeline, .block:not(.timeline) > *, .rule, .updated, .webring'{% else %}'.subtitle, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .updated, .webring, .term'{% endif %});
       for (var i = 0; i < pieces.length; i++) pieces[i].style.setProperty('--i', Math.min(i, 12));
       root.classList.add('anim-play');
       root.classList.remove('anim-hide');
