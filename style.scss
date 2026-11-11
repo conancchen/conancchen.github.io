@@ -265,7 +265,7 @@ $reveal-fine: '.bio > p, .block:not(.timeline) > *';
 /**************/
 .page {
   width: 100%;
-  max-width: 552px;  // a 520px text column plus the 16px gutters
+  max-width: 500px;  // a 468px text column plus the 16px gutters
   margin: 0 auto;
   padding: 80px 16px 40px;
 }
@@ -1647,8 +1647,16 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   line-height: inherit;
   padding: 0;
   vertical-align: baseline;
+  // the chip takes its baseline from the text, not the icon's bottom edge,
+  // so the name sits level with the words around it
+  align-items: baseline;
   border-radius: 0;
   color: var(--text);
+}
+
+.bio .chip > .chip-icon,
+.bio .chip > .chip-icon-slot {
+  align-self: center;
 }
 
 .bio .chip,
@@ -1675,4 +1683,29 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 // the arrow, so it pulls back in to sit as close as it does elsewhere
 .bio .chip[href^="http"]::after {
   margin-left: -1px;
+}
+
+// The links that stay on the site (coursework, the race card) look just like
+// the ones that leave it: plain text with a small grey ↗ that darkens on hover
+.bio a:not([href^="http"]):not(.chip),
+.bio .preview-link {
+  text-decoration: none;
+}
+
+.bio a:not([href^="http"]):not(.chip)::after,
+.bio .preview-link::after {
+  content: '↗';
+  color: var(--link-mark);
+  margin-left: 2px;
+  font-size: 0.85em;
+  user-select: none;
+  transition: color 0.15s ease;
+}
+
+.bio a:not([href^="http"]):not(.chip):hover::after,
+.bio a:not([href^="http"]):not(.chip):focus-visible::after,
+.bio .preview-link:hover::after,
+.bio .preview-link:focus-visible::after,
+.preview.is-open .preview-link::after {
+  color: var(--text);
 }
