@@ -7,7 +7,7 @@ home: true
     I'm a junior studying <a href="{{ site.baseurl }}/coursework/">applied math</a> at Princeton.
   </p>
   <p>
-    Currently, I research <a href="https://www.instagram.com/p/De17MaNSDC0/?vrfl=MXV4N3UwMDNqbW0xbA==">humanoid robots</a> in the <a href="https://pvl.cs.princeton.edu/" data-exp="pvl">Vision &amp; Learning Lab</a>. Previously, I interned at <a href="https://scale.com/" data-exp="scale">Scale AI</a>.
+    Currently, I research humanoid robots in the <a href="https://pvl.cs.princeton.edu/" data-exp="pvl">Vision &amp; Learning Lab</a>. Previously, I interned at <a href="https://scale.com/" data-exp="scale">Scale AI</a>.
   </p>
   <p>
     I also compete as a Division I swimmer and enjoy doing triathlons. Recently, I finished my first <span class="preview"><button type="button" class="preview-link" aria-expanded="false" aria-controls="im-card">Ironman 70.3</button><span class="preview-card" id="im-card" role="tooltip">
@@ -353,8 +353,11 @@ home: true
       var GRAVITY = 300;           // px/s/s: about twice real for its size, as true to scale looks floaty
       var UNDER_DIST = 0;          // swimming-pace seconds the glide and kicks carry it
       var time = 0, surface = [];
+      var SURFACE_STEP = 0.5;      // px between samples of the water line
 
       function size() {
+        // One canvas pixel to each of the screen's own, so nothing is scaled
+        // (scaling a canvas, up or down, softens it)
         var scale = window.devicePixelRatio || 1;
         W = lane.clientWidth;
         var header = document.querySelector('.header h1');
@@ -850,13 +853,15 @@ home: true
         }
       }
 
-      // The height of the water every 2px along the lane: two slow swells
+      // The height of the water every SURFACE_STEP px along the lane, half a
+      // pixel apart so the line curves smoothly rather than in short straight
+      // segments: two slow swells
       // rolling past, plus the swimmer's bow wave and wake, which die down
       // while it is under the water
       function water() {
         surface.length = 0;
         var churn = aloft() || mode === 'hurt' ? 0 : mode === 'swim' ? pace : 0.25;
-        for (var px = 0; px <= W + 2; px += 2) {
+        for (var px = 0; px <= W + 2; px += SURFACE_STEP) {
           var y = 0.7 * Math.sin(px * 0.045 - time * 1.4) + 0.35 * Math.sin(px * 0.12 + time * 2.1);
           var ahead = (px - x) * dir;
           if (ahead > -BODY - LEG && ahead < 10) {
@@ -910,7 +915,7 @@ home: true
 
       function surfacePath() {
         ctx.moveTo(0, surface[0]);
-        for (var i = 1; i < surface.length; i++) ctx.lineTo(i * 2, surface[i]);
+        for (var i = 1; i < surface.length; i++) ctx.lineTo(i * SURFACE_STEP, surface[i]);
       }
 
       // Draw the water line, then the pose twice: once clipped to the air
@@ -987,7 +992,7 @@ home: true
       // for a moment before it fades
       var foam = [];
       function surfaceAt(px) {
-        return surface[Math.min(Math.max(Math.round(px / 2), 0), surface.length - 1)];
+        return surface[Math.min(Math.max(Math.round(px / SURFACE_STEP), 0), surface.length - 1)];
       }
       function churn(dt) {
         if (mode === 'swim' && !held) {
@@ -1357,16 +1362,33 @@ home: true
         }
       }
 
+      // The layout can leave the lane, and so the canvas, sitting a fraction
+      // of a screen pixel off the grid, which blurs every line on it; this
+      // nudges the canvas by that fraction so its pixels land on the screen's
+      function snap() {
+        var ratio = window.devicePixelRatio || 1;
+        canvas.style.transform = '';
+        var at = canvas.getBoundingClientRect();
+        var dx = Math.round(at.left * ratio) / ratio - at.left;
+        var dy = Math.round(at.top * ratio) / ratio - at.top;
+        canvas.style.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
+      }
+      // (measured once the page's entrance, which slides the lane in, is over)
+      lane.addEventListener('animationend', function (event) {
+        if (event.target === lane) snap();
+      });
+
       size();
+      snap();
       // Refitting the pace times a few dozen simulated lengths, so wait for
       // the window to settle rather than doing it on every resize event
       var resizing;
       window.addEventListener('resize', function () {
         clearTimeout(resizing);
-        resizing = setTimeout(size, 150);
+        resizing = setTimeout(function () { size(); snap(); }, 150);
       });
       // and measure again once fonts and images have settled where the header is
-      window.addEventListener('load', size);
+      window.addEventListener('load', function () { size(); snap(); });
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         // Held still mid-length rather than crouched at the start
         mode = 'swim';

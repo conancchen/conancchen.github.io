@@ -5,42 +5,11 @@
 /* THEME      */
 /**************/
 // The site is light only
-// PP Neue Montreal (Pangram Pangram), the face zh1kang.com uses, from the
-// files in assets/fonts. Its Medium is drawn at the text's regular weight
-// (400) to match that site's slightly heavier text, and its Bold at bold.
-// Until the files are there, the system font below stands in unchanged
-@font-face {
-  font-family: 'PP Neue Montreal';
-  src: url('assets/fonts/PPNeueMontreal-Medium.woff2') format('woff2'),
-       url('assets/fonts/PPNeueMontreal-Medium.otf') format('opentype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'PP Neue Montreal';
-  src: url('assets/fonts/PPNeueMontreal-Italic.woff2') format('woff2'),
-       url('assets/fonts/PPNeueMontreal-Italic.otf') format('opentype');
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'PP Neue Montreal';
-  src: url('assets/fonts/PPNeueMontreal-Bold.woff2') format('woff2'),
-       url('assets/fonts/PPNeueMontreal-Bold.otf') format('opentype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
 :root {
   color-scheme: light;
   // LinkedIn's stack: the system's own sans, San Francisco on Apple devices,
   // Segoe UI on Windows, Roboto on Android
-  --font: 'PP Neue Montreal', -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', 'Fira Sans', Ubuntu, Oxygen, 'Oxygen Sans', Cantarell, 'Droid Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+  --font: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', 'Fira Sans', Ubuntu, Oxygen, 'Oxygen Sans', Cantarell, 'Droid Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
   --bg: #fff;  // pure white, as on zh1kang.com
   --text: #16150f;
   --muted: #717171;  // the lightest grey that still reads at 4.5:1 on the background
@@ -142,12 +111,12 @@ a:focus {
 }
 
 // Bio links read as body text over a faint underline (the text's black at
-// 30%), breaking around the descenders, that darkens when hovered
+// 15%), breaking around the descenders, that darkens when hovered
 .bio a,
 .bio .preview-link {
   color: var(--text);
   text-decoration: underline;
-  text-decoration-color: color-mix(in srgb, var(--text) 30%, transparent);
+  text-decoration-color: color-mix(in srgb, var(--text) 15%, transparent);
   text-decoration-thickness: 1px;
   text-decoration-skip-ink: auto;
   text-underline-offset: 3px;
@@ -1654,4 +1623,56 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+/**************/
+/* MARKDOWN   */
+/**************/
+// Bio links that leave the site end in a small grey arrow (↗) instead of an
+// underline; the ones that stay on it (coursework, the race card) keep their
+// faint underline. The arrow sits on the line, a touch smaller than the
+// text. The follow and email links lose their pills: the follow link keeps its
+// profile's logo and gets the arrow, the email link keeps its copy icon
+:root {
+  --link-mark: #a8a8a8;
+}
+
+.bio a[href^="http"] {
+  text-decoration: none;
+}
+
+.bio .chip {
+  gap: 3px;
+  height: auto;
+  line-height: inherit;
+  padding: 0;
+  vertical-align: baseline;
+  border-radius: 0;
+  color: var(--text);
+}
+
+.bio .chip,
+.bio .chip:hover,
+.bio .chip:focus-visible {
+  background: none;
+}
+
+.bio a[href^="http"]::after {
+  content: '↗';
+  color: var(--link-mark);
+  margin-left: 2px;
+  font-size: 0.85em;
+  user-select: none;
+  transition: color 0.15s ease;
+}
+
+.bio a[href^="http"]:hover::after,
+.bio a[href^="http"]:focus-visible::after {
+  color: var(--text);
+}
+
+// In the follow link (laid out as a row, 3px apart) the gap already spaces
+// the arrow, so it pulls back in to sit as close as it does elsewhere
+.bio .chip[href^="http"]::after {
+  margin-left: -1px;
 }
