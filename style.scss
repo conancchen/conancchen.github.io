@@ -1709,3 +1709,356 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 .preview.is-open .preview-link::after {
   color: var(--text);
 }
+
+// The training heatmap: a year of days in a grid, a column per week, each
+// day in its sport's color and deeper the longer it ran, with the months
+// along the top and the day's sessions in a small tip on hover
+.training {
+  position: relative;
+}
+
+// The title on the left and its total on the right
+.training > .block-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.tr-total {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.tr-months,
+.tr-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 53), 1fr);
+  column-gap: 2px;
+}
+
+.tr-months {
+  margin: 6px 0 3px;
+  font-size: 11px;
+  line-height: 14px;
+  color: var(--muted);
+
+  span {
+    grid-row: 1;
+    white-space: nowrap;
+  }
+}
+
+.tr-grid {
+  grid-template-rows: repeat(7, auto);
+  grid-auto-flow: column;
+  row-gap: 2px;
+}
+
+.tr-day {
+  aspect-ratio: 1;
+  border-radius: 1.5px;
+  background: color-mix(in srgb, var(--text) 6%, var(--bg));
+  transition: transform 0.12s ease;
+}
+
+.tr-pad {
+  visibility: hidden;
+}
+
+.tr-day[data-tip]:hover {
+  transform: scale(1.35);
+  position: relative;
+  z-index: 1;
+}
+
+// Lifting has no sport color of its own, so it takes a warm grey
+.tr-lift {
+  --c: #8a7f72;
+}
+
+@each $sport in swim, bike, run {
+  .tr-#{$sport} {
+    --c: var(--#{$sport});
+  }
+}
+
+.tr-l1 { background: color-mix(in srgb, var(--c) 28%, var(--bg)); }
+.tr-l2 { background: color-mix(in srgb, var(--c) 50%, var(--bg)); }
+.tr-l3 { background: color-mix(in srgb, var(--c) 74%, var(--bg)); }
+.tr-l4 { background: var(--c); }
+
+// Race days stand out in Strava's orange, whatever the day held
+.tr-race {
+  --c: var(--race);
+}
+
+.tr-day.tr-race {
+  background: var(--race);
+}
+
+.tr-legend {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.tr-key::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 5px;
+  border-radius: 1.5px;
+  background: var(--c);
+}
+
+.tr-tip {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  padding: 3px 7px;
+  border-radius: 5px;
+  background: var(--toast-bg);
+  color: var(--toast-text);
+  font-size: 11px;
+  line-height: 16px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+
+  &.is-on {
+    opacity: 1;
+  }
+}
+
+/**************/
+/* STRAVA     */
+/**************/
+// The training log, set like the coursework page: filters in a muted line,
+// a mileage chart, then each month's name over its activities, races in
+// Strava's orange, each one opening to its route and numbers
+:root {
+  --race: #d84302;
+}
+
+.sv-swim { --c: var(--swim); }
+.sv-bike { --c: var(--bike); }
+.sv-run { --c: var(--run); }
+.sv-other { --c: var(--muted); }
+
+.sv-section {
+  margin-top: 36px;
+}
+
+// The section's title with its all / races switch across from it
+.sv-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+
+  .block-label {
+    margin: 0;
+    color: var(--text);
+  }
+}
+
+.sv-filters {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+
+  button {
+    cursor: pointer;
+  }
+
+  .is-on {
+    color: var(--text);
+  }
+}
+
+// The log
+.sv-log {
+  margin: 20px 0 12px;
+}
+
+.sv-month + .sv-month {
+  margin-top: 24px;
+}
+
+// A month opens on a hairline, its name and totals above its activities
+.sv-month-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0 0 6px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.sv-month-name {
+  color: var(--muted);
+}
+
+.sv-month-sum {
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.sv-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 4px 0;
+  cursor: pointer;
+  list-style: none;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+.sv-day {
+  width: 16px;
+  flex: none;
+  text-align: right;
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.sv-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sv-amount {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.sv-entry.is-race .sv-name,
+.sv-entry.is-race .sv-amount {
+  color: var(--race);
+}
+
+// An opened activity
+.sv-detail {
+  padding: 6px 0 14px 30px;
+  animation: sv-in 0.2s ease both;
+}
+
+@keyframes sv-in {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+}
+
+.sv-map {
+  position: relative;
+  aspect-ratio: 5 / 3;
+  margin-bottom: 10px;
+  overflow: hidden;
+  border-radius: 6px;
+  border: 1px solid var(--rule);
+  background: color-mix(in srgb, var(--text) 4%, var(--bg));
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.3) contrast(0.95);
+  }
+}
+
+.sv-route {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+
+  path {
+    fill: none;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+}
+
+.sv-route-case {
+  stroke: rgba(255, 255, 255, 0.9);
+  stroke-width: 4.5;
+}
+
+.sv-route-line {
+  stroke: var(--c);
+  stroke-width: 2.25;
+}
+
+.sv-meta {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 12px;
+
+  a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--text) 20%, transparent);
+    text-underline-offset: 3px;
+  }
+}
+
+.sv-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 8px 16px;
+}
+
+.sv-stat-label {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.sv-stat-value {
+  font-variant-numeric: tabular-nums;
+}
+
+// Older months come in three at a time
+.sv-more {
+  margin-top: 16px;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: var(--muted);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--text);
+  }
+}
+
+.sv-foot {
+  margin: 24px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+@media screen and (max-width: 479px) {
+  .sv-detail {
+    padding-left: 0;
+  }
+}
