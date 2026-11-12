@@ -108,9 +108,9 @@ quick_entrance: true
         var date = parse(d[0]);
         var parts = [];
         SPORTS.forEach(function (s, k) { if (mins[k]) parts.push(hm(mins[k]) + ' ' + s); });
+        // A race or meet day says only which one it was, not how long it ran
         cell.dataset.tip = WEEKDAYS[date.getDay()] + ', ' + MONTHS[date.getMonth()] + ' ' + date.getDate() +
-          ' · ' + (d[6] ? d[6] + (parts.length ? ', ' : '') : '') +
-          (parts.length ? parts.join(', ') : d[6] ? '' : 'rest');
+          ' · ' + (d[5] ? d[6] || d[5] : parts.length ? parts.join(', ') : 'rest');
         grid.appendChild(cell);
         total += sum;
 
@@ -134,7 +134,9 @@ quick_entrance: true
       // The activity overview, as on a GitHub profile: a few lines on the
       // left, and on the right a cross with an arm per sport, its point out
       // along the arm by its share of the year's hours, the busiest sport's
-      // reaching the end
+      // reaching the end. The points go out by the square root of the share,
+      // so the smaller sports keep clear of the middle and of each other
+      // when one sport takes most of the year
       var thisMonth = DAYS[DAYS.length - 1][0].slice(0, 7);
       var monthMins = 0, weekMins = 0, year = [0, 0, 0, 0], races = 0;
       // The week starts on Monday, as the grid's columns do
@@ -143,23 +145,27 @@ quick_entrance: true
         if (n >= DAYS.length - weekDays) weekMins += d[1] + d[2] + d[3] + d[4];
         for (var k = 0; k < 4; k++) year[k] += d[k + 1];
         if (d[0].slice(0, 7) === thisMonth) monthMins += d[1] + d[2] + d[3] + d[4];
-        if (d[5]) races++;
+        // A meet over several days in a row is one race
+        var prev = DAYS[n - 1];
+        if (d[5] && !(prev && prev[5] === d[5] && prev[6] === d[6])) races++;
       });
       var yearMins = year[0] + year[1] + year[2] + year[3];
       var monthName = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][+thisMonth.slice(5) - 1];
       function hrs(min) { return Math.round(min / 60).toLocaleString(); }
 
-      // Swim to the left, bike up, run to the right, lift down
-      var CX = 120, CY = 100, ARM = 58;
+      // Swim to the left, bike up, run to the right, lift down. The cross
+      // is a little wider than it is tall, to sit beside the few lines on
+      // its left
+      var CX = 120, CY = 64, ARMS = [52, 48, 52, 48];
       var DIRS = [[-1, 0], [0, -1], [1, 0], [0, 1]];
       var most = Math.max.apply(null, year) || 1;
       var pts = year.map(function (m, k) {
-        var r = m / most * ARM;
+        var r = Math.sqrt(m / most) * ARMS[k];
         return [CX + DIRS[k][0] * r, CY + DIRS[k][1] * r];
       });
-      var svg = '<svg class="tr-cross" viewBox="0 0 240 200" role="img" aria-label="Share of the year\'s hours by sport">';
+      var svg = '<svg class="tr-cross" viewBox="0 0 240 128" role="img" aria-label="Share of the year\'s hours by sport">';
       SPORTS.forEach(function (s, k) {
-        svg += '<line class="tr-' + s + '" x1="' + CX + '" y1="' + CY + '" x2="' + (CX + DIRS[k][0] * ARM) + '" y2="' + (CY + DIRS[k][1] * ARM) + '"/>';
+        svg += '<line class="tr-' + s + '" x1="' + CX + '" y1="' + CY + '" x2="' + (CX + DIRS[k][0] * ARMS[k]) + '" y2="' + (CY + DIRS[k][1] * ARMS[k]) + '"/>';
       });
       // The shape between the four points, each side bowing in toward the
       // middle: a curve whose handle sits partway from the side's midpoint
@@ -176,13 +182,23 @@ quick_entrance: true
       pts.forEach(function (p, k) {
         if (year[k]) svg += '<circle class="tr-' + SPORTS[k] + '" cx="' + p[0] + '" cy="' + p[1] + '" r="3"/>';
       });
-      // Each arm's label past its end: the share over the sport's name
-      var LABELS = [[CX - ARM - 8, CY - 4, 'end'], [CX, CY - ARM - 20, 'middle'], [CX + ARM + 8, CY - 4, 'start'], [CX, CY + ARM + 16, 'middle']];
+      // Whole percents that add to 100: each share rounded down, then the
+      // points left over handed to the largest remainders
+      var pcts = year.map(function (m) { return Math.floor(m / (yearMins || 1) * 100); });
+      var left = yearMins ? 100 - pcts[0] - pcts[1] - pcts[2] - pcts[3] : 0;
+      year.map(function (m, k) { return [m / yearMins * 100 - pcts[k], k]; })
+        .sort(function (a, b) { return b[0] - a[0]; })
+        .slice(0, left)
+        .forEach(function (r) { pcts[r[1]]++; });
+      // Each arm's label, the share then the sport's name on one line: past
+      // the ends of the arms across, and beside the ends of the arms up and
+      // down, so the chart stays short
+      var LABELS = [[CX - ARMS[0] - 8, CY + 4, 'end'], [CX + 9, CY - ARMS[1] + 8, 'start'], [CX + ARMS[2] + 8, CY + 4, 'start'], [CX + 9, CY + ARMS[3], 'start']];
       SPORTS.forEach(function (s, k) {
-        var L = LABELS[k], pct = Math.round(year[k] / yearMins * 100);
+        var L = LABELS[k], pct = pcts[k], name = s.charAt(0).toUpperCase() + s.slice(1);
         svg += '<text x="' + L[0] + '" y="' + L[1] + '" text-anchor="' + L[2] + '">' +
           '<tspan class="tr-pct" x="' + L[0] + '">' + pct + '%</tspan>' +
-          '<tspan x="' + L[0] + '" dy="14">' + s.charAt(0).toUpperCase() + s.slice(1) + '</tspan></text>';
+          '<tspan dx="4">' + name + '</tspan></text>';
       });
       svg += '</svg>';
 
@@ -218,7 +234,10 @@ quick_entrance: true
 <div class="sv-body" id="sv-body">
 <div class="sv-log" id="sv-log" aria-live="polite"></div>
 
-<p class="sv-foot" id="sv-foot"></p>
+<div class="sv-end">
+  <button type="button" class="sv-more" id="sv-more" hidden>Show more activity</button>
+  <p class="sv-foot" id="sv-foot"></p>
+</div>
 </div>
 </section>
 

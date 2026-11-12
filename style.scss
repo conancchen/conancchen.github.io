@@ -1679,9 +1679,11 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 // Laid out like a GitHub profile's contribution graph: the year's total
 // as the title, then the calendar with weekday labels down its side and a
 // key along the bottom, over the activity overview
+// The page's type runs in three sizes: 13px for the two section titles,
+// 12px for the log, and 11px for labels, keys and the overview
 .tr-title {
-  margin: 0 0 10px;
-  font-size: inherit;
+  margin: 0 0 8px;
+  font-size: 13px;
   font-weight: normal;
   color: var(--text);
   font-variant-numeric: tabular-nums;
@@ -1814,7 +1816,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
-  margin-top: 20px;
+  margin-top: 16px;
 
   &[hidden] {
     display: none;
@@ -1855,13 +1857,13 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6px 8px;
+  padding: 0;
 }
 
 .tr-cross {
   display: block;
   width: 100%;
-  max-width: 216px;
+  max-width: 240px;
   overflow: visible;
 
   line {
@@ -1884,9 +1886,9 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
     stroke-width: 2;
   }
 
-  // 11px on screen: the chart draws at 216px across a 240-wide viewBox
+  // 11px on screen: the chart draws at about its viewBox's own 240px
   text {
-    font-size: 12.2px;
+    font-size: 11px;
     fill: var(--muted);
   }
 
@@ -1953,7 +1955,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 .sv-other { --c: var(--muted); }
 
 .sv-section {
-  margin-top: 36px;
+  margin-top: 28px;
 }
 
 // The section's title with its all / races switch across from it
@@ -1964,17 +1966,19 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 
   .block-label {
     margin: 0;
+    font-size: 13px;
     color: var(--text);
   }
 }
 
 // The log
 .sv-log {
-  margin: 20px 0 12px;
+  margin: 14px 0 0;
+  font-size: 12px;
 }
 
 .sv-month + .sv-month {
-  margin-top: 28px;
+  margin-top: 22px;
 }
 
 // Each month as on a GitHub profile's contribution activity: its name
@@ -1985,7 +1989,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   display: flex;
   align-items: center;
   gap: 12px;
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   font-size: inherit;
   font-weight: normal;
   color: var(--muted);
@@ -2003,17 +2007,25 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   }
 }
 
+// The line runs down the middle of the icons, whose left edge sits under
+// the month's name; everything beside them shares two columns, a narrow
+// one for a sport's name or a day and the rest for what it says
 .sv-tl {
+  --sv-col: 40px;
+  --sv-gap: 8px;
   position: relative;
-  font-size: 12.5px;
-  margin-left: 13px;
+  margin-left: 12.25px;
   padding-left: 0;
   border-left: 1.5px solid var(--rule);
 }
 
 .sv-tl-item {
   position: relative;
-  padding: 14px 0 6px 26px;
+  padding: 10px 0 0 26.25px;
+}
+
+.sv-tl-item + .sv-tl-item {
+  margin-top: 4px;
 }
 
 // The first icon starts the line, with no stub of it showing above
@@ -2027,8 +2039,8 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 
 .sv-tl-icon {
   position: absolute;
-  left: -14px;
-  top: 14px;
+  left: -13.75px;
+  top: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2040,14 +2052,14 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   color: var(--muted);
 
   svg {
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
   }
 }
 
 .sv-tl-title {
   // as tall as its icon, so the two share a middle
-  margin: 0 0 8px;
+  margin: 0 0 2px;
   font-size: inherit;
   line-height: 26px;
 }
@@ -2059,10 +2071,10 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 
   li {
     display: grid;
-    grid-template-columns: auto 1fr 34%;
-    align-items: center;
-    gap: 8px;
-    padding: 2px 0;
+    grid-template-columns: var(--sv-col) 1fr 34%;
+    align-items: baseline;
+    gap: var(--sv-gap);
+    padding: 3px 0;
   }
 }
 
@@ -2078,6 +2090,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 
 .sv-tl-bar {
   display: block;
+  align-self: center;
 
   span {
     display: block;
@@ -2095,8 +2108,8 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 .sv-row {
   display: flex;
   align-items: baseline;
-  gap: 8px;
-  padding: 4px 0;
+  gap: var(--sv-gap);
+  padding: 3px 0;
   cursor: pointer;
   list-style: none;
 
@@ -2110,9 +2123,8 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 }
 
 .sv-day {
-  width: 16px;
+  width: var(--sv-col);
   flex: none;
-  text-align: right;
   color: var(--muted);
   font-size: inherit;
   font-variant-numeric: tabular-nums;
@@ -2134,7 +2146,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 
 // An opened activity
 .sv-detail {
-  padding: 6px 0 14px 30px;
+  padding: 6px 0 14px calc(var(--sv-col) + var(--sv-gap));
   animation: sv-in 0.2s ease both;
 }
 
@@ -2189,7 +2201,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 .sv-meta {
   margin: 0 0 10px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 11px;
 
   a {
     color: inherit;
@@ -2197,6 +2209,11 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
     text-decoration-color: color-mix(in srgb, var(--text) 20%, transparent);
     text-underline-offset: 3px;
   }
+}
+
+// A triathlon's legs, one under the next
+.sv-leg {
+  margin-top: 16px;
 }
 
 .sv-stats {
@@ -2215,9 +2232,21 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   font-variant-numeric: tabular-nums;
 }
 
-// Older months come in three at a time
+// Under the log, one line set like the log's own text: the button for
+// older months, which come in three at a time, on the left under the month
+// names, and when the log was last synced on the right under the bars
+.sv-end {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  margin-top: 20px;
+  font-size: 12px;
+  line-height: 20px;
+}
+
 .sv-more {
-  margin-top: 16px;
+  margin: 0;
   padding: 0;
   border: none;
   background: none;
@@ -2232,9 +2261,11 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 }
 
 .sv-foot {
-  margin: 24px 0 0;
+  margin: 0 0 0 auto;
   color: var(--muted);
   font-size: inherit;
+  line-height: inherit;
+  font-variant-numeric: tabular-nums;
 }
 
 @media screen and (max-width: 479px) {
