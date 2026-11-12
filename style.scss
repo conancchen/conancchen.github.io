@@ -111,12 +111,12 @@ a:focus {
 }
 
 // Bio links read as body text over a faint underline (the text's black at
-// 15%), breaking around the descenders, that darkens when hovered
+// 10%), breaking around the descenders, that darkens when hovered
 .bio a,
 .bio .preview-link {
   color: var(--text);
   text-decoration: underline;
-  text-decoration-color: color-mix(in srgb, var(--text) 15%, transparent);
+  text-decoration-color: color-mix(in srgb, var(--text) 10%, transparent);
   text-decoration-thickness: 1px;
   text-decoration-skip-ink: auto;
   text-underline-offset: 3px;
@@ -1628,19 +1628,8 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 /**************/
 /* MARKDOWN   */
 /**************/
-// Bio links that leave the site end in a small grey arrow (↗) instead of an
-// underline; the ones that stay on it (coursework, the race card) keep their
-// faint underline. The arrow sits on the line, a touch smaller than the
-// text. The follow and email links lose their pills: the follow link keeps its
-// profile's logo and gets the arrow, the email link keeps its copy icon
-:root {
-  --link-mark: #a8a8a8;
-}
-
-.bio a[href^="http"] {
-  text-decoration: none;
-}
-
+// The follow and email links lose their pills and read like the other bio
+// links: the logo or copy icon, then the name over the same faint underline
 .bio .chip {
   gap: 3px;
   height: auto;
@@ -1665,49 +1654,18 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   background: none;
 }
 
-.bio a[href^="http"]::after {
-  content: '↗';
-  color: var(--link-mark);
-  margin-left: 2px;
-  font-size: 0.85em;
-  user-select: none;
-  transition: color 0.15s ease;
+.bio .chip > span:not(.chip-icon-slot) {
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--text) 10%, transparent);
+  text-decoration-thickness: 1px;
+  text-decoration-skip-ink: auto;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.15s ease;
 }
 
-.bio a[href^="http"]:hover::after,
-.bio a[href^="http"]:focus-visible::after {
-  color: var(--text);
-}
-
-// In the follow link (laid out as a row, 3px apart) the gap already spaces
-// the arrow, so it pulls back in to sit as close as it does elsewhere
-.bio .chip[href^="http"]::after {
-  margin-left: -1px;
-}
-
-// The links that stay on the site (coursework, the race card) look just like
-// the ones that leave it: plain text with a small grey ↗ that darkens on hover
-.bio a:not([href^="http"]):not(.chip),
-.bio .preview-link {
-  text-decoration: none;
-}
-
-.bio a:not([href^="http"]):not(.chip)::after,
-.bio .preview-link::after {
-  content: '↗';
-  color: var(--link-mark);
-  margin-left: 2px;
-  font-size: 0.85em;
-  user-select: none;
-  transition: color 0.15s ease;
-}
-
-.bio a:not([href^="http"]):not(.chip):hover::after,
-.bio a:not([href^="http"]):not(.chip):focus-visible::after,
-.bio .preview-link:hover::after,
-.bio .preview-link:focus-visible::after,
-.preview.is-open .preview-link::after {
-  color: var(--text);
+.bio .chip:hover > span:not(.chip-icon-slot),
+.bio .chip:focus-visible > span:not(.chip-icon-slot) {
+  text-decoration-color: color-mix(in srgb, var(--text) 70%, transparent);
 }
 
 // The training heatmap: a year of days in a grid, a column per week, each
@@ -1804,6 +1762,78 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   color: var(--muted);
 }
 
+// Hours by sport under the grid: this month and the past year side by
+// side, each a total over a bar split by sport and the sports beneath it
+.tr-sums {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  margin-top: 24px;
+  font-variant-numeric: tabular-nums;
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    line-height: 20px;
+    color: var(--muted);
+
+    &::before {
+      margin: 0 7px 0 0;
+    }
+
+    span:first-child {
+      flex: 1;
+    }
+
+    span:last-child {
+      color: var(--text);
+    }
+  }
+}
+
+.tr-card-title {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.tr-card-total {
+  display: block;
+  margin-top: 2px;
+  font-size: 22px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--text);
+
+  small {
+    font-size: 12px;
+    letter-spacing: 0;
+    color: var(--muted);
+  }
+}
+
+.tr-bar {
+  display: flex;
+  gap: 2px;
+  height: 6px;
+  margin: 10px 0 10px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--rule);
+
+  span {
+    background: var(--c);
+  }
+}
+
 .tr-key::before {
   content: '';
   display: inline-block;
@@ -1840,7 +1870,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 // a mileage chart, then each month's name over its activities, races in
 // Strava's orange, each one opening to its route and numbers
 :root {
-  --race: #d84302;
+  --race: #8b5cc4;
 }
 
 .sv-swim { --c: var(--swim); }
@@ -1862,6 +1892,31 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
     margin: 0;
     color: var(--text);
   }
+}
+
+// The title opens and closes the log; closed, the switch and log are hidden
+.sv-toggle {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+
+  &::before {
+    content: "−";
+    display: inline-block;
+    width: 1ch;
+    margin-right: 6px;
+    color: var(--muted);
+  }
+}
+
+.sv-section.is-closed {
+  .sv-toggle::before { content: "+"; }
+  .sv-filters, .sv-body { display: none; }
 }
 
 .sv-filters {
@@ -1951,6 +2006,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 .sv-entry.is-race .sv-name,
 .sv-entry.is-race .sv-amount {
   color: var(--race);
+  font-weight: 600;
 }
 
 // An opened activity

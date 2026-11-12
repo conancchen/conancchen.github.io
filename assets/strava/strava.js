@@ -171,6 +171,11 @@
     renderLog(list);
   }
 
+  document.getElementById('sv-toggle').addEventListener('click', function () {
+    var closed = document.getElementById('sv-section').classList.toggle('is-closed');
+    this.setAttribute('aria-expanded', String(!closed));
+  });
+
   var bar = document.getElementById('sv-filters');
   bar.addEventListener('click', function (e) {
     var b = e.target.closest('button');

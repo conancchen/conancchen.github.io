@@ -15,6 +15,7 @@ quick_entrance: true
     <div class="tr-legend" aria-hidden="true">
       <span class="tr-key tr-swim">Swim</span><span class="tr-key tr-bike">Bike</span><span class="tr-key tr-run">Run</span><span class="tr-key tr-lift">Lift</span><span class="tr-key tr-race">Race</span>
     </div>
+    <div class="tr-sums" id="tr-sums" hidden></div>
     <div class="tr-tip" id="tr-tip" role="tooltip"></div>
   </section>
   <script>
@@ -25,7 +26,7 @@ quick_entrance: true
     (function () {
       var RIDES = ['Ride', 'VirtualRide', 'EBikeRide', 'EMountainBikeRide', 'GravelRide', 'MountainBikeRide'];
       var RUNS = ['Run', 'TrailRun', 'VirtualRun', 'Treadmill'];
-      fetch('https://raw.githubusercontent.com/conancchen/strava/main/activities.json')
+      fetch('https://raw.githubusercontent.com/conancchen/strava/main/activities.json', { cache: 'no-cache' })
         .then(function (r) { return r.json(); })
         .then(function (acts) {
           // A year of days ending today, each [date, swim, bike, run, lift] in minutes
@@ -41,7 +42,28 @@ quick_entrance: true
             if (k >= BREAK[0] && k <= BREAK[1]) return false;
             return SEASONS.some(function (s) { return k >= s[0] && k <= s[1]; });
           }
-          var PRACTICE = [[0, 0], [180, 60], [120, 0], [180, 0], [120, 0], [180, 0], [120, 0]];
+          var PRACTICE = [[0, 0], [180, 60], [120, 0], [180, 60], [120, 0], [180, 60], [120, 0]];
+          // Weeks that ran differently from the usual one, as [swim, lift]
+          var WEEKS = {
+            '2026-10-18': [180, 60], '2026-10-19': [240, 0], '2026-10-20': [120, 0],
+            '2026-10-21': [240, 0], '2026-10-22': [120, 60], '2026-10-23': [240, 0]
+          };
+          // Meet days count as a 4.5-hour swim instead of practice and show as races
+          var MEETS = {
+            '2025-11-22': 'at Cornell w/ Penn',
+            '2025-12-04': 'Big Al Invitational', '2025-12-05': 'Big Al Invitational',
+            '2025-12-06': 'Big Al Invitational',
+            '2026-01-09': 'at Navy w/ Kenyon, Delaware', '2026-01-10': 'at Navy w/ Kenyon, Delaware',
+            '2026-01-24': 'vs Penn State',
+            '2026-01-30': 'at Harvard w/ Yale', '2026-01-31': 'at Harvard w/ Yale',
+            '2026-10-16': 'vs Villanova',
+            '2026-11-07': 'at Columbia w/ Dartmouth', '2026-11-14': 'at Penn',
+            '2026-11-20': 'Big Al Invitational', '2026-11-21': 'Big Al Invitational',
+            '2026-11-22': 'Big Al Invitational',
+            '2027-01-08': 'vs Navy, Notre Dame, Delaware', '2027-01-09': 'vs Navy, Notre Dame, Delaware',
+            '2027-01-16': 'at Brown w/ Cornell',
+            '2027-01-29': 'vs Harvard & Yale', '2027-01-30': 'vs Harvard & Yale'
+          };
           acts.forEach(function (a) {
             var k = a.type === 'Swim' ? 1 : RIDES.indexOf(a.type) >= 0 ? 2 : RUNS.indexOf(a.type) >= 0 ? 3 : 0;
             if (!k) return;
@@ -55,9 +77,14 @@ quick_entrance: true
             var t = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i);
             var key = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
             var day = byDay[key] || [key, 0, 0, 0, 0];
-            if (inSeason(key)) {
-              day[1] = Math.max(day[1], PRACTICE[t.getDay()][0]);
-              day[4] += PRACTICE[t.getDay()][1];
+            if (MEETS[key]) {
+              day[5] = day[5] || 'Meet';
+              day[6] = MEETS[key];
+              day[1] = Math.max(day[1], 270);  // a meet runs about 4 to 5 hours
+            } else if (inSeason(key)) {
+              var plan = WEEKS[key] || PRACTICE[t.getDay()];
+              day[1] = Math.max(day[1], plan[0]);
+              day[4] += plan[1];
             }
             days.push(day);
           }
@@ -102,7 +129,8 @@ quick_entrance: true
         var parts = [];
         SPORTS.forEach(function (s, k) { if (mins[k]) parts.push(hm(mins[k]) + ' ' + s); });
         cell.dataset.tip = WEEKDAYS[date.getDay()] + ', ' + MONTHS[date.getMonth()] + ' ' + date.getDate() +
-          ' · ' + (d[5] ? d[5] + ', ' : '') + (parts.length ? parts.join(', ') : 'rest');
+          ' · ' + (d[6] ? d[6] + (parts.length ? ', ' : '') : '') +
+          (parts.length ? parts.join(', ') : d[6] ? '' : 'rest');
         grid.appendChild(cell);
         total += sum;
 
@@ -122,6 +150,33 @@ quick_entrance: true
       months.style.setProperty('--cols', cols);
       document.getElementById('tr-total').textContent = Math.round(total / 60) + ' hours';
 
+      // Hours by sport, this calendar month and the whole year
+      var thisMonth = DAYS[DAYS.length - 1][0].slice(0, 7);
+      var month = [0, 0, 0, 0], year = [0, 0, 0, 0];
+      DAYS.forEach(function (d) {
+        for (var k = 0; k < 4; k++) {
+          year[k] += d[k + 1];
+          if (d[0].slice(0, 7) === thisMonth) month[k] += d[k + 1];
+        }
+      });
+      function hrs(min) { return Math.round(min / 60).toLocaleString(); }
+      function card(title, mins) {
+        var all = mins[0] + mins[1] + mins[2] + mins[3];
+        var bar = SPORTS.map(function (s, k) {
+          return mins[k] ? '<span class="tr-' + s + '" style="flex:' + mins[k] + '"></span>' : '';
+        }).join('');
+        var rows = SPORTS.map(function (s, k) {
+          return '<li class="tr-key tr-' + s + '"><span>' + s.charAt(0).toUpperCase() + s.slice(1) +
+            '</span><span>' + hrs(mins[k]) + ' h</span></li>';
+        }).join('');
+        return '<div class="tr-card"><span class="tr-card-title">' + title + '</span>' +
+          '<span class="tr-card-total">' + hrs(all) + '<small> hours</small></span>' +
+          '<div class="tr-bar">' + bar + '</div><ul>' + rows + '</ul></div>';
+      }
+      var sums = document.getElementById('tr-sums');
+      sums.innerHTML = card(['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][+thisMonth.slice(5) - 1], month) + card('Past year', year);
+      sums.hidden = false;
+
       function show(cell) {
         tip.textContent = cell.dataset.tip;
         tip.classList.add('is-on');
@@ -138,18 +193,20 @@ quick_entrance: true
     }
   </script>
 
-<section class="block sv-section">
+<section class="block sv-section is-closed" id="sv-section">
 <div class="sv-head">
-  <h2 class="block-label">Activities from Strava</h2>
+  <h2 class="block-label"><button type="button" class="sv-toggle" id="sv-toggle" aria-expanded="false" aria-controls="sv-body">Activities from Strava</button></h2>
   <p class="sort-line sv-filters" id="sv-filters">
     <button type="button" class="is-on" data-scope="all">all</button>
     <button type="button" data-scope="races">races</button>
   </p>
 </div>
 
+<div class="sv-body" id="sv-body">
 <div class="sv-log" id="sv-log" aria-live="polite"></div>
 
 <p class="sv-foot" id="sv-foot"></p>
+</div>
 </section>
 
 <script src="{{ site.baseurl }}/assets/strava/strava.js?v={{ site.time | date: '%s' }}"></script>
