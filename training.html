@@ -9,15 +9,26 @@ quick_entrance: true
      repo, which syncs them from the Strava API every six hours, so nothing
      here holds a key and the page stays current without a rebuild -->
 <section class="block training">
-    <h2 class="block-label">Past year<span class="tr-total" id="tr-total"></span></h2>
-    <div class="tr-months" id="tr-months" aria-hidden="true"></div>
-    <div class="tr-grid" id="tr-grid" role="img" aria-label="A year of training, day by day"></div>
-    <div class="tr-legend" aria-hidden="true">
-      <span class="tr-key tr-swim">Swim</span><span class="tr-key tr-bike">Bike</span><span class="tr-key tr-run">Run</span><span class="tr-key tr-lift">Lift</span><span class="tr-key tr-race">Race</span>
+    <h2 class="tr-title" id="tr-title">Training in the last year</h2>
+    <div class="tr-box">
+      <div class="tr-cal">
+        <div class="tr-months" id="tr-months" aria-hidden="true"></div>
+        <div class="tr-body">
+          <div class="tr-wdays" aria-hidden="true"><span>Mon</span><span></span><span>Wed</span><span></span><span>Fri</span><span></span><span></span></div>
+          <div class="tr-grid" id="tr-grid" role="img" aria-label="A year of training, day by day"></div>
+        </div>
+        <div class="tr-foot" aria-hidden="true">
+          <div class="tr-legend">
+            <span class="tr-key tr-swim">Swim</span><span class="tr-key tr-bike">Bike</span><span class="tr-key tr-run">Run</span><span class="tr-key tr-lift">Lift</span><span class="tr-key tr-race">Race</span>
+          </div>
+          <div class="tr-scale">Less<span class="tr-day"></span><span class="tr-day tr-swim tr-l1"></span><span class="tr-day tr-swim tr-l2"></span><span class="tr-day tr-swim tr-l3"></span><span class="tr-day tr-swim tr-l4"></span>More</div>
+        </div>
+      </div>
+      <div class="tr-sums" id="tr-sums" hidden></div>
     </div>
-    <div class="tr-sums" id="tr-sums" hidden></div>
     <div class="tr-tip" id="tr-tip" role="tooltip"></div>
   </section>
+  <script src="{{ site.baseurl }}/assets/strava/schedule.js?v={{ site.time | date: '%s' }}"></script>
   <script>
     // A year of training as a grid of days, a column per week from Monday
     // down: each day takes the color of the sport it spent the most time on
@@ -31,39 +42,8 @@ quick_entrance: true
         .then(function (acts) {
           // A year of days ending today, each [date, swim, bike, run, lift] in minutes
           var byDay = {}, days = [], today = new Date();
-          // Pool practice isn't on Strava, so in season the team's usual week
-          // fills it in: the back half of last season and this one from its
-          // start, minus the break over the end of the year. PRACTICE is the
-          // minutes of [swim, lift] by weekday, Sunday first; a day Strava
-          // already has a longer swim keeps that.
-          var SEASONS = [['2025-11-01', '2026-02-02'], ['2026-09-03', '9999-12-31']];
-          var BREAK = ['2025-12-22', '2025-12-31'];
-          function inSeason(k) {
-            if (k >= BREAK[0] && k <= BREAK[1]) return false;
-            return SEASONS.some(function (s) { return k >= s[0] && k <= s[1]; });
-          }
-          var PRACTICE = [[0, 0], [180, 60], [120, 0], [180, 60], [120, 0], [180, 60], [120, 0]];
-          // Weeks that ran differently from the usual one, as [swim, lift]
-          var WEEKS = {
-            '2026-10-18': [180, 60], '2026-10-19': [240, 0], '2026-10-20': [120, 0],
-            '2026-10-21': [240, 0], '2026-10-22': [120, 60], '2026-10-23': [240, 0]
-          };
-          // Meet days count as a 4.5-hour swim instead of practice and show as races
-          var MEETS = {
-            '2025-11-22': 'at Cornell w/ Penn',
-            '2025-12-04': 'Big Al Invitational', '2025-12-05': 'Big Al Invitational',
-            '2025-12-06': 'Big Al Invitational',
-            '2026-01-09': 'at Navy w/ Kenyon, Delaware', '2026-01-10': 'at Navy w/ Kenyon, Delaware',
-            '2026-01-24': 'vs Penn State',
-            '2026-01-30': 'at Harvard w/ Yale', '2026-01-31': 'at Harvard w/ Yale',
-            '2026-10-16': 'vs Villanova',
-            '2026-11-07': 'at Columbia w/ Dartmouth', '2026-11-14': 'at Penn',
-            '2026-11-20': 'Big Al Invitational', '2026-11-21': 'Big Al Invitational',
-            '2026-11-22': 'Big Al Invitational',
-            '2027-01-08': 'vs Navy, Notre Dame, Delaware', '2027-01-09': 'vs Navy, Notre Dame, Delaware',
-            '2027-01-16': 'at Brown w/ Cornell',
-            '2027-01-29': 'vs Harvard & Yale', '2027-01-30': 'vs Harvard & Yale'
-          };
+          // Pool practice and meets aren't on Strava, so they come from the
+          // team's schedule; a day Strava already has a longer swim keeps that
           acts.forEach(function (a) {
             var k = a.type === 'Swim' ? 1 : RIDES.indexOf(a.type) >= 0 ? 2 : RUNS.indexOf(a.type) >= 0 ? 3 : 0;
             if (!k) return;
@@ -75,16 +55,16 @@ quick_entrance: true
           });
           for (var i = 364; i >= 0; i--) {
             var t = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i);
-            var key = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
+            var key = SCHEDULE.keyOf(t);
             var day = byDay[key] || [key, 0, 0, 0, 0];
-            if (MEETS[key]) {
-              day[5] = day[5] || 'Meet';
-              day[6] = MEETS[key];
-              day[1] = Math.max(day[1], 270);  // a meet runs about 4 to 5 hours
-            } else if (inSeason(key)) {
-              var plan = WEEKS[key] || PRACTICE[t.getDay()];
-              day[1] = Math.max(day[1], plan[0]);
-              day[4] += plan[1];
+            var plan = SCHEDULE.day(t);
+            if (plan) {
+              day[1] = Math.max(day[1], plan.swim);
+              day[4] += plan.lift;
+              if (plan.meet) {
+                day[5] = day[5] || 'Meet';
+                day[6] = plan.meet;
+              }
             }
             days.push(day);
           }
@@ -148,39 +128,76 @@ quick_entrance: true
       var cols = Math.ceil((DAYS.length + lead) / 7);
       grid.style.setProperty('--cols', cols);
       months.style.setProperty('--cols', cols);
-      document.getElementById('tr-total').textContent = Math.round(total / 60) + ' hours';
+      document.getElementById('tr-title').textContent =
+        Math.round(total / 60).toLocaleString() + ' hours of training in the last year';
 
-      // Hours by sport, this calendar month and the whole year
+      // The activity overview, as on a GitHub profile: a few lines on the
+      // left, and on the right a cross with an arm per sport, its point out
+      // along the arm by its share of the year's hours, the busiest sport's
+      // reaching the end
       var thisMonth = DAYS[DAYS.length - 1][0].slice(0, 7);
-      var month = [0, 0, 0, 0], year = [0, 0, 0, 0];
-      DAYS.forEach(function (d) {
-        for (var k = 0; k < 4; k++) {
-          year[k] += d[k + 1];
-          if (d[0].slice(0, 7) === thisMonth) month[k] += d[k + 1];
-        }
+      var monthMins = 0, weekMins = 0, year = [0, 0, 0, 0], races = 0;
+      // The week starts on Monday, as the grid's columns do
+      var weekDays = (parse(DAYS[DAYS.length - 1][0]).getDay() + 6) % 7 + 1;
+      DAYS.forEach(function (d, n) {
+        if (n >= DAYS.length - weekDays) weekMins += d[1] + d[2] + d[3] + d[4];
+        for (var k = 0; k < 4; k++) year[k] += d[k + 1];
+        if (d[0].slice(0, 7) === thisMonth) monthMins += d[1] + d[2] + d[3] + d[4];
+        if (d[5]) races++;
       });
+      var yearMins = year[0] + year[1] + year[2] + year[3];
+      var monthName = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][+thisMonth.slice(5) - 1];
       function hrs(min) { return Math.round(min / 60).toLocaleString(); }
-      function card(title, mins) {
-        var all = mins[0] + mins[1] + mins[2] + mins[3];
-        var bar = SPORTS.map(function (s, k) {
-          return mins[k] ? '<span class="tr-' + s + '" style="flex:' + mins[k] + '"></span>' : '';
-        }).join('');
-        var rows = SPORTS.map(function (s, k) {
-          return '<li class="tr-key tr-' + s + '"><span>' + s.charAt(0).toUpperCase() + s.slice(1) +
-            '</span><span>' + hrs(mins[k]) + ' h</span></li>';
-        }).join('');
-        return '<div class="tr-card"><span class="tr-card-title">' + title + '</span>' +
-          '<span class="tr-card-total">' + hrs(all) + '<small> hours</small></span>' +
-          '<div class="tr-bar">' + bar + '</div><ul>' + rows + '</ul></div>';
+
+      // Swim to the left, bike up, run to the right, lift down
+      var CX = 120, CY = 100, ARM = 58;
+      var DIRS = [[-1, 0], [0, -1], [1, 0], [0, 1]];
+      var most = Math.max.apply(null, year) || 1;
+      var pts = year.map(function (m, k) {
+        var r = m / most * ARM;
+        return [CX + DIRS[k][0] * r, CY + DIRS[k][1] * r];
+      });
+      var svg = '<svg class="tr-cross" viewBox="0 0 240 200" role="img" aria-label="Share of the year\'s hours by sport">';
+      SPORTS.forEach(function (s, k) {
+        svg += '<line class="tr-' + s + '" x1="' + CX + '" y1="' + CY + '" x2="' + (CX + DIRS[k][0] * ARM) + '" y2="' + (CY + DIRS[k][1] * ARM) + '"/>';
+      });
+      // The shape between the four points, each side bowing in toward the
+      // middle: a curve whose handle sits partway from the side's midpoint
+      // to the center
+      var d = 'M' + pts[0][0].toFixed(1) + ',' + pts[0][1].toFixed(1);
+      for (var j = 0; j < 4; j++) {
+        var p1 = pts[j], p2 = pts[(j + 1) % 4];
+        var qx = (p1[0] + p2[0]) / 2, qy = (p1[1] + p2[1]) / 2;
+        qx += (CX - qx) * 0.7;
+        qy += (CY - qy) * 0.7;
+        d += ' Q' + qx.toFixed(1) + ',' + qy.toFixed(1) + ' ' + p2[0].toFixed(1) + ',' + p2[1].toFixed(1);
       }
+      svg += '<path class="tr-shape" d="' + d + ' Z"/>';
+      pts.forEach(function (p, k) {
+        if (year[k]) svg += '<circle class="tr-' + SPORTS[k] + '" cx="' + p[0] + '" cy="' + p[1] + '" r="3"/>';
+      });
+      // Each arm's label past its end: the share over the sport's name
+      var LABELS = [[CX - ARM - 8, CY - 4, 'end'], [CX, CY - ARM - 20, 'middle'], [CX + ARM + 8, CY - 4, 'start'], [CX, CY + ARM + 16, 'middle']];
+      SPORTS.forEach(function (s, k) {
+        var L = LABELS[k], pct = Math.round(year[k] / yearMins * 100);
+        svg += '<text x="' + L[0] + '" y="' + L[1] + '" text-anchor="' + L[2] + '">' +
+          '<tspan class="tr-pct" x="' + L[0] + '">' + pct + '%</tspan>' +
+          '<tspan x="' + L[0] + '" dy="14">' + s.charAt(0).toUpperCase() + s.slice(1) + '</tspan></text>';
+      });
+      svg += '</svg>';
+
       var sums = document.getElementById('tr-sums');
-      sums.innerHTML = card(['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][+thisMonth.slice(5) - 1], month) + card('Past year', year);
+      sums.innerHTML = '<div class="tr-overview"><h3>Activity overview</h3><ul>' +
+        '<li><b>' + hrs(weekMins) + ' hours</b> so far this week</li>' +
+        '<li><b>' + hrs(monthMins) + ' hours</b> so far in ' + monthName + '</li>' +
+        '<li><b>' + races + (races === 1 ? ' race or meet' : ' races and meets') + '</b> this year</li>' +
+        '</ul></div><div class="tr-radar">' + svg + '</div>';
       sums.hidden = false;
 
       function show(cell) {
         tip.textContent = cell.dataset.tip;
         tip.classList.add('is-on');
-        var box = grid.parentNode.getBoundingClientRect(), c = cell.getBoundingClientRect();
+        var box = tip.offsetParent.getBoundingClientRect(), c = cell.getBoundingClientRect();
         var x = c.left + c.width / 2 - box.left;
         var half = tip.offsetWidth / 2;
         tip.style.left = Math.max(half, Math.min(box.width - half, x)) + 'px';
@@ -193,13 +210,9 @@ quick_entrance: true
     }
   </script>
 
-<section class="block sv-section is-closed" id="sv-section">
+<section class="block sv-section" id="sv-section">
 <div class="sv-head">
-  <h2 class="block-label"><button type="button" class="sv-toggle" id="sv-toggle" aria-expanded="false" aria-controls="sv-body">Activities from Strava</button></h2>
-  <p class="sort-line sv-filters" id="sv-filters">
-    <button type="button" class="is-on" data-scope="all">all</button>
-    <button type="button" data-scope="races">races</button>
-  </p>
+  <h2 class="block-label">Recent activities</h2>
 </div>
 
 <div class="sv-body" id="sv-body">

@@ -265,7 +265,7 @@ $reveal-fine: '.bio > p, .block:not(.timeline) > *';
 /**************/
 .page {
   width: 100%;
-  max-width: 500px;  // a 468px text column plus the 16px gutters
+  max-width: 552px;  // a 520px text column plus the 16px gutters
   margin: 0 auto;
   padding: 80px 16px 40px;
 }
@@ -1676,15 +1676,64 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 }
 
 // The title on the left and its total on the right
-.training > .block-label {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
+// Laid out like a GitHub profile's contribution graph: the year's total
+// as the title, then the calendar with weekday labels down its side and a
+// key along the bottom, over the activity overview
+.tr-title {
+  margin: 0 0 10px;
+  font-size: inherit;
+  font-weight: normal;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
 }
 
-.tr-total {
+
+.tr-body {
+  position: relative;
+  padding-left: 28px;
+}
+
+.tr-wdays {
+  display: grid;
+  grid-template-rows: repeat(7, minmax(0, 1fr));
+  row-gap: 2px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 22px;
+  font-size: 10px;
   color: var(--muted);
-  font-variant-numeric: tabular-nums;
+
+  span {
+    display: flex;
+    align-items: center;
+    line-height: 1;
+  }
+}
+
+
+.tr-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.tr-scale {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+
+  .tr-day {
+    width: 8px;
+    height: 8px;
+  }
+
+  .tr-day:first-child { margin-left: 3px; }
+  .tr-day:last-child { margin-right: 3px; }
 }
 
 .tr-months,
@@ -1695,7 +1744,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 }
 
 .tr-months {
-  margin: 6px 0 3px;
+  margin: 0 0 3px 28px;
   font-size: 11px;
   line-height: 14px;
   color: var(--muted);
@@ -1756,20 +1805,32 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 
 .tr-legend {
   display: flex;
-  gap: 12px;
-  margin-top: 8px;
-  font-size: 11px;
-  color: var(--muted);
+  gap: 10px;
 }
 
-// Hours by sport under the grid: this month and the past year side by
-// side, each a total over a bar split by sport and the sports beneath it
+// The lower panel, as on a GitHub profile: a few lines on the left, a
+// cross on the right with an arm per sport and the year's share on each
 .tr-sums {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 28px;
-  margin-top: 24px;
-  font-variant-numeric: tabular-nums;
+  gap: 16px;
+  margin-top: 20px;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.tr-overview {
+  border-right: 1px solid var(--rule);
+  font-size: 11px;
+
+  h3 {
+    margin: 0 0 10px;
+    font-size: inherit;
+    font-weight: normal;
+    color: var(--text);
+  }
 
   ul {
     list-style: none;
@@ -1778,60 +1839,72 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   }
 
   li {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 12px;
+    font-size: inherit;
     line-height: 20px;
     color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
 
-    &::before {
-      margin: 0 7px 0 0;
-    }
-
-    span:first-child {
-      flex: 1;
-    }
-
-    span:last-child {
-      color: var(--text);
-    }
+  b {
+    font-weight: normal;
+    color: var(--text);
   }
 }
 
-.tr-card-title {
-  display: block;
-  font-size: 11px;
-  color: var(--muted);
-}
-
-.tr-card-total {
-  display: block;
-  margin-top: 2px;
-  font-size: 22px;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-  color: var(--text);
-
-  small {
-    font-size: 12px;
-    letter-spacing: 0;
-    color: var(--muted);
-  }
-}
-
-.tr-bar {
+.tr-radar {
   display: flex;
-  gap: 2px;
-  height: 6px;
-  margin: 10px 0 10px;
-  border-radius: 3px;
-  overflow: hidden;
-  background: var(--rule);
+  align-items: center;
+  justify-content: center;
+  padding: 6px 8px;
+}
 
-  span {
-    background: var(--c);
+.tr-cross {
+  display: block;
+  width: 100%;
+  max-width: 216px;
+  overflow: visible;
+
+  line {
+    stroke: var(--c);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    opacity: 0.45;
   }
+
+  .tr-shape {
+    fill: color-mix(in srgb, var(--text) 6%, transparent);
+    stroke: color-mix(in srgb, var(--text) 45%, transparent);
+    stroke-width: 1.25;
+    stroke-linejoin: round;
+  }
+
+  circle {
+    fill: var(--bg);
+    stroke: var(--c);
+    stroke-width: 2;
+  }
+
+  // 11px on screen: the chart draws at 216px across a 240-wide viewBox
+  text {
+    font-size: 12.2px;
+    fill: var(--muted);
+  }
+
+  .tr-pct {
+    fill: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .tr-sums {
+    grid-template-columns: 1fr;
+  }
+
+  .tr-overview {
+    border-right: 0;
+  }
+
 }
 
 .tr-key::before {
@@ -1876,6 +1949,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 .sv-swim { --c: var(--swim); }
 .sv-bike { --c: var(--bike); }
 .sv-run { --c: var(--run); }
+.sv-lift { --c: #8a7f72; }
 .sv-other { --c: var(--muted); }
 
 .sv-section {
@@ -1894,73 +1968,128 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   }
 }
 
-// The title opens and closes the log; closed, the switch and log are hidden
-.sv-toggle {
-  font: inherit;
-  color: inherit;
-  letter-spacing: inherit;
-  text-transform: inherit;
-  background: none;
-  border: 0;
-  padding: 0;
-  cursor: pointer;
-
-  &::before {
-    content: "−";
-    display: inline-block;
-    width: 1ch;
-    margin-right: 6px;
-    color: var(--muted);
-  }
-}
-
-.sv-section.is-closed {
-  .sv-toggle::before { content: "+"; }
-  .sv-filters, .sv-body { display: none; }
-}
-
-.sv-filters {
-  margin: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 10px;
-
-  button {
-    cursor: pointer;
-  }
-
-  .is-on {
-    color: var(--text);
-  }
-}
-
 // The log
 .sv-log {
   margin: 20px 0 12px;
 }
 
 .sv-month + .sv-month {
-  margin-top: 24px;
+  margin-top: 28px;
 }
 
-// A month opens on a hairline, its name and totals above its activities
+// Each month as on a GitHub profile's contribution activity: its name
+// with a hairline running off to the right, then a timeline down the left
+// with an icon by each item, a summary of the month's sports and its
+// activities
 .sv-month-head {
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  padding: 0 0 6px;
-  margin-bottom: 4px;
-  border-bottom: 1px solid var(--rule);
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 10px;
+  font-size: inherit;
+  font-weight: normal;
+  color: var(--muted);
+
+  b {
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
 }
 
-.sv-month-name {
-  color: var(--muted);
+.sv-tl {
+  position: relative;
+  font-size: 12.5px;
+  margin-left: 13px;
+  padding-left: 0;
+  border-left: 1.5px solid var(--rule);
 }
 
-.sv-month-sum {
+.sv-tl-item {
+  position: relative;
+  padding: 14px 0 6px 26px;
+}
+
+// The first icon starts the line, with no stub of it showing above
+.sv-tl-item:first-child {
+  padding-top: 0;
+
+  .sv-tl-icon {
+    top: 0;
+  }
+}
+
+.sv-tl-icon {
+  position: absolute;
+  left: -14px;
+  top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--text) 6%, var(--bg));
+  box-shadow: 0 0 0 3px var(--bg);
   color: var(--muted);
-  font-size: 12px;
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.sv-tl-title {
+  // as tall as its icon, so the two share a middle
+  margin: 0 0 8px;
+  font-size: inherit;
+  line-height: 26px;
+}
+
+.sv-tl-sports {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    display: grid;
+    grid-template-columns: auto 1fr 34%;
+    align-items: center;
+    gap: 8px;
+    padding: 2px 0;
+  }
+}
+
+.sv-tl-sport {
+  color: var(--text);
+}
+
+.sv-tl-count {
+  color: var(--muted);
+  font-size: inherit;
   font-variant-numeric: tabular-nums;
+}
+
+.sv-tl-bar {
+  display: block;
+
+  span {
+    display: block;
+    height: 8px;
+    border-radius: 4px;
+    background: var(--c);
+  }
+}
+
+// A practice from the schedule opens to nothing
+.sv-practice .sv-row {
+  cursor: default;
 }
 
 .sv-row {
@@ -1985,7 +2114,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   flex: none;
   text-align: right;
   color: var(--muted);
-  font-size: 12px;
+  font-size: inherit;
   font-variant-numeric: tabular-nums;
 }
 
@@ -2001,12 +2130,6 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   color: var(--muted);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
-}
-
-.sv-entry.is-race .sv-name,
-.sv-entry.is-race .sv-amount {
-  color: var(--race);
-  font-weight: 600;
 }
 
 // An opened activity
@@ -2101,6 +2224,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   font: inherit;
   color: var(--muted);
   cursor: pointer;
+  transition: color 0.15s ease;
 
   &:hover {
     color: var(--text);
@@ -2110,7 +2234,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 .sv-foot {
   margin: 24px 0 0;
   color: var(--muted);
-  font-size: 12px;
+  font-size: inherit;
 }
 
 @media screen and (max-width: 479px) {

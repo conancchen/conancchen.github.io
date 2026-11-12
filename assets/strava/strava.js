@@ -23,6 +23,7 @@
     if (RUN_LIKE.indexOf(type) >= 0) return 'run';
     if (RIDE_LIKE.indexOf(type) >= 0) return 'bike';
     if (type === 'Swim') return 'swim';
+    if (type === 'WeightTraining') return 'lift';
     return 'other';
   }
   function labelFor(type) {
@@ -55,7 +56,13 @@
   }
 
   // The one number that says most about an activity
+  function hours(s) {
+    var h = Math.floor(s / 3600), m = Math.round((s % 3600) / 60);
+    return h ? h + ' h' + (m ? ' ' + m + ' m' : '') : m + ' m';
+  }
+
   function headline(a) {
+    if (a.practice) return a.is_race ? '' : hours(a.moving_time_s);
     if (a.type === 'Swim') return fmtYds(a.distance_m);
     if (a.distance_m > 0) return fmtMi(a.distance_m);
     return fmtTime(a.moving_time_s);
@@ -110,6 +117,14 @@
 
   function entryHtml(a) {
     var when = new Date(a.date + 'T00:00:00');
+    // Practices and meets from the team's schedule have no map or numbers
+    // to open to, so they're plain rows
+    if (a.practice) {
+      return '<div class="sv-entry sv-practice' + (a.is_race ? ' is-race' : '') + '"><div class="sv-row">' +
+        '<span class="sv-day">' + when.getDate() + '</span>' +
+        '<span class="sv-name">' + esc(a.name) + '</span>' +
+        '<span class="sv-amount">' + headline(a) + '</span></div></div>';
+    }
     var where = a.location ? ' · ' + esc(a.location) : '';
     var label = a.is_race ? esc(a.name || '') : labelFor(a.type) + where;
     var full = when.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
@@ -145,15 +160,53 @@
       groups[groups.length - 1].items.push(a);
     });
     log.innerHTML = groups.slice(0, shownMonths).map(function (g) {
-      // The month's count and its miles on the right of its name
-      var miles = g.items.reduce(function (s, a) { return s + a.distance_m; }, 0) / M_PER_MI;
-      var count = g.items.length + (g.items.length === 1 ? ' activity' : ' activities');
-      var sum = count + (miles >= 1 ? ' · ' + Math.round(miles).toLocaleString() + ' mi' : '');
-      return '<div class="sv-month"><div class="sv-month-head"><span class="sv-month-name">' + g.name + '</span>' +
-        '<span class="sv-month-sum">' + sum + '</span></div>' +
-        g.items.map(entryHtml).join('') + '</div>';
+      return '<div class="sv-month"><h3 class="sv-month-head"><span><b>' + g.name.split(' ')[0] + '</b> ' +
+        g.name.split(' ')[1] + '</span></h3><div class="sv-tl">' +
+        summaryHtml(g.items) + racesHtml(g.items) +
+        '</div></div>';
     }).join('') +
-      (groups.length > shownMonths ? '<button type="button" class="sv-more" id="sv-more">Show older</button>' : '');
+      (groups.length > shownMonths ? '<button type="button" class="sv-more" id="sv-more">Show more activity</button>' : '');
+  }
+
+  // A month's opening line, as on a GitHub profile ("Created 41 commits in
+  // 3 repositories"): how many activities in how many sports, then a row
+  // for each sport with its count and distance and a bar for its share
+  var SPORT_NAMES = { swim: 'Swim', bike: 'Bike', run: 'Run', lift: 'Lift', other: 'Other' };
+  var ICON_PULSE = '<svg viewBox="0 0 16 16"><path d="M1 8h3l2-5 4 10 2-5h3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  // The month's races and meets by name, like GitHub's "Created 2
+  // repositories", each opening to its numbers when Strava has them
+  // An outlined flag, its pole and cloth together centered in the icon
+  var ICON_FLAG = '<svg viewBox="0 0 16 16"><path d="M4.5 12.5V3.5h7l-1.5 2.5 1.5 2.5h-7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  function racesHtml(items) {
+    var races = items.filter(function (a) { return a.is_race; });
+    if (!races.length) return '';
+    return '<div class="sv-tl-item"><span class="sv-tl-icon" aria-hidden="true">' + ICON_FLAG + '</span>' +
+      '<div class="sv-tl-main"><p class="sv-tl-title">Raced ' + races.length + (races.length === 1 ? ' time' : ' times') + '</p>' +
+      races.map(entryHtml).join('') + '</div></div>';
+  }
+
+  function summaryHtml(items) {
+    var by = {};
+    items.forEach(function (a) {
+      var k = sportOf(a.type);
+      by[k] = by[k] || { n: 0, m: 0, s: 0 };
+      by[k].n++;
+      by[k].m += a.distance_m || 0;
+      by[k].s += a.moving_time_s || 0;
+    });
+    var keys = ['swim', 'bike', 'run', 'lift', 'other'].filter(function (k) { return by[k]; });
+    var most = Math.max.apply(null, keys.map(function (k) { return by[k].n; }));
+    var n = items.length;
+    var rows = keys.map(function (k) {
+      var dist = k === 'swim' || k === 'lift' ? ' · ' + Math.round(by[k].s / 3600) + ' h'
+        : by[k].m ? ' · ' + Math.round(by[k].m / M_PER_MI).toLocaleString() + ' mi' : '';
+      return '<li class="sv-' + k + '"><span class="sv-tl-sport">' + SPORT_NAMES[k] + '</span>' +
+        '<span class="sv-tl-count">' + by[k].n + (by[k].n === 1 ? ' activity' : ' activities') + dist + '</span>' +
+        '<span class="sv-tl-bar"><span style="width:' + Math.max(4, by[k].n / most * 100) + '%"></span></span></li>';
+    }).join('');
+    return '<div class="sv-tl-item"><span class="sv-tl-icon" aria-hidden="true">' + ICON_PULSE + '</span>' +
+      '<div class="sv-tl-main"><p class="sv-tl-title">Logged ' + n + (n === 1 ? ' activity' : ' activities') +
+      ' in ' + keys.length + (keys.length === 1 ? ' sport' : ' sports') + '</p><ul class="sv-tl-sports">' + rows + '</ul></div></div>';
   }
 
   document.getElementById('sv-log').addEventListener('click', function (e) {
@@ -162,36 +215,47 @@
     apply();
   });
 
-  var all = [], scope = 'all', shownMonths = STEP;
+  var all = [], shownMonths = STEP;
 
   function apply() {
-    var list = all.filter(function (a) {
-      return scope === 'all' || a.is_race;
-    });
-    renderLog(list);
+    renderLog(all);
   }
 
-  document.getElementById('sv-toggle').addEventListener('click', function () {
-    var closed = document.getElementById('sv-section').classList.toggle('is-closed');
-    this.setAttribute('aria-expanded', String(!closed));
-  });
 
-  var bar = document.getElementById('sv-filters');
-  bar.addEventListener('click', function (e) {
-    var b = e.target.closest('button');
-    if (!b) return;
-    scope = b.dataset.scope;
-    shownMonths = STEP;
-    bar.querySelectorAll('button').forEach(function (x) { x.classList.toggle('is-on', x === b); });
-    apply();
-  });
+  // The team's practices and meets, from the start of the schedule to
+  // today. A practice swim is left out when Strava already has a swim that
+  // day at least as long, as the heatmap does
+  function practices(data) {
+    if (!window.SCHEDULE) return [];
+    var swum = {};
+    data.forEach(function (a) {
+      if (a.type === 'Swim') swum[a.date] = (swum[a.date] || 0) + a.moving_time_s;
+    });
+    var out = [], today = new Date();
+    var p = SCHEDULE.first.split('-');
+    for (var t = new Date(+p[0], +p[1] - 1, +p[2]); t <= today; t.setDate(t.getDate() + 1)) {
+      var plan = SCHEDULE.day(t);
+      if (!plan) continue;
+      var key = SCHEDULE.keyOf(t);
+      if (plan.swim && (swum[key] || 0) < plan.swim * 60) {
+        out.push({ date: key, start_date: key + 'T07:00:00Z', type: 'Swim', practice: true,
+          is_race: !!plan.meet, name: plan.meet || 'Swim practice', moving_time_s: plan.swim * 60, distance_m: 0 });
+      }
+      if (plan.lift) {
+        out.push({ date: key, start_date: key + 'T06:00:00Z', type: 'WeightTraining', practice: true,
+          name: 'Lift', moving_time_s: plan.lift * 60, distance_m: 0 });
+      }
+    }
+    return out;
+  }
 
   fetch(SOURCE + 'activities.json', { cache: 'no-cache' })
     .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then(function (data) {
-      all = data.sort(function (a, b) { return a.start_date < b.start_date ? 1 : -1; });
+      var latest = data.reduce(function (m, a) { return a.date > m ? a.date : m; }, '');
+      all = data.concat(practices(data)).sort(function (a, b) { return a.start_date < b.start_date ? 1 : -1; });
       apply();
-      var latest = new Date(all[0].date + 'T00:00:00');
+      latest = new Date(latest + 'T00:00:00');
       document.getElementById('sv-foot').textContent = 'Last updated ' +
         latest.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     })
