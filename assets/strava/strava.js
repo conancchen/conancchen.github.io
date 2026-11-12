@@ -1,6 +1,7 @@
-// The training log: every activity from the strava repo's sync, a month at a
-// time, each one opening to its route map and numbers. Ported from that
-// repo's own page and set in this site's type and colors.
+// The training log, from the strava repo's sync: a month at a time, each
+// month's activities totalled by sport and its races listed by name, a race
+// opening to its route map and numbers. The sync keeps only the numbers of
+// an activity that isn't a race, so a race is all there is to open.
 (function () {
   var SOURCE = 'https://raw.githubusercontent.com/conancchen/strava/main/';
   var M_PER_MI = 1609.344;
@@ -30,6 +31,14 @@
     return TYPE_NAMES[type] || type.replace(/([A-Z])/g, ' $1').trim();
   }
   function pad(n) { return (n < 10 ? '0' : '') + n; }
+  // A race's name in title case, as Strava has some all in lowercase
+  // ("princeton half marathon"): each word's first letter raised, short
+  // joining words past the first left alone
+  function titleCase(s) {
+    return String(s).replace(/(^|[\s(-])([a-z])([a-z']*)/g, function (m, pre, c, rest) {
+      return pre && /^(a|an|and|at|by|for|in|of|on|the|to|vs|w)$/.test(c + rest) ? m : pre + c.toUpperCase() + rest;
+    });
+  }
 
   function fmtMi(m) { return (m / M_PER_MI).toFixed(2) + ' mi'; }
   function fmtYds(m) { return Math.round(m / M_PER_YD).toLocaleString() + ' yds'; }
@@ -117,9 +126,7 @@
 
   // What an activity opens to: its map, a line about it and its numbers
   function detailHtml(a, about) {
-    var link = a.is_race
-      ? ' · <a href="https://www.strava.com/activities/' + a.id + '" target="_blank" rel="noopener">on Strava</a>'
-      : '';
+    var link = ' · <a href="https://www.strava.com/activities/' + a.id + '" target="_blank" rel="noopener">on Strava</a>';
     var map = a.has_map
       ? '<div class="sv-map"><img src="' + SOURCE + 'maps/' + a.id + '.png" alt="" loading="lazy">' + routeSvg(a) + '</div>'
       : '';
@@ -142,7 +149,7 @@
         '<span class="sv-amount">' + headline(a) + '</span></div></div>';
     }
     var where = a.location ? ' · ' + esc(a.location) : '';
-    var label = a.is_race ? esc(a.name || '') : labelFor(a.type) + where;
+    var label = esc(titleCase(a.name || ''));
     var full = when.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
     // A triathlon is one row with its whole distance, opening to the day
     // and then each leg under its sport
@@ -153,8 +160,8 @@
       ? '<p class="sv-meta">' + full + where + '</p>' + a.legs.map(function (l) {
           return '<div class="sv-leg">' + detailHtml(l, labelFor(l.type)) + '</div>';
         }).join('')
-      : detailHtml(a, full + (a.is_race ? where : ''));
-    return '<details class="sv-entry' + (a.is_race ? ' is-race' : '') + '">' +
+      : detailHtml(a, full + where);
+    return '<details class="sv-entry is-race">' +
       '<summary class="sv-row"><span class="sv-day">' + md + '</span>' +
       '<span class="sv-name">' + label + '</span>' +
       '<span class="sv-amount">' + amount + '</span></summary>' +

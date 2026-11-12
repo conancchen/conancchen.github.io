@@ -203,7 +203,7 @@ $reveal: '.subtitle, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .up
 // The home page comes in a line at a time rather than a section at a time:
 // each line of the bio, the experiences, and each line under More is its own
 // piece, 80ms after the one before. The sections around them hold still
-$reveal-fine: '.bio > p, .block:not(.timeline) > *';
+$reveal-fine: '.bio > p, .block:not(.timeline) > :not([role=tooltip])';
 
 .home-entrance {
   --step: 80ms;
@@ -1717,8 +1717,10 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 
 .tr-foot {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 4px 12px;
   margin-top: 10px;
   font-size: 11px;
   color: var(--muted);
@@ -1728,6 +1730,8 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   display: flex;
   align-items: center;
   gap: 3px;
+  margin-left: auto;
+  white-space: nowrap;
 
   .tr-day {
     width: 8px;
@@ -1807,7 +1811,12 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 
 .tr-legend {
   display: flex;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+}
+
+.tr-key {
+  white-space: nowrap;
 }
 
 // The lower panel, as on a GitHub profile: a few lines on the left, a
@@ -1817,6 +1826,13 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   grid-template-columns: 1fr 1fr;
   gap: 16px;
   margin-top: 16px;
+  // A rule across the box between the calendar and the panel below it; the
+  // panels pad their own tops so the overview's divider runs up to meet it
+  border-top: 1px solid var(--rule);
+
+  > * {
+    padding-top: 16px;
+  }
 
   &[hidden] {
     display: none;
@@ -1857,7 +1873,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
+  padding: 16px 0 0;
 }
 
 .tr-cross {
@@ -1907,6 +1923,33 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
     border-right: 0;
   }
 
+  // On a phone the days are a few pixels across, so they sit closer and
+  // keep square corners, and the weekday names shrink to fit their rows
+  .tr-months,
+  .tr-grid {
+    column-gap: 1px;
+  }
+
+  .tr-grid,
+  .tr-wdays {
+    row-gap: 1px;
+  }
+
+  .tr-day {
+    border-radius: 1px;
+  }
+
+  .tr-scale .tr-day {
+    border-radius: 1.5px;
+  }
+
+  .tr-months {
+    font-size: 10px;
+  }
+
+  .tr-wdays {
+    font-size: 8px;
+  }
 }
 
 .tr-key::before {

@@ -57,7 +57,7 @@
 </head>
 
 <body>
-  <div class="page{% if page.quick_entrance %} quick-entrance{% endif %}{% if page.home %} home-entrance{% endif %}">
+  <div class="page{% if page.quick_entrance %} quick-entrance{% endif %}{% if page.home or page.line_entrance %} home-entrance{% endif %}">
     <header class="header">
       <div class="header-row">
         {% if page.home %}<h1 translate="no" id="site-name" title="Retype">{{ page.heading | default: site.name }}</h1>{% else %}<h1 translate="no"><a class="name-link" href="{{ site.baseurl }}/">{{ page.heading | default: site.name }}</a></h1>{% endif %}
@@ -169,8 +169,9 @@
     try { fromSite = new URL(document.referrer).origin === location.origin; } catch (e) {}
     var returning = fromSite || (nav && nav.type === 'back_forward');
     function playEntrance() {
-      // On the home page each line is its own piece (see .home-entrance)
-      var pieces = document.querySelectorAll({% if page.home %}'.bio > p, .timeline, .block:not(.timeline) > *, .rule, .updated, .webring'{% else %}'.subtitle, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .updated, .webring, .term'{% endif %});
+      // On the home page (and pages that set line_entrance) each line is its
+      // own piece (see .home-entrance)
+      var pieces = document.querySelectorAll({% if page.home or page.line_entrance %}'.subtitle, .bio > p, .timeline, .block:not(.timeline) > :not([role=tooltip]), .rule, .updated, .webring'{% else %}'.subtitle, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .updated, .webring, .term'{% endif %});
       for (var i = 0; i < pieces.length; i++) pieces[i].style.setProperty('--i', Math.min(i, 12));
       root.classList.add('anim-play');
       root.classList.remove('anim-hide');

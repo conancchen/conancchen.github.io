@@ -2,9 +2,9 @@
 // the weeks that ran differently and the meets. The training page's heatmap
 // and its activity list both read their practices and meets from here.
 window.SCHEDULE = (function () {
-  // The back half of last season and this one from its start, minus the
-  // break over the end of the year
-  var SEASONS = [['2025-11-01', '2026-02-02'], ['2026-09-03', '9999-12-31']];
+  // Last season and this one, each from its start, minus the break over
+  // the end of the year
+  var SEASONS = [['2025-09-03', '2026-02-02'], ['2026-09-03', '9999-12-31']];
   var BREAK = ['2025-12-22', '2025-12-31'];
 
   // Minutes of [swim, lift] by weekday, Sunday first
@@ -19,6 +19,7 @@ window.SCHEDULE = (function () {
   // Meet days count as a 4.5-hour swim instead of practice and show as races
   var MEET_MINUTES = 270;
   var MEETS = {
+    '2025-11-08': 'at Dartmouth w/ Brown', '2025-11-14': 'vs Columbia',
     '2025-11-22': 'at Cornell w/ Penn',
     '2025-12-04': 'Big Al Invitational', '2025-12-05': 'Big Al Invitational',
     '2025-12-06': 'Big Al Invitational',

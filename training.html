@@ -3,7 +3,7 @@ layout: default
 title: Training
 subtitle: Training
 permalink: /training/
-quick_entrance: true
+line_entrance: true
 ---
 <!-- The training log. Its activities and route maps come from the strava
      repo, which syncs them from the Strava API every six hours, so nothing
@@ -19,7 +19,7 @@ quick_entrance: true
         </div>
         <div class="tr-foot" aria-hidden="true">
           <div class="tr-legend">
-            <span class="tr-key tr-swim">Swim</span><span class="tr-key tr-bike">Bike</span><span class="tr-key tr-run">Run</span><span class="tr-key tr-lift">Lift</span><span class="tr-key tr-race">Race</span>
+            <span class="tr-key tr-swim">Swim</span><span class="tr-key tr-bike">Bike</span><span class="tr-key tr-run">Run</span><span class="tr-key tr-race">Race</span>
           </div>
           <div class="tr-scale">Less<span class="tr-day"></span><span class="tr-day tr-swim tr-l1"></span><span class="tr-day tr-swim tr-l2"></span><span class="tr-day tr-swim tr-l3"></span><span class="tr-day tr-swim tr-l4"></span>More</div>
         </div>
@@ -51,7 +51,11 @@ quick_entrance: true
             d[k] += Math.round(a.moving_time_s / 60);
             // A race day keeps the race's name, less a leg's sport on the end
             // ("Ironman 70.3 bike") so a triathlon's legs read as one race
-            if (a.is_race) d[5] = a.name.replace(/\s+(swim|bike|run)$/i, '');
+            if (a.is_race) d[5] = a.name.replace(/\s+(swim|bike|run)$/i, '')
+              .replace(/(^|[\s(-])([a-z])([a-z']*)/g, function (m, pre, c, rest) {
+                // In title case, as Strava has some names all in lowercase
+                return pre && /^(a|an|and|at|by|for|in|of|on|the|to|vs|w)$/.test(c + rest) ? m : pre + c.toUpperCase() + rest;
+              });
           });
           for (var i = 364; i >= 0; i--) {
             var t = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i);
@@ -126,8 +130,23 @@ quick_entrance: true
       });
 
       var cols = Math.ceil((DAYS.length + lead) / 7);
+      // A month that starts in the last few weeks has no room to its right
+      // for its name, so the name ends at the grid's edge instead
+      var lastLabel = months.lastElementChild;
+      if (lastLabel && +lastLabel.style.gridColumnStart > cols - 4) {
+        lastLabel.style.gridColumn = (cols - 4) + ' / ' + (cols + 1);
+        lastLabel.style.textAlign = 'right';
+      }
       grid.style.setProperty('--cols', cols);
       months.style.setProperty('--cols', cols);
+      // On a narrow screen even that can run into the month before it, and
+      // then the name is left out
+      var before = lastLabel && lastLabel.previousElementSibling;
+      if (before) {
+        var range = document.createRange();
+        range.selectNodeContents(lastLabel);
+        if (range.getBoundingClientRect().left < before.getBoundingClientRect().left + before.scrollWidth + 4) lastLabel.hidden = true;
+      }
       document.getElementById('tr-title').textContent =
         Math.round(total / 60).toLocaleString() + ' hours of training in the last year';
 
