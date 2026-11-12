@@ -1683,9 +1683,9 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 // 12px for the log, and 11px for labels, keys and the overview
 .tr-title {
   margin: 0 0 8px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: normal;
-  color: var(--text);
+  color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
 
@@ -1915,12 +1915,9 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 }
 
 @media screen and (max-width: 479px) {
+  // Too narrow for the overview and its chart, so the calendar stands alone
   .tr-sums {
-    grid-template-columns: 1fr;
-  }
-
-  .tr-overview {
-    border-right: 0;
+    display: none;
   }
 
   // On a phone the days are a few pixels across, so they sit closer and

@@ -4,7 +4,7 @@
 window.SCHEDULE = (function () {
   // Last season and this one, each from its start, minus the break over
   // the end of the year
-  var SEASONS = [['2025-09-03', '2026-02-02'], ['2026-09-03', '9999-12-31']];
+  var SEASONS = [['2025-09-03', '2026-02-01'], ['2026-09-03', '9999-12-31']];
   var BREAK = ['2025-12-22', '2025-12-31'];
 
   // Minutes of [swim, lift] by weekday, Sunday first

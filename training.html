@@ -9,7 +9,7 @@ line_entrance: true
      repo, which syncs them from the Strava API every six hours, so nothing
      here holds a key and the page stays current without a rebuild -->
 <section class="block training">
-    <h2 class="tr-title" id="tr-title">Training in the last year</h2>
+    <h2 class="tr-title" id="tr-title">Training this year</h2>
     <div class="tr-box">
       <div class="tr-cal">
         <div class="tr-months" id="tr-months" aria-hidden="true"></div>
@@ -148,7 +148,7 @@ line_entrance: true
         if (range.getBoundingClientRect().left < before.getBoundingClientRect().left + before.scrollWidth + 4) lastLabel.hidden = true;
       }
       document.getElementById('tr-title').textContent =
-        Math.round(total / 60).toLocaleString() + ' hours of training in the last year';
+        Math.round(total / 60).toLocaleString() + ' hours of training this year';
 
       // The activity overview, as on a GitHub profile: a few lines on the
       // left, and on the right a cross with an arm per sport, its point out
