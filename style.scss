@@ -21,11 +21,7 @@
   --run: #e8605f;
   --toast-bg: #3a3a38;
   --toast-text: #f7f6f3;
-  --lane: #adc3da;  // the water line
-  --foam: #94aecb;  // spray and foam off the swimmer
-  --hurt: #d93025;  // the swimmer, hurt from a fall
-  --underwater: 0.6;  // how strongly the swimmer shows below the surface
-  --glow: rgba(55, 135, 240, 0.22);  // the water's tint just under the surface
+  --hurt: #d93025;
 }
 
 
@@ -133,54 +129,6 @@ a:focus {
   text-decoration-color: color-mix(in srgb, var(--text) 70%, transparent);
 }
 
-// The LinkedIn and email links are chips, as on chanbin.xyz: a small logo
-// and the name on a soft grey pill with no underline, a shade darker on
-// hover and pressing in a touch when clicked
-.bio .chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  // shorter than the bio's 22px lines it sits in
-  height: 18px;
-  line-height: 18px;
-  padding: 0 6px 0 5px;
-  vertical-align: -2px;
-  white-space: nowrap;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--text) 6%, var(--bg));
-  text-decoration: none;
-  transition: background-color 0.18s cubic-bezier(0.23, 1, 0.32, 1), transform 0.15s cubic-bezier(0.23, 1, 0.32, 1);
-}
-
-.bio .chip:hover,
-.bio .chip:focus-visible {
-  background: color-mix(in srgb, var(--text) 11%, var(--bg));
-}
-
-.bio .chip:active {
-  transition-duration: 80ms;
-  transform: scale(0.97);
-}
-
-// In em so the logo follows the chip's text size
-.chip-icon {
-  width: 0.93em;
-  height: 0.93em;
-  flex: none;
-}
-
-// The social chip cycles between profiles; its width eases to fit each name,
-// and the scrambling letters are clipped to it while they settle
-.bio .chip-rotating {
-  overflow: hidden;
-  transition: background-color 0.18s cubic-bezier(0.23, 1, 0.32, 1), transform 0.15s cubic-bezier(0.23, 1, 0.32, 1), width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.chip-icon-slot {
-  display: inline-flex;
-  flex: none;
-}
-
 // The page comes in piece by piece, each one coming into focus a beat after the last.
 // The layout's script numbers the pieces (--i) and swaps anim-hide for anim-play.
 // The name in the header and the back arrow aren't among them: they hold still,
@@ -203,7 +151,7 @@ $reveal: '.subtitle, .sort-line, .bio, .block, .bs-cabinet, .bs-list, .rule, .up
 // The home page comes in a line at a time rather than a section at a time:
 // each line of the bio, the experiences, and each line under More is its own
 // piece, 80ms after the one before. The sections around them hold still
-$reveal-fine: '.bio > p, .block:not(.timeline) > :not([role=tooltip])';
+$reveal-fine: '.bio > p, .block > :not([role=tooltip])';
 
 .home-entrance {
   --step: 80ms;
@@ -211,7 +159,7 @@ $reveal-fine: '.bio > p, .block:not(.timeline) > :not([role=tooltip])';
 
 .anim-hide .home-entrance {
   .bio,
-  .block:not(.timeline) {
+  .block {
     opacity: 1;
   }
 
@@ -222,7 +170,7 @@ $reveal-fine: '.bio > p, .block:not(.timeline) > :not([role=tooltip])';
 
 .anim-play .home-entrance {
   .bio,
-  .block:not(.timeline) {
+  .block {
     animation: none;
   }
 
@@ -271,7 +219,7 @@ $reveal-fine: '.bio > p, .block:not(.timeline) > :not([role=tooltip])';
 }
 
 .header {
-  padding-bottom: 8px;
+  padding-bottom: 16px;
 }
 
 .header-row {
@@ -279,6 +227,55 @@ $reveal-fine: '.bio > p, .block:not(.timeline) > :not([role=tooltip])';
   align-items: center;
   justify-content: space-between;
   gap: 14px;
+}
+
+// Says the email address was copied
+#copy-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 32px;
+  transform: translateX(-50%);
+  background: var(--toast-bg);
+  color: var(--toast-text);
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 5px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  z-index: 1000;
+}
+
+// Contact links on the right of the name's line, sitting over the name's
+// wide click area so they take their own clicks
+.header-links {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  // Each logo in its own color: GitHub and X are black marks, so they and
+  // the envelope take the text color; LinkedIn takes its blue
+  a {
+    display: flex;
+    color: var(--text);
+    transition: opacity 0.15s ease;
+  }
+
+  a[href*="linkedin.com"] {
+    color: #0a66c2;
+  }
+
+  a:hover,
+  a:focus-visible {
+    opacity: 0.7;
+  }
+
+  svg {
+    width: 15px;
+    height: 15px;
+  }
 }
 
 // The caret the name types out behind on the home page
@@ -347,7 +344,7 @@ $reveal-fine: '.bio > p, .block:not(.timeline) > :not([role=tooltip])';
 /* SECTIONS   */
 /**************/
 .block {
-  margin-top: 24px;
+  margin-top: 36px;
 }
 
 .block-label {
@@ -427,198 +424,6 @@ $reveal-fine: '.bio > p, .block:not(.timeline) > :not([role=tooltip])';
 }
 
 
-// The experiences hang off a thin rail, one dot per entry, centred on its
-// first line: where I am now pulses in the pool's blue, what's coming is a
-// hollow dot on a dashed stretch of rail, and what's done is filled in black
-$dot: 7px;
-// Each experience sits on a 20px line the dots are centred on
-$entry-pad: 4px;
-$entry-line: 20px;
-$dot-center: calc(#{$entry-pad} + #{$entry-line} / 2);
-
-.timeline .row {
-  padding: $entry-pad 0;
-  line-height: $entry-line;
-}
-
-.timeline .entry {
-  position: relative;
-  padding-left: 20px;
-}
-
-.timeline .entry::before {
-  content: '';
-  position: absolute;
-  left: 3px;
-  top: 0;
-  bottom: 0;
-  border-left: 1px solid var(--rule);
-}
-
-// The rail stops at the edge of each dot instead of running behind it, so it
-// never shows through a dot dimmed by a hover
-$dot-top: calc(#{$dot-center} - #{$dot} / 2);
-$dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
-
-.timeline .entry:not(:first-of-type):not(:last-of-type)::before {
-  -webkit-mask-image: linear-gradient(to bottom, #000 $dot-top, transparent $dot-top, transparent $dot-bottom, #000 $dot-bottom);
-  mask-image: linear-gradient(to bottom, #000 $dot-top, transparent $dot-top, transparent $dot-bottom, #000 $dot-bottom);
-}
-
-.timeline .entry:first-of-type::before {
-  top: $dot-bottom;
-}
-
-.timeline .entry:last-of-type::before {
-  bottom: auto;
-  height: $dot-top;
-}
-
-// The rail on to what's coming is a row of round dots
-.timeline .entry.is-next::before {
-  left: 2.5px;
-  width: 2px;
-  border-left: 0;
-  top: calc(#{$dot-center} + #{$dot} / 2 + 2px);
-  bottom: calc(#{$dot} / 2 + 2px - #{$dot-center});
-  background: radial-gradient(circle, var(--muted) 1px, transparent 1px) center top / 2px 5px;
-  background-repeat: no-repeat space;
-}
-
-// The dots run all the way to the next dot, so its own solid rail starts
-// from there
-.timeline .entry.is-next + .entry::before {
-  top: $dot-bottom;
-  -webkit-mask-image: none;
-  mask-image: none;
-}
-
-.timeline .entry::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: calc(#{$dot-center} - #{$dot} / 2);
-  width: $dot;
-  height: $dot;
-  border-radius: 50%;
-  background: var(--muted);
-  transition: transform 0.18s ease, opacity 0.1s ease-in-out;
-}
-
-// What's done is filled in, in the text's black
-.timeline .entry.is-past::after {
-  background: var(--text);
-}
-
-.timeline .entry.is-next::after {
-  background: var(--bg);
-  box-shadow: inset 0 0 0 1px var(--muted);
-}
-
-.timeline .entry.is-now::after {
-  background: rgb(55, 135, 240);
-  animation: now-pulse 2.4s ease-out infinite;
-}
-
-// An open entry's dot swells a touch
-.timeline .entry[open]:not(.is-closing)::after {
-  transform: scale(1.3);
-}
-
-// Hovering anywhere in an experience, its note included, dims every other
-// one: name, year, note and dot. The rail stays put, so the line never breaks.
-// Hovering its name in the bio does the same (the script marks it hot).
-.timeline .entry > * {
-  transition: opacity 0.1s ease-in-out;
-}
-
-.timeline:has(.entry:hover) .entry:not(:hover) > *,
-.timeline:has(.entry:hover) .entry:not(:hover)::after,
-.timeline.is-linked .entry:not(.is-hot) > *,
-.timeline.is-linked .entry:not(.is-hot)::after {
-  opacity: 0.4;
-}
-
-// As the page comes in, the experiences arrive one by one from the top down,
-// the rail drawing itself downward from each to the next: the hollow dot pops
-// in, the dots run down to the blue dot, which pops in and starts to pulse,
-// and the line carries on down to the green one. Each piece of rail grows
-// from its top end, and each experience comes in as the rail reaches its dot.
-@keyframes entry-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-}
-
-@keyframes rail-draw {
-  from {
-    transform: scaleY(0);
-  }
-}
-
-@keyframes dot-pop {
-  from {
-    transform: scale(0);
-  }
-  60% {
-    transform: scale(1.35);
-  }
-}
-
-.anim-play .timeline .entry > summary {
-  animation: entry-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
-}
-
-.anim-play .timeline .entry::before {
-  transform-origin: top;
-  animation: rail-draw 0.3s linear backwards;
-}
-
-.anim-play .timeline .entry::after {
-  animation: dot-pop 0.3s ease-out backwards;
-}
-
-// The delays below count from when the timeline itself comes in (its --i,
-// which its entries inherit)
-
-// Next: first in, at the top
-.anim-play .timeline .entry.is-next > summary,
-.anim-play .timeline .entry.is-next::after {
-  animation-delay: calc(var(--i, 1) * var(--step, 120ms) + 0.28s);
-}
-
-.anim-play .timeline .entry.is-next::before {
-  animation-duration: 0.25s;
-  animation-delay: calc(var(--i, 1) * var(--step, 120ms) + 0.36s);
-}
-
-// Now: as the dots reach it
-.anim-play .timeline .entry.is-now > summary {
-  animation-delay: calc(var(--i, 1) * var(--step, 120ms) + 0.61s);
-}
-
-.anim-play .timeline .entry.is-now::after {
-  animation: dot-pop 0.3s ease-out backwards, now-pulse 2.4s ease-out infinite;
-  animation-delay: calc(var(--i, 1) * var(--step, 120ms) + 0.61s), calc(var(--i, 1) * var(--step, 120ms) + 0.98s);
-}
-
-.anim-play .timeline .entry.is-now::before {
-  animation-duration: 0.15s;
-  animation-delay: calc(var(--i, 1) * var(--step, 120ms) + 0.68s);
-}
-
-// Done: last, as the line comes down to it
-.anim-play .timeline .entry.is-past::before {
-  animation-duration: 0.15s;
-  animation-delay: calc(var(--i, 1) * var(--step, 120ms) + 0.83s);
-}
-
-.anim-play .timeline .entry.is-past > summary,
-.anim-play .timeline .entry.is-past::after {
-  animation-delay: calc(var(--i, 1) * var(--step, 120ms) + 0.98s);
-}
-
 @keyframes now-pulse {
   0% {
     box-shadow: 0 0 0 0 rgba(55, 135, 240, 0.5);
@@ -642,53 +447,11 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   color: var(--text);
 }
 
-// The divider above the clock is the surface of a pool, drawn with its
-// swimmer on a canvas by the script in index.html. The lane itself sits above
-// the page, not just its canvas: while the reveal animates it, the lane
-// becomes its own layer, and the canvas's z-index alone would then only lift
-// it within the lane, leaving it under the text animating in around it
-.lane {
-  position: relative;
-  z-index: 1;
-  touch-action: none;
-  height: 2px;
-  margin: 40px 0 16px;
-}
-
-// An invisible strip along the water line takes the pointer: a click drops a
-// splash, and a press and drag carries the swimmer, or lifts it out. The canvas itself never
-// takes the pointer, so the text around it stays clickable. A drag on a phone
-// moves the swimmer rather than scrolling the page.
-.lane::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: -8px;
-  height: 18px;
-  cursor: pointer;
-  touch-action: none;
-}
-
-.lane.holding::before {
-  cursor: grabbing;
-}
-
-// While a press on the water is down, a long press on a phone doesn't open
-// the callout menu over the text around the pool
-.pool-pressed,
-.pool-pressed * {
-  -webkit-touch-callout: none !important;
-}
-
-// The canvas's waterline sits where the line is (the script sets its top, as
-// the canvas reaches up to the header)
-.swimmer {
-  position: absolute;
-  left: 0;
-  top: -60px;
-  z-index: 1;
-  pointer-events: none;
+// A hairline between the page and the clock
+.rule {
+  height: 1px;
+  margin: 24px 0 16px;
+  background: var(--rule);
 }
 
 .updated {
@@ -761,7 +524,8 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   padding: 0;
   cursor: pointer;
   text-decoration: underline dotted;
-  text-decoration-thickness: 1.25px;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
   text-decoration-skip-ink: none;
   text-underline-offset: 3px;
 }
@@ -841,22 +605,6 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   color: var(--top);
 }
 
-#copy-toast {
-  position: fixed;
-  left: 50%;
-  bottom: 32px;
-  transform: translateX(-50%);
-  background: var(--toast-bg);
-  color: var(--toast-text);
-  font-size: 13px;
-  padding: 6px 12px;
-  border-radius: 5px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.25s ease;
-  z-index: 1000;
-}
-
 @media screen and (max-width: 639px) {
   .page {
     padding: 32px 24px 40px;
@@ -867,7 +615,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 /* PREVIEW    */
 /**************/
 // Pressing the Ironman link (or hovering it, where there's a pointer) grows a
-// little results card up out of it: the total, a bar splitting the race into
+// little results card down out of it: the total, a bar splitting the race into
 // swim, bike and run by time, and the placings.
 .preview {
   position: relative;
@@ -885,7 +633,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 .preview-card {
   position: absolute;
   left: 0;
-  bottom: calc(100% + 10px);
+  top: calc(100% + 10px);
   z-index: 10;
   display: flex;
   flex-direction: column;
@@ -905,10 +653,10 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
   line-height: 16px;
   font-variant-numeric: tabular-nums;
   white-space: normal;
-  // It grows from the middle of the link below it (--grow-x is set by the
+  // It grows from the middle of the link above it (--grow-x is set by the
   // script, as the card can shift left on a narrow screen), a touch past
-  // full size and back, and shrinks back down into the link when it closes
-  transform-origin: var(--grow-x, 40px) calc(100% + 20px);
+  // full size and back, and shrinks back up into the link when it closes
+  transform-origin: var(--grow-x, 40px) -20px;
   opacity: 0;
   visibility: hidden;
   transform: scale(0.2);
@@ -1118,7 +866,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 }
 
 // while the clock runs, a blue dot ahead of the time, pulsing like the
-// timeline's "now"; it hangs out in the margin, so the time doesn't shift
+// the "now" dot the page used to have; it hangs out in the margin, so the time doesn't shift
 // when it comes
 .zm-time {
   position: relative;
@@ -1628,46 +1376,6 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 /**************/
 /* MARKDOWN   */
 /**************/
-// The follow and email links lose their pills and read like the other bio
-// links: the logo or copy icon, then the name over the same faint underline
-.bio .chip {
-  gap: 3px;
-  height: auto;
-  line-height: inherit;
-  padding: 0;
-  vertical-align: baseline;
-  // the chip takes its baseline from the text, not the icon's bottom edge,
-  // so the name sits level with the words around it
-  align-items: baseline;
-  border-radius: 0;
-  color: var(--text);
-}
-
-.bio .chip > .chip-icon,
-.bio .chip > .chip-icon-slot {
-  align-self: center;
-}
-
-.bio .chip,
-.bio .chip:hover,
-.bio .chip:focus-visible {
-  background: none;
-}
-
-.bio .chip > span:not(.chip-icon-slot) {
-  text-decoration: underline;
-  text-decoration-color: color-mix(in srgb, var(--text) 10%, transparent);
-  text-decoration-thickness: 1px;
-  text-decoration-skip-ink: auto;
-  text-underline-offset: 3px;
-  transition: text-decoration-color 0.15s ease;
-}
-
-.bio .chip:hover > span:not(.chip-icon-slot),
-.bio .chip:focus-visible > span:not(.chip-icon-slot) {
-  text-decoration-color: color-mix(in srgb, var(--text) 70%, transparent);
-}
-
 // The training heatmap: a year of days in a grid, a column per week, each
 // day in its sport's color and deeper the longer it ran, with the months
 // along the top and the day's sessions in a small tip on hover
@@ -1683,7 +1391,7 @@ $dot-bottom: calc(#{$dot-center} + #{$dot} / 2);
 // 12px for the log, and 11px for labels, keys and the overview
 .tr-title {
   margin: 0 0 8px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: normal;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
