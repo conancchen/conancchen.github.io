@@ -253,18 +253,14 @@ $reveal-fine: '.bio > p, .block > :not([role=tooltip])';
   z-index: 1;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 
   // Each logo in its own color: GitHub and X are black marks, so they and
-  // the envelope take the text color; LinkedIn takes its blue
+  // the envelope all take the text color
   a {
     display: flex;
     color: var(--text);
     transition: opacity 0.15s ease;
-  }
-
-  a[href*="linkedin.com"] {
-    color: #0a66c2;
   }
 
   a:hover,
@@ -321,17 +317,17 @@ $reveal-fine: '.bio > p, .block > :not([role=tooltip])';
   outline: none;
 }
 
-// The name sits as far above the bio as its paragraphs sit apart (14.4px):
+// The name sits as far above the bio as its paragraphs sit apart (10px):
 // less the header's 8px below it, and the 1px more the bio's taller lines
 // leave above their first
 .bio {
-  padding-top: 5.4px;
+  padding-top: 1px;
 }
 
 // The bio's lines sit a touch further apart than the rest (22px rather than
 // 20px), as running sentences read easier with room between them
 .bio p {
-  margin: 0 0 14.4px;
+  margin: 0 0 10px;
   line-height: calc(22 / 14);
   text-wrap: pretty;
 }
@@ -344,7 +340,7 @@ $reveal-fine: '.bio > p, .block > :not([role=tooltip])';
 /* SECTIONS   */
 /**************/
 .block {
-  margin-top: 36px;
+  margin-top: 16px;
 }
 
 .block-label {
@@ -450,7 +446,7 @@ $reveal-fine: '.bio > p, .block > :not([role=tooltip])';
 // A hairline between the page and the clock
 .rule {
   height: 1px;
-  margin: 24px 0 16px;
+  margin: 16px 0 8px;
   background: var(--rule);
 }
 
@@ -561,7 +557,7 @@ $reveal-fine: '.bio > p, .block > :not([role=tooltip])';
 // courses stacked beside it with their codes on the right; the rows are set
 // apart by space alone
 .courses {
-  margin: 28px 0 12px;
+  margin: 16px 0 12px;
 }
 
 .courses[hidden] {
@@ -569,9 +565,9 @@ $reveal-fine: '.bio > p, .block > :not([role=tooltip])';
 }
 
 // A semester's (or subject's) name sits above its courses, every row the
-// same 28px, with one blank row between groups
+// same 28px, with 16px between groups, as between the home page's sections
 .term + .term {
-  margin-top: 28px;
+  margin-top: 16px;
 }
 
 .term-name {
@@ -844,7 +840,7 @@ $reveal-fine: '.bio > p, .block > :not([role=tooltip])';
   --bs-muted: var(--muted);
   --bs-title-weight: 474;
   --bs-recede-blur: 0px;  // what steps back only fades, without blurring
-  margin-top: 24px;
+  margin-top: 16px;
 }
 
 /**************/
