@@ -389,6 +389,11 @@ $reveal-fine: '.bio > p, .block > :not([role=tooltip])';
   white-space: nowrap;
 }
 
+// A post that isn't out yet says so in the site's blue
+.row-soon {
+  color: var(--top);
+}
+
 // An entry opens a note about itself when pressed
 .entry > summary {
   cursor: pointer;
@@ -701,6 +706,137 @@ $reveal-fine: '.bio > p, .block > :not([role=tooltip])';
   .preview:focus-within .preview-card {
     transform: none !important;
   }
+}
+
+// The Mini Metro post's title is a preview link too, reading as its row's
+// plain text until hovered; its row lets the card hang out below it
+.posts .row-label {
+  overflow: visible;
+}
+
+.row .preview-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--text) 10%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.15s ease;
+}
+
+.row .preview-link:hover,
+.row .preview-link:focus-visible,
+.row .preview.is-open .preview-link {
+  outline: none;
+  text-decoration-color: color-mix(in srgb, var(--text) 70%, transparent);
+}
+
+// A card that's a video, with a line under it saying what it shows. Unlike
+// the race card it takes the pointer, so moving onto the video (across a
+// bridge over the gap below the link) or pressing it keeps it open, playing
+.video-card {
+  gap: 8px;
+  width: 400px;
+  min-width: 0;
+  padding: 6px 6px 8px;
+  pointer-events: auto;
+}
+
+.video-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -11px;
+  height: 11px;
+}
+
+.video-card video {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 9px;
+  background: #f0f0f0;
+}
+
+.video-card,
+.row .preview:has(.video-card) .preview-link {
+  cursor: zoom-in;
+}
+
+// The video pressed, opened large over the page, as the bookshelf's
+// paintings open: the page darkens behind it, and its caption comes in under
+// it just after
+.video-box {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  cursor: zoom-out;
+}
+
+.video-box::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 20, 18, 0.82);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.video-box.is-open::before {
+  opacity: 1;
+}
+
+.video-box:focus {
+  outline: none;
+}
+
+.video-box[hidden] {
+  display: none;
+}
+
+.video-box figure {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+}
+
+.video-box video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  background: #f0f0f0;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.video-box figcaption {
+  margin-top: 12px;
+  color: #f2f2f0;
+  font-size: 12px;
+  line-height: 16px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.video-box.is-open figcaption {
+  opacity: 1;
+  transition: opacity 0.25s ease 0.2s;
+}
+
+.vc-caption {
+  padding: 0 6px;
 }
 
 .pc-head {

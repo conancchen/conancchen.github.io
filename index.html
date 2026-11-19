@@ -18,37 +18,144 @@ home: true
 </section>
 
 <script>
-  // Pressing the Ironman link grows its results card out of it, and pressing
-  // it again, anywhere else, or Esc closes it. On a narrow screen the card
-  // shifts left so it never runs past the edge.
-  (function () {
-    var preview = document.querySelector('.preview');
-    var link = preview.querySelector('.preview-link');
-    var card = preview.querySelector('.preview-card');
-    // the card grows out of the middle of the link, wherever the card sits
-    function growFrom(shift) {
-      card.style.setProperty('--grow-x', link.offsetWidth / 2 + shift + 'px');
-    }
-    growFrom(0);
-    function toggle(on) {
-      preview.classList.toggle('is-open', on);
-      link.setAttribute('aria-expanded', on);
-      if (on) {
-        card.style.left = '';
-        // measured by layout, as the card's still scaled down as it starts
-        var over = preview.getBoundingClientRect().left + card.offsetWidth - (document.documentElement.clientWidth - 16);
-        if (over > 0) card.style.left = -over + 'px';
-        growFrom(Math.max(0, over));
+  // Pressing a preview link (the Ironman race, the Mini Metro post) grows its
+  // card out of it, and pressing it again, anywhere else, or Esc closes it. On
+  // a narrow screen the card shifts left so it never runs past the edge. A
+  // card with a video plays it only while the card is showing.
+  document.addEventListener('DOMContentLoaded', function () {
+    var canHover = window.matchMedia('(hover: hover)').matches;
+    document.querySelectorAll('.preview').forEach(function (preview) {
+      var link = preview.querySelector('.preview-link');
+      var card = preview.querySelector('.preview-card');
+      var video = card.querySelector('video');
+      // the card grows out of the middle of the link, wherever the card sits
+      function growFrom(shift) {
+        card.style.setProperty('--grow-x', link.offsetWidth / 2 + shift + 'px');
       }
-    }
-    link.addEventListener('click', function () { toggle(!preview.classList.contains('is-open')); });
-    document.addEventListener('click', function (e) {
-      if (!preview.contains(e.target)) toggle(false);
+      growFrom(0);
+      function syncVideo() {
+        if (!video) return;
+        var shown = preview.classList.contains('is-open') ||
+          (canHover && (preview.matches(':hover') || preview.matches(':focus-within')));
+        if (box && !box.hidden) shown = false;  // it's playing large instead
+        if (shown) {
+          var playing = video.play();
+          if (playing) playing.catch(function () {});
+        } else {
+          video.pause();
+        }
+      }
+      function toggle(on) {
+        preview.classList.toggle('is-open', on);
+        link.setAttribute('aria-expanded', on);
+        if (on) {
+          card.style.left = '';
+          // measured by layout, as the card's still scaled down as it starts
+          var over = preview.getBoundingClientRect().left + card.offsetWidth - (document.documentElement.clientWidth - 16);
+          if (over > 0) card.style.left = -over + 'px';
+          growFrom(Math.max(0, over));
+        }
+        syncVideo();
+      }
+      // A video's link opens the video large when pressed (hovering it shows
+      // the card); the race's opens and shuts its card
+      var openBig = null;
+      link.addEventListener('click', function (e) {
+        if (openBig) { e.stopPropagation(); openBig(); return; }
+        toggle(!preview.classList.contains('is-open'));
+      });
+      document.addEventListener('click', function (e) {
+        if (!preview.contains(e.target)) toggle(false);
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') toggle(false);
+      });
+      ['mouseenter', 'mouseleave', 'focusin', 'focusout'].forEach(function (type) {
+        preview.addEventListener(type, function () { setTimeout(syncVideo, 0); });
+      });
+      // The browser pauses a video when the page goes to the background, and
+      // doesn't always start it again on coming back, so the card does
+      document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'visible') syncVideo();
+      });
+      if (video) video.addEventListener('pause', function () {
+        if (document.visibilityState === 'visible') setTimeout(syncVideo, 0);
+      });
+      // The card can come up without a fresh hover, as when the large video
+      // closes with the pointer already over the link, so the video also
+      // starts whenever the card grows or the pointer moves over it
+      if (video) {
+        card.addEventListener('transitionstart', syncVideo);
+        card.addEventListener('transitionend', syncVideo);
+        preview.addEventListener('pointermove', function () {
+          if (video.paused) syncVideo();
+        });
+      }
+
+      // Pressing the video opens it large over the page, darkened behind it,
+      // with its caption, as the paintings open on the bookshelf; pressing
+      // anywhere or Esc closes it. It picks up where the card's video was.
+      if (video) {
+        var box = document.createElement('div');
+        box.className = 'video-box';
+        box.setAttribute('role', 'dialog');
+        box.setAttribute('aria-modal', 'true');
+        box.setAttribute('aria-label', 'Video');
+        box.tabIndex = -1;
+        box.hidden = true;
+        var fig = document.createElement('figure');
+        var big = document.createElement('video');
+        // the large one plays a full size copy, fetched only once it's opened
+        big.src = video.dataset.full || video.getAttribute('src');
+        big.muted = big.loop = big.playsInline = true;
+        big.preload = 'none';
+        // as large as fits, but never wider than 672px
+        big.style.width = 'min(90vw, calc(80vh * ' + (video.width / video.height).toFixed(3) + '), 672px)';
+        var cap = document.createElement('figcaption');
+        cap.textContent = card.querySelector('.vc-caption').textContent;
+        fig.appendChild(big);
+        fig.appendChild(cap);
+        box.appendChild(fig);
+        document.body.appendChild(box);
+        var lastFocus = null;
+        openBig = function () {
+          // focus goes back to the link after only if a key opened it, as a
+          // focused link shows its card
+          lastFocus = document.activeElement && document.activeElement.matches(':focus-visible') ? document.activeElement : null;
+          if (document.activeElement && !lastFocus) document.activeElement.blur();
+          big.currentTime = video.currentTime;
+          box.hidden = false;
+          box.getBoundingClientRect();
+          box.classList.add('is-open');
+          box.focus();
+          var playing = big.play();
+          if (playing) playing.catch(function () {});
+          toggle(false);
+        };
+        function closeBig() {
+          if (box.hidden) return;
+          video.currentTime = big.currentTime;
+          big.pause();
+          box.classList.remove('is-open');
+          box.hidden = true;
+          if (lastFocus) lastFocus.focus();
+          setTimeout(syncVideo, 0);
+        }
+        card.addEventListener('click', function (e) { e.stopPropagation(); openBig(); });
+        box.addEventListener('click', closeBig);
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape') closeBig();
+        });
+        function resumeBig() {
+          if (document.visibilityState !== 'visible' || box.hidden) return;
+          var playing = big.play();
+          if (playing) playing.catch(function () {});
+        }
+        document.addEventListener('visibilitychange', resumeBig);
+        big.addEventListener('pause', function () { setTimeout(resumeBig, 0); });
+      }
     });
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') toggle(false);
-    });
-  })();
+  });
 
 </script>
 
@@ -152,6 +259,17 @@ home: true
       });
     })();
   </script>
+
+  <section class="block posts">
+    <h2 class="block-label">Posts</h2>
+
+    <div class="row">
+      <span class="row-label"><span class="preview"><button type="button" class="preview-link" aria-expanded="false" aria-controls="mm-card">RL for Mini Metro</button><span class="preview-card video-card" id="mm-card" role="tooltip">
+        <video src="{{ site.baseurl }}/images/posts/mini-metro-rl.mp4?v={{ site.time | date: '%s' }}" width="1280" height="654" muted loop playsinline preload="metadata" data-full="{{ site.baseurl }}/images/posts/mini-metro-rl-full.mp4?v={{ site.time | date: '%s' }}" aria-hidden="true"></video>
+        <span class="vc-caption">Claude Sonnet 5.5 on London</span>
+      </span></span> <span class="row-year row-soon">Coming soon</span></span>
+    </div>
+  </section>
 
   <div class="rule" aria-hidden="true"></div>
   <div class="footer">
